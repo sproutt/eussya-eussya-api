@@ -1,4 +1,4 @@
 package com.sproutt.eussyaeussyaapi.api;
 
-public class UserController {
+public class MemberController {
 }

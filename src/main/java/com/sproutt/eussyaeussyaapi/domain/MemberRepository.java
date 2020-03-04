@@ -1,4 +1,4 @@
 package com.sproutt.eussyaeussyaapi.domain;
 
-public class User {
+public interface MemberRepository {
 }

@@ -1,4 +1,4 @@
 package com.sproutt.eussyaeussyaapi.application;
 
-public class UserServiceImpl {
+public interface MemberService {
 }
