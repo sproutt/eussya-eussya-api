@@ -1,55 +1,36 @@
 package com.sproutt.eussyaeussyaapi.application;
 
+import com.sproutt.eussyaeussyaapi.api.exceptions.DuplicatedMemberIdException;
 import com.sproutt.eussyaeussyaapi.domain.Member;
 import com.sproutt.eussyaeussyaapi.domain.MemberRepository;
-import com.sproutt.eussyaeussyaapi.dto.SignUpDTO;
-import lombok.RequiredArgsConstructor;
+import com.sproutt.eussyaeussyaapi.domain.dto.JoinDTO;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
 
 @Service
-@RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
-    final MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
-    @Override
-    public Member findByMemberId(String memberId) {
-        return memberRepository.findByMemberId(memberId).orElseThrow(RuntimeException::new);
-    }
-
-    @Override
-    public Member findByName(String name) {
-        return memberRepository.findByName(name).orElseThrow(RuntimeException::new);
-    }
-
-    @Override
-    public Member findByNickName(String nickName) {
-        return memberRepository.findByNickName(nickName).orElseThrow(RuntimeException::new);
-    }
-
-    @Override
-    public Member findByEmail(String email) {
-        return memberRepository.findByEmail(email).orElseThrow(RuntimeException::new);
-    }
-
-    @Override
-    public Member updateNickName(String memberId, String newNickName) {
-        Member member = findByMemberId(memberId);
-        member.updateNickName(newNickName);
-
-        return memberRepository.save(member);
+    public MemberServiceImpl(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
     }
 
     @Override
     public void login(HttpSession session, String accessToken) {
+        // jwt로 적용 예정
     }
 
     @Override
-    public Member create(SignUpDTO signUpDTO) {
-        Member newMember = new Member(signUpDTO);
+    public Member join(JoinDTO joinDTO) {
 
-        return memberRepository.save(newMember);
+        if (memberRepository.findByMemberId(joinDTO.getMemberId()).isPresent()) {
+            throw new DuplicatedMemberIdException();
+        }
+
+        Member member = joinDTO.toEntity();
+
+        return memberRepository.save(member);
     }
 }

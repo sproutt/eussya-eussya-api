@@ -1,41 +1,36 @@
 package com.sproutt.eussyaeussyaapi.domain;
 
-import com.sproutt.eussyaeussyaapi.dto.SignUpDTO;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Entity
-@Data
+@Getter
+@NoArgsConstructor
 public class Member {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-
-    @Column(nullable = false, unique = true)
     private String memberId;
 
-    @Column(unique = true)
-    private String email;
+    @Column(nullable = false)
+    private String password;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true, length = 20)
-    private String nickName;
 
-    @Column
-    private String profileUrl;
-
-    public Member(SignUpDTO signUpDTO) {
-        this.memberId = signUpDTO.memberId;
-        this.email = signUpDTO.email;
-        this.name = signUpDTO.name;
-        this.nickName = signUpDTO.nickName;
+    @Builder
+    public Member(String memberId, String password, String name) {
+        this.memberId = memberId;
+        this.password = password;
+        this.name = name;
     }
 
-    public void updateNickName(String newNickName) {
-        this.nickName = newNickName;
+    public boolean isEqualId(String memberId) {
+        return this.memberId.equals(memberId);
     }
 }
