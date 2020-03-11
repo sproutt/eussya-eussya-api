@@ -1,4 +1,4 @@
-package com.sproutt.eussyaeussyaapi.domain.dto;
+package com.sproutt.eussyaeussyaapi.api.dto;
 
 import com.sproutt.eussyaeussyaapi.domain.Member;
 import lombok.Builder;

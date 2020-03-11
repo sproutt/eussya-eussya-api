@@ -1,7 +1,7 @@
 package com.sproutt.eussyaeussyaapi.api;
 
 import com.sproutt.eussyaeussyaapi.application.MemberService;
-import com.sproutt.eussyaeussyaapi.domain.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

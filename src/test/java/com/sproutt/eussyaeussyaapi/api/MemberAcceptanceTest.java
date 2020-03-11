@@ -1,7 +1,7 @@
 package com.sproutt.eussyaeussyaapi.api;
 
 import com.sproutt.eussyaeussyaapi.domain.MemberRepository;
-import com.sproutt.eussyaeussyaapi.domain.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

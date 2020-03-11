@@ -1,7 +1,7 @@
 package com.sproutt.eussyaeussyaapi.application;
 
 import com.sproutt.eussyaeussyaapi.domain.Member;
-import com.sproutt.eussyaeussyaapi.domain.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
 
 import javax.servlet.http.HttpSession;
 

@@ -1,9 +1,9 @@
 package com.sproutt.eussyaeussyaapi.application;
 
-import com.sproutt.eussyaeussyaapi.api.exceptions.DuplicatedMemberIdException;
+import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicatedMemberIdException;
 import com.sproutt.eussyaeussyaapi.domain.Member;
 import com.sproutt.eussyaeussyaapi.domain.MemberRepository;
-import com.sproutt.eussyaeussyaapi.domain.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
