@@ -41,7 +41,7 @@ public class MemberControllerTest {
     @Test
     public void createMember() throws Exception {
         JoinDTO joinDTO = defaultSignUpDTO();
-        Member member = joinDTO.toEntity();
+        Member member = defaultMember();
 
         given(memberService.join(joinDTO)).willReturn(member);
 
@@ -77,6 +77,14 @@ public class MemberControllerTest {
 
     private JoinDTO defaultSignUpDTO() {
         return JoinDTO.builder()
+                .memberId(DEFAULT_MEMBER_ID)
+                .password(DEFAULT_PASSWORD)
+                .name(DEFAULT_NAME)
+                .build();
+    }
+
+    private Member defaultMember() {
+        return Member.builder()
                 .memberId(DEFAULT_MEMBER_ID)
                 .password(DEFAULT_PASSWORD)
                 .name(DEFAULT_NAME)

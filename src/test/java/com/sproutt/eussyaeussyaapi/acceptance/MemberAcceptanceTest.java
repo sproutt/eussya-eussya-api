@@ -1,7 +1,8 @@
-package com.sproutt.eussyaeussyaapi.api;
+package com.sproutt.eussyaeussyaapi.acceptance;
 
-import com.sproutt.eussyaeussyaapi.domain.MemberRepository;
 import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.domain.Member;
+import com.sproutt.eussyaeussyaapi.domain.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +44,7 @@ public class MemberAcceptanceTest {
 
     @Test
     public void createMember_with_already_exist_memberId() {
-        memberRepository.save(defaultSignUpDTO().toEntity());
+        memberRepository.save(defaultMember());
 
         JoinDTO wrongJoinDTO = JoinDTO.builder()
                 .memberId(DEFAULT_MEMBER_ID)
@@ -58,6 +59,14 @@ public class MemberAcceptanceTest {
 
     private JoinDTO defaultSignUpDTO() {
         return JoinDTO.builder()
+                .memberId(DEFAULT_MEMBER_ID)
+                .password(DEFAULT_PASSWORD)
+                .name(DEFAULT_NAME)
+                .build();
+    }
+
+    private Member defaultMember() {
+        return Member.builder()
                 .memberId(DEFAULT_MEMBER_ID)
                 .password(DEFAULT_PASSWORD)
                 .name(DEFAULT_NAME)

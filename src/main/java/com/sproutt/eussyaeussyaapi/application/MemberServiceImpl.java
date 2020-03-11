@@ -31,11 +31,15 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Member join(JoinDTO joinDTO) {
 
-        if (memberRepository.findByMemberId(joinDTO.getMemberId()).isPresent()) {
+        if (memberRepository.findByMemberId(joinDTO.getMemberId()).orElse(null) != null) {
             throw new DuplicatedMemberIdException();
         }
 
-        Member member = joinDTO.toEntity();
+        Member member = Member.builder()
+                .memberId(joinDTO.getMemberId())
+                .password(joinDTO.getPassword())
+                .name(joinDTO.getName())
+                .build();
 
         return memberRepository.save(member);
     }
