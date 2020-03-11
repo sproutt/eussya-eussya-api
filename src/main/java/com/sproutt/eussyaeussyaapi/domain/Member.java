@@ -33,4 +33,8 @@ public class Member {
     public boolean isEqualId(String memberId) {
         return this.memberId.equals(memberId);
     }
+
+    public boolean isEqualPassword(String password) {
+        return this.password.equals(password);
+    }
 }
