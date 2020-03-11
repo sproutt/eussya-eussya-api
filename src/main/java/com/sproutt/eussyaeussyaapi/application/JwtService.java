@@ -7,4 +7,6 @@ public interface JwtService {
     String createToken(Member member);
 
     Member decryptToken(String token);
+
+    boolean isUsable(String token);
 }

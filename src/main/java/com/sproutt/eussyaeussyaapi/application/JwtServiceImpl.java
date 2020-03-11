@@ -32,17 +32,38 @@ public class JwtServiceImpl implements JwtService {
         Jws<Claims> claims = null;
 
         try {
-            claims = Jwts.parser()
-                    .setSigningKey(generateKey())
-                    .parseClaimsJws(token);
+
+            claims = getClaims(token);
 
         } catch (Exception e) {
+
             throw new UnsupportedJwtException("token parser fail");
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         return objectMapper.convertValue(claims.getBody().get(CLAIM_KEY), Member.class);
+    }
+
+    @Override
+    public boolean isUsable(String token) {
+        try{
+
+            Jws<Claims> claims = getClaims(token);
+
+            return true;
+
+        }catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
+
+    private Jws<Claims> getClaims(String token) {
+        Jws<Claims> claims = Jwts.parser()
+                .setSigningKey(this.generateKey())
+                .parseClaimsJws(token);
+
+        return claims;
     }
 
     private byte[] generateKey() {

@@ -2,6 +2,7 @@ package com.sproutt.eussyaeussyaapi.api;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sproutt.eussyaeussyaapi.application.JwtService;
 import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicatedMemberIdException;
 import com.sproutt.eussyaeussyaapi.application.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.Member;
@@ -23,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(MemberController.class)
-public class MemberApiTest {
+public class MemberControllerTest {
     private static final String DEFAULT_MEMBER_ID = "test@gmail.com";
     private static final String DEFAULT_PASSWORD = "1111";
     private static final String DEFAULT_NAME = "test";
@@ -33,6 +34,9 @@ public class MemberApiTest {
 
     @MockBean
     private MemberService memberService;
+
+    @MockBean
+    private JwtService jwtService;
 
     @Test
     public void createMember() throws Exception {
