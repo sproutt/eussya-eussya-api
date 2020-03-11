@@ -4,17 +4,18 @@ import com.sproutt.eussyaeussyaapi.api.exceptions.DuplicatedMemberIdException;
 import com.sproutt.eussyaeussyaapi.domain.Member;
 import com.sproutt.eussyaeussyaapi.domain.MemberRepository;
 import com.sproutt.eussyaeussyaapi.domain.dto.JoinDTO;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
     private static final String MEMBER_ID = "test@gmail.com";
     private static final String NAME = "test";
@@ -26,7 +27,7 @@ public class MemberServiceTest {
     @Mock
     private MemberRepository memberRepository;
 
-    @Test(expected = DuplicatedMemberIdException.class)
+    @Test
     public void createMember_with_exist_memberId() {
         JoinDTO joinDTO = JoinDTO.builder()
                 .memberId(MEMBER_ID)
@@ -37,6 +38,6 @@ public class MemberServiceTest {
         Member member = joinDTO.toEntity();
         when(memberRepository.findByMemberId(MEMBER_ID)).thenReturn(Optional.of(member));
 
-        memberService.join(joinDTO);
+        assertThrows(DuplicatedMemberIdException.class, () -> memberService.join(joinDTO));
     }
 }
