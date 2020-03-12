@@ -1,32 +1,35 @@
 package com.sproutt.eussyaeussyaapi.application;
 
-import com.sproutt.eussyaeussyaapi.api.exceptions.DuplicatedMemberIdException;
+import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.domain.Member;
 import com.sproutt.eussyaeussyaapi.domain.MemberRepository;
-import com.sproutt.eussyaeussyaapi.domain.dto.JoinDTO;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicatedMemberIdException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
     private static final String MEMBER_ID = "test@gmail.com";
     private static final String NAME = "test";
     private static final String PASSWORD = "1111";
 
-    @InjectMocks
-    private MemberServiceImpl memberService;
+    private MemberRepository memberRepository = mock(MemberRepository.class);
+    private MemberService memberService;
 
-    @Mock
-    private MemberRepository memberRepository;
+    @BeforeEach
+    void setUp() {
+        memberService = new MemberServiceImpl(memberRepository);
+    }
 
-    @Test(expected = DuplicatedMemberIdException.class)
+    @Test
     public void createMember_with_exist_memberId() {
         JoinDTO joinDTO = JoinDTO.builder()
                 .memberId(MEMBER_ID)
@@ -34,9 +37,17 @@ public class MemberServiceTest {
                 .password(PASSWORD)
                 .build();
 
-        Member member = joinDTO.toEntity();
+        Member member = defaultMember();
         when(memberRepository.findByMemberId(MEMBER_ID)).thenReturn(Optional.of(member));
 
-        memberService.join(joinDTO);
+        assertThrows(DuplicatedMemberIdException.class, () -> memberService.join(joinDTO));
+    }
+
+    private Member defaultMember() {
+        return Member.builder()
+                .memberId(MEMBER_ID)
+                .password(PASSWORD)
+                .name(NAME)
+                .build();
     }
 }

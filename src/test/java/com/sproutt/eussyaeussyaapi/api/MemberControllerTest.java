@@ -2,17 +2,18 @@ package com.sproutt.eussyaeussyaapi.api;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sproutt.eussyaeussyaapi.api.exceptions.DuplicatedMemberIdException;
+import com.sproutt.eussyaeussyaapi.application.JwtService;
+import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicatedMemberIdException;
 import com.sproutt.eussyaeussyaapi.application.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.Member;
-import com.sproutt.eussyaeussyaapi.domain.dto.JoinDTO;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -21,9 +22,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(MemberController.class)
-public class MemberApiTest {
+public class MemberControllerTest {
     private static final String DEFAULT_MEMBER_ID = "test@gmail.com";
     private static final String DEFAULT_PASSWORD = "1111";
     private static final String DEFAULT_NAME = "test";
@@ -34,10 +35,13 @@ public class MemberApiTest {
     @MockBean
     private MemberService memberService;
 
+    @MockBean
+    private JwtService jwtService;
+
     @Test
     public void createMember() throws Exception {
         JoinDTO joinDTO = defaultSignUpDTO();
-        Member member = joinDTO.toEntity();
+        Member member = defaultMember();
 
         given(memberService.join(joinDTO)).willReturn(member);
 
@@ -73,6 +77,14 @@ public class MemberApiTest {
 
     private JoinDTO defaultSignUpDTO() {
         return JoinDTO.builder()
+                .memberId(DEFAULT_MEMBER_ID)
+                .password(DEFAULT_PASSWORD)
+                .name(DEFAULT_NAME)
+                .build();
+    }
+
+    private Member defaultMember() {
+        return Member.builder()
                 .memberId(DEFAULT_MEMBER_ID)
                 .password(DEFAULT_PASSWORD)
                 .name(DEFAULT_NAME)

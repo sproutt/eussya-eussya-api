@@ -1,12 +1,11 @@
 package com.sproutt.eussyaeussyaapi.application;
 
-import com.sproutt.eussyaeussyaapi.api.exceptions.DuplicatedMemberIdException;
+import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.dto.LoginDTO;
 import com.sproutt.eussyaeussyaapi.domain.Member;
 import com.sproutt.eussyaeussyaapi.domain.MemberRepository;
-import com.sproutt.eussyaeussyaapi.domain.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicatedMemberIdException;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpSession;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -18,18 +17,29 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void login(HttpSession session, String accessToken) {
-        // jwt로 적용 예정
+    public Member login(LoginDTO loginDTO) {
+
+        Member member = memberRepository.findByMemberId(loginDTO.getMemberId()).orElseThrow(RuntimeException::new);
+
+        if (!member.isEqualPassword(loginDTO.getPassword())) {
+            throw new RuntimeException();
+        }
+
+        return member;
     }
 
     @Override
     public Member join(JoinDTO joinDTO) {
 
-        if (memberRepository.findByMemberId(joinDTO.getMemberId()).isPresent()) {
+        if (memberRepository.findByMemberId(joinDTO.getMemberId()).orElse(null) != null) {
             throw new DuplicatedMemberIdException();
         }
 
-        Member member = joinDTO.toEntity();
+        Member member = Member.builder()
+                .memberId(joinDTO.getMemberId())
+                .password(joinDTO.getPassword())
+                .name(joinDTO.getName())
+                .build();
 
         return memberRepository.save(member);
     }
