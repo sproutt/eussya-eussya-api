@@ -14,7 +14,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception{
         http
             .authorizeRequests()
-                .antMatchers("/", "/error")
+                .antMatchers("/", "/error", "/h2-console/**")
                     .permitAll()
                 .anyRequest()
                     .authenticated()
@@ -25,5 +25,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .failureHandler((request, response, exception) -> {
                     request.getSession().setAttribute("error.message", exception.getMessage());
                 });
+
+        /* h2 -console 사용시 활성화
+        http.csrf()
+                .disable()
+            .headers()
+                .frameOptions()
+                .disable();시
+
+         */
     }
 }
