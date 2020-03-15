@@ -2,11 +2,15 @@ package com.sproutt.eussyaeussyaapi.api;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sproutt.eussyaeussyaapi.application.JwtService;
-import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicatedMemberIdException;
-import com.sproutt.eussyaeussyaapi.application.MemberService;
-import com.sproutt.eussyaeussyaapi.domain.Member;
+import com.sproutt.eussyaeussyaapi.api.dto.EmailDTO;
 import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.application.JwtService;
+import com.sproutt.eussyaeussyaapi.application.MailService;
+import com.sproutt.eussyaeussyaapi.application.MemberService;
+import com.sproutt.eussyaeussyaapi.application.exceptions.NotValidEmailException;
+import com.sproutt.eussyaeussyaapi.domain.Member;
+import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicatedMemberIdException;
+import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +21,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,6 +43,9 @@ public class MemberControllerTest {
 
     @MockBean
     private JwtService jwtService;
+
+    @MockBean
+    private MailService mailService;
 
     @Test
     public void createMember() throws Exception {
@@ -65,6 +74,42 @@ public class MemberControllerTest {
 
         actions
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void sendAuthEmail() throws Exception {
+        String email = "kjkun7631@naver.com";
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmail(email);
+        String authCode = RandomGenerator.createAuthenticationCode();
+
+        given(mailService.sendAuthEmail(email)).willReturn(authCode);
+
+        ResultActions actions = mvc.perform(post("/email-auth")
+                .content(asJsonString(emailDTO))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print());
+
+        actions
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void sendAuthEmail_with_wrongEmail() throws Exception {
+        String email = "wrong";
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setEmail(email);
+
+        when(mailService.sendAuthEmail(email)).thenThrow(new NotValidEmailException());
+
+        ResultActions actions = mvc.perform(post("/email-auth")
+                .content(asJsonString(emailDTO))
+                .contentType(MediaType.APPLICATION_JSON)).andDo(print());
+
+        actions
+                .andExpect(status().isBadRequest());
+
+        assertThrows(NotValidEmailException.class, () -> mailService.sendAuthEmail(email));
     }
 
     private static String asJsonString(final Object object) {

@@ -4,7 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mail.MailSendException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -17,6 +20,13 @@ public class MailServiceTest {
     public void send_mail() {
         String to = "kjkun7631@naver.com";
 
-        mailService.sendAuthenticationMail(to);
+        mailService.sendAuthEmail(to);
+    }
+
+    @Test
+    public void send_wrong_email_address() {
+        String to = "wrongAddress";
+
+        assertThrows(MailSendException.class, () -> mailService.sendAuthEmail(to));
     }
 }

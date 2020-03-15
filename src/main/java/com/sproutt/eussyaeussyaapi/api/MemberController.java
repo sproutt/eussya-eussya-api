@@ -1,8 +1,10 @@
 package com.sproutt.eussyaeussyaapi.api;
 
+import com.sproutt.eussyaeussyaapi.api.dto.EmailDTO;
 import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.api.dto.LoginDTO;
 import com.sproutt.eussyaeussyaapi.application.JwtService;
+import com.sproutt.eussyaeussyaapi.application.MailService;
 import com.sproutt.eussyaeussyaapi.application.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.Member;
 import org.springframework.http.HttpHeaders;
@@ -13,17 +15,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 public class MemberController {
     private static final String TOKEN_KEY = "Authorization";
 
     private final MemberService memberService;
-
     private final JwtService jwtService;
+    private final MailService mailService;
 
-    public MemberController(MemberService memberService, JwtService jwtService) {
+    public MemberController(MemberService memberService, JwtService jwtService, MailService mailService) {
         this.memberService = memberService;
         this.jwtService = jwtService;
+        this.mailService = mailService;
     }
 
     @PostMapping("/members")
@@ -47,5 +52,15 @@ public class MemberController {
         headers.set(TOKEN_KEY, token);
 
         return new ResponseEntity<>(headers, HttpStatus.OK);
+    }
+
+    @PostMapping("/email-auth")
+    public ResponseEntity<String> sendAuthEmail(@RequestBody @Valid EmailDTO emailDTO) {
+        String authCode = mailService.sendAuthEmail(emailDTO.getEmail());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return new ResponseEntity<>(authCode, headers, HttpStatus.OK);
     }
 }

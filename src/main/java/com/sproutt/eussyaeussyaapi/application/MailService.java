@@ -2,7 +2,8 @@ package com.sproutt.eussyaeussyaapi.application;
 
 public interface MailService {
 
-    void sendAuthenticationMail(String to);
+    String sendAuthEmail(String to);
+
 
     void sendChangedPasswordMail();
 }
