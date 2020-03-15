@@ -4,3 +4,19 @@ spring:
     console:
       enabled: true
       path: /h2-console
+
+
+  #gmail SMTP
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    default-encoding: UTF-8
+    protocol: smtp
+    username: [gmail아이디@gmail.com]
+    password: [gmail비밀번호]
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
