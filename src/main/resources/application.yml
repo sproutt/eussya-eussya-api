@@ -4,3 +4,24 @@ spring:
     console:
       enabled: true
       path: /h2-console
+
+  # oauth
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId:
+            clientSecret:
+            scope:
+              - email
+          facebook:
+            clientId:
+            clientSecret:
+            scope:
+              - email
+          github:
+            clientId:
+            clientSecret:
+            scope:
+              - user:email
