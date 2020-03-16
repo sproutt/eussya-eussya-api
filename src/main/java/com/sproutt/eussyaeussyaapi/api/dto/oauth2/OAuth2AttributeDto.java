@@ -5,7 +5,7 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public abstract class OAuth2UserDto {
+public abstract class OAuth2AttributeDto {
 
     protected Map<String, Object> attributes;
 

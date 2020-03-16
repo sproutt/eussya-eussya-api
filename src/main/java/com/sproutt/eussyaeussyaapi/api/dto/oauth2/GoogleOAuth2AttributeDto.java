@@ -3,15 +3,15 @@ package com.sproutt.eussyaeussyaapi.api.dto.oauth2;
 import com.sproutt.eussyaeussyaapi.domain.Member;
 import java.util.Map;
 
-public class GithubOAuth2UserDto extends OAuth2UserDto {
+public class GoogleOAuth2AttributeDto extends OAuth2AttributeDto {
 
-    public GithubOAuth2UserDto(Map<String, Object> attributes) {
+    public GoogleOAuth2AttributeDto(Map<String, Object> attributes) {
         super(attributes);
     }
 
     @Override
     public String getId() {
-        return ((Integer) attributes.get("id")).toString();
+        return (String) attributes.get("sub");
     }
 
     @Override
