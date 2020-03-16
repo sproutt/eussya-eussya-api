@@ -9,6 +9,8 @@ public abstract class OAuth2UserDto {
 
     protected Map<String, Object> attributes;
 
+    public abstract String getId();
+
     public abstract String getName();
 
     public abstract Member toEntity();

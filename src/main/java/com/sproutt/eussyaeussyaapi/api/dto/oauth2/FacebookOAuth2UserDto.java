@@ -3,15 +3,15 @@ package com.sproutt.eussyaeussyaapi.api.dto.oauth2;
 import com.sproutt.eussyaeussyaapi.domain.Member;
 import java.util.Map;
 
-public class GithubOAuth2UserDto extends OAuth2UserDto {
+public class FacebookOAuth2UserDto extends OAuth2UserDto {
 
-    public GithubOAuth2UserDto(Map<String, Object> attributes) {
+    public FacebookOAuth2UserDto(Map<String, Object> attributes) {
         super(attributes);
     }
 
     @Override
     public String getId() {
-        return ((Integer) attributes.get("id")).toString();
+        return (String) attributes.get("id");
     }
 
     @Override
@@ -21,7 +21,6 @@ public class GithubOAuth2UserDto extends OAuth2UserDto {
 
     @Override
     public Member toEntity() {
-
         return Member.builder()
             .password("no password")
             .memberId(getId())
