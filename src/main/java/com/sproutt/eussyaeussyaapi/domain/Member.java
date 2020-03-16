@@ -37,4 +37,9 @@ public class Member {
     public boolean isEqualPassword(String password) {
         return this.password.equals(password);
     }
+
+    public Member update(Member updatedMember) {
+        name = updatedMember.name;
+        return this;
+    }
 }

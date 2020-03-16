@@ -21,18 +21,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
             .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
             .csrf(c -> c.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+            .formLogin()
+                .successForwardUrl("/success")
+                .failureForwardUrl("/fail")
+                .and()
             .oauth2Login()
                 .failureHandler((request, response, exception) -> {
                     request.getSession().setAttribute("error.message", exception.getMessage());
                 });
 
-        /* h2 -console 사용시 활성화
+        //h2 -console 사용시 활성화
         http.csrf()
                 .disable()
             .headers()
                 .frameOptions()
-                .disable();시
+                .disable();
 
-         */
     }
 }
