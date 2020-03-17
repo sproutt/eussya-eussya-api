@@ -1,27 +1,30 @@
 language: java
 jdk:
-  - openjdk11
-
+- openjdk11
 branches:
   only:
-    - master
+  - master
+
+# 실행전 접근 권한 설정
+before_install:
+  - chmod +x gradlew
 
 # Travis CI 서버의 Cache 활성화
 cache:
   directories:
-    - '$HOME/.m2/repository'
-    - '$HOME/.gradle'
+  - "$HOME/.m2/repository"
+  - "$HOME/.gradle"
 
-# clean 후 Build (Build시 자동으로 test 수행)
+# gradle build
 script: "./gradlew clean build"
 
 # slack notification
 notifications:
-  slack: $SLACK
+  slack: "$SLACK"
 
+# heroku deploy
 deploy:
   provider: heroku
   api_key:
-      secure: $HEROKU_API_KEY
-  app:
-    eussya-eussya-api
+    secure: NZuDlLSG7ktPIR3mdazY5AwysK6QICGPCIlcECUDnetoxkY5tPOdsv1Kr2gnfkGq3XLQt6EOotUmxB9vJZBU5fw8rKbSWIR/l0B+PrUk/vf2aYkHTSAWse/QqpLjV3TRUZgk7C39oeLYZpgCY066eWuaoZgSJK1Zf1sP+fOTB22PHm7MVAvA/l+0nOtku16es4ATTtfvrSEOyxIBzTzBl5jfu/eV1/nHudivVqntenOtgTVOKDgv97NlGF3hGLQaZU6TEDVc80hk2fO0sSaXzv4ib41Q814Ohz1KLhxKg9qQxcBJvA28FN1KrKMLAUMWYAqcVyBEKAgpC79zCPB2BNAqT4iF8KPYnKjSdPLlpq1FMMvKG1JNW0loObvksbzMTTgUxXbjgoPmUDoRKNzo7OzqeSqcNDmTjbhYH3d48DN85Z+0VT1pIkjeJii9x0q+wHU7o8ANy+SnaVOTwqEKQeOTe2w47+03ofOxdDvfAkVmXdN3YkGLsslbpZh+g+FRUDZD9XsERKZ9Zqc/cKePdXsZHX/3Z7qByqDtMa3wSN7X5OR6I8tKqglvesjaFPpA4Ny9O6pb3eOAEKUuTd10wCOymDN7i+ZK2k+RQpJcK5HoaL0yQtW70STHV/sIIW5aCihJU7i3tDQCTXxazwqR7b3dmDf7T6m6HScHidHCprQ=
+  app: eussya-eussya-api
