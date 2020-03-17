@@ -17,4 +17,4 @@ script: "./gradlew clean build"
 
 # slack notification
 notifications:
-  slack: econo-spring-study:IwlDT1MyUcNZY5K62uyIqOev
+  slack: econo-spring-study:KBNUfhKxA3RAFulks76lf2M2
