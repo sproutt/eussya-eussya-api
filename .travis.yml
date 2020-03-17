@@ -20,7 +20,8 @@ script: "./gradlew clean build"
 
 # slack notification
 notifications:
-  slack: "$SLACK"
+  slack:
+    secure: HHRHpUJ+kgG9+HSUC5i2Wx/y9JhKlN1m7iR7VSD3JpmBGNGGr75pCr4Gx4YuhBqUsaWuDYDB/uWbbd2fG0Beg9Lg0wbV6DH/1csl7S+FUlod2UHAhvQa127ZdZOPZqIejazbO71a7c8yDKQFGPQj1bLB3JD3YtFnFOQHL5MJFprgMFObmEWE+hFoIw/Nk0+/a5K+O3feZDPkFxlmxobHkmNxoVDu1DwRXC212I7XFc+VF5lSmMfwWh5B3pTHjDj+Xx2wf71vJZ59HKJdl01OBTe/A1Jz1ys+dZmawVpDp6fOyeV2xEo2Z3lrkVbmbTyOAaX9keOwQntt9H3mzRvJOA4+qTwXNzRdi7pRHVoJ7n5ltev0tJS97L16Dz9lc/exKYn5AJbj2ANCZQfZbAVG9HcTCeeudSg90x8NLm2GFOLc+eQLTAqKdLwYkUAAUGb41gdi3F27zedrgMX1kxJnqY23SK265eI0WRLWP5sQ4iOyMU3OUCQ2kIyDQBIDGSJ9L/QzCiVNUZ5wdvje16616xz5iX20Pew/1yIruRL1kv+hNF9/iNnB9RxQ+JNNHuRRr0f9RqzeM6Snl/7VE0vkv3QF1cOK7vRQtieNevInhPtZ0nHw7A4q2p8ID8LHGm6lvXdjqacqTi7tcazFDyn62KIwYjtDmtKfOzwZ+FA4T2Y=
 
 # heroku deploy
 deploy:
