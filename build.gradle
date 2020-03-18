@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.2.4.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
+    id 'com.github.kt3k.coveralls' version '2.10.1'
 }
 
 group = 'com.sproutt'
@@ -12,6 +13,9 @@ targetCompatibility = '11'
 repositories {
     mavenCentral()
 }
+
+apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'jacoco'
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -34,4 +38,11 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
 }
