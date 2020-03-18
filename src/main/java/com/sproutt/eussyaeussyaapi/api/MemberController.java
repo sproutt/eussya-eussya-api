@@ -7,6 +7,7 @@ import com.sproutt.eussyaeussyaapi.application.JwtService;
 import com.sproutt.eussyaeussyaapi.application.MailService;
 import com.sproutt.eussyaeussyaapi.application.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.Member;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,7 +20,9 @@ import javax.validation.Valid;
 
 @RestController
 public class MemberController {
-    private static final String TOKEN_KEY = "Authorization";
+
+    @Value("${token.key}")
+    private static String TOKEN_KEY;
 
     private final MemberService memberService;
     private final JwtService jwtService;
@@ -33,6 +36,8 @@ public class MemberController {
 
     @PostMapping("/members")
     public ResponseEntity createMember(@RequestBody JoinDTO joinDTO) {
+        System.out.println("token_key: " + TOKEN_KEY);
+
         memberService.join(joinDTO);
 
         HttpHeaders headers = new HttpHeaders();

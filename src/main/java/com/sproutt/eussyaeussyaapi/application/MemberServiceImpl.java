@@ -38,7 +38,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = Member.builder()
                 .memberId(joinDTO.getMemberId())
                 .password(joinDTO.getPassword())
-                .name(joinDTO.getName())
+                .name(joinDTO.getNickName())
                 .build();
 
         return memberRepository.save(member);

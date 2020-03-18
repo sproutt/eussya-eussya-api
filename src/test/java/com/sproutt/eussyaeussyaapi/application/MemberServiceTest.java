@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
     private static final String MEMBER_ID = "test@gmail.com";
-    private static final String NAME = "test";
+    private static final String NICKNAME = "test";
     private static final String PASSWORD = "1111";
 
     private MemberRepository memberRepository = mock(MemberRepository.class);
@@ -33,7 +33,7 @@ public class MemberServiceTest {
     public void createMember_with_exist_memberId() {
         JoinDTO joinDTO = JoinDTO.builder()
                 .memberId(MEMBER_ID)
-                .name(NAME)
+                .nickName(NICKNAME)
                 .password(PASSWORD)
                 .build();
 
@@ -47,7 +47,7 @@ public class MemberServiceTest {
         return Member.builder()
                 .memberId(MEMBER_ID)
                 .password(PASSWORD)
-                .name(NAME)
+                .name(NICKNAME)
                 .build();
     }
 }

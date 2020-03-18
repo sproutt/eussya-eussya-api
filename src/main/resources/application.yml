@@ -20,3 +20,6 @@ spring:
           auth: true
           starttls:
             enable: true
+
+token:
+  key: Authorization

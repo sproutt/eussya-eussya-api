@@ -48,7 +48,7 @@ public class MemberAcceptanceTest {
 
         JoinDTO wrongJoinDTO = JoinDTO.builder()
                 .memberId(DEFAULT_MEMBER_ID)
-                .name("test2")
+                .nickName("test2")
                 .password(DEFAULT_PASSWORD)
                 .build();
 
@@ -61,7 +61,7 @@ public class MemberAcceptanceTest {
         return JoinDTO.builder()
                 .memberId(DEFAULT_MEMBER_ID)
                 .password(DEFAULT_PASSWORD)
-                .name(DEFAULT_NAME)
+                .nickName(DEFAULT_NAME)
                 .build();
     }
 

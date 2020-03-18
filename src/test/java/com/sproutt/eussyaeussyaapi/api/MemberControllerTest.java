@@ -47,6 +47,8 @@ public class MemberControllerTest {
     @MockBean
     private MailService mailService;
 
+
+
     @Test
     public void createMember() throws Exception {
         JoinDTO joinDTO = defaultSignUpDTO();
@@ -124,7 +126,7 @@ public class MemberControllerTest {
         return JoinDTO.builder()
                 .memberId(DEFAULT_MEMBER_ID)
                 .password(DEFAULT_PASSWORD)
-                .name(DEFAULT_NAME)
+                .nickName(DEFAULT_NAME)
                 .build();
     }
 
