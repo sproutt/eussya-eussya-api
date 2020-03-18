@@ -28,6 +28,9 @@ before_deploy:
   - mkdir -p deploy
   - mv eussya-eussya-api.zip deploy/eussya-eussya-api.zip
 
+after_success:
+  - ./gradlew jacocoTestReport coveralls
+
 # aws code deploy
 deploy:
   - provider: s3
