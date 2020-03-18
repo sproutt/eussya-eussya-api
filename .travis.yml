@@ -3,7 +3,7 @@ jdk:
 - openjdk11
 branches:
   only:
-  - feature/Issue-26
+  - master
 
 # 실행전 접근 권한 설정
 before_install:
@@ -41,7 +41,7 @@ deploy:
     wait-until-deployed: true
     on:
       repo: sproutt/eussya-eussya-api #Github 주소
-      branch: feature/Issue-26
+      branch: master
 
   - provider: codedeploy
     access_key_id: $AWS_ACCESS_KEY # Travis repo settings에 설정된 값
@@ -55,4 +55,4 @@ deploy:
     wait-until-deployed: true
     on:
       repo: sproutt/eussya-eussya-api #Github 주소
-      branch: feature/Issue-26
+      branch: master
