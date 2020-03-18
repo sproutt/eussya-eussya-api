@@ -1,4 +1,4 @@
-package com.sproutt.eussyaeussyaapi.config;
+package com.sproutt.eussyaeussyaapi.api.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

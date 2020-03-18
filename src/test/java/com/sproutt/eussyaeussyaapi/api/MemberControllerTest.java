@@ -2,11 +2,12 @@ package com.sproutt.eussyaeussyaapi.api;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sproutt.eussyaeussyaapi.application.JwtService;
-import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicatedMemberIdException;
-import com.sproutt.eussyaeussyaapi.application.MemberService;
-import com.sproutt.eussyaeussyaapi.domain.Member;
-import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.member.MemberController;
+import com.sproutt.eussyaeussyaapi.api.security.JwtService;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicatedMemberIdException;
+import com.sproutt.eussyaeussyaapi.application.member.MemberService;
+import com.sproutt.eussyaeussyaapi.domain.member.Member;
+import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

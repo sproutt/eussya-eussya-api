@@ -1,10 +1,10 @@
-package com.sproutt.eussyaeussyaapi.api;
+package com.sproutt.eussyaeussyaapi.api.member;
 
-import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
-import com.sproutt.eussyaeussyaapi.api.dto.LoginDTO;
-import com.sproutt.eussyaeussyaapi.application.JwtService;
-import com.sproutt.eussyaeussyaapi.application.MemberService;
-import com.sproutt.eussyaeussyaapi.domain.Member;
+import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
+import com.sproutt.eussyaeussyaapi.api.security.JwtService;
+import com.sproutt.eussyaeussyaapi.application.member.MemberService;
+import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
