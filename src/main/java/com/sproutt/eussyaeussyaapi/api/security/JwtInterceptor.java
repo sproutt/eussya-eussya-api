@@ -1,4 +1,4 @@
-package com.sproutt.eussyaeussyaapi.api.config;
+package com.sproutt.eussyaeussyaapi.api.security;
 
 import com.sproutt.eussyaeussyaapi.api.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;

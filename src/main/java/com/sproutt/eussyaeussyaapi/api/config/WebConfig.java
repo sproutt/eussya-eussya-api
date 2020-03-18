@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.api.config;
 
+import com.sproutt.eussyaeussyaapi.api.security.JwtInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
