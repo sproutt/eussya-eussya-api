@@ -1,9 +1,11 @@
 package com.sproutt.eussyaeussyaapi.application;
 
-import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
-import com.sproutt.eussyaeussyaapi.domain.Member;
-import com.sproutt.eussyaeussyaapi.domain.MemberRepository;
+import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.application.member.MemberService;
+import com.sproutt.eussyaeussyaapi.application.member.MemberServiceImpl;
 import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicationMemberException;
+import com.sproutt.eussyaeussyaapi.domain.member.Member;
+import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,10 +34,10 @@ public class MemberServiceTest {
     @Test
     public void createMember_with_exist_memberId() {
         JoinDTO joinDTO = JoinDTO.builder()
-                .memberId(MEMBER_ID)
-                .nickName(NICKNAME)
-                .password(PASSWORD)
-                .build();
+                                 .memberId(MEMBER_ID)
+                                 .nickName(NICKNAME)
+                                 .password(PASSWORD)
+                                 .build();
 
         Member member = defaultMember();
         when(memberRepository.findByMemberId(MEMBER_ID)).thenReturn(Optional.of(member));
@@ -45,9 +47,9 @@ public class MemberServiceTest {
 
     private Member defaultMember() {
         return Member.builder()
-                .memberId(MEMBER_ID)
-                .password(PASSWORD)
-                .nickName(NICKNAME)
-                .build();
+                     .memberId(MEMBER_ID)
+                     .password(PASSWORD)
+                     .nickName(NICKNAME)
+                     .build();
     }
 }

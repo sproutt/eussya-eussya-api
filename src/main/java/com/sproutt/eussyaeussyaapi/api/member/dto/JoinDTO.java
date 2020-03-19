@@ -1,4 +1,4 @@
-package com.sproutt.eussyaeussyaapi.api.dto;
+package com.sproutt.eussyaeussyaapi.api.member.dto;
 
 import com.sproutt.eussyaeussyaapi.utils.RegexExpression;
 import lombok.Builder;

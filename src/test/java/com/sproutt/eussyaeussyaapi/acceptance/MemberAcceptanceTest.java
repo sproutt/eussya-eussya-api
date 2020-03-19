@@ -1,8 +1,8 @@
 package com.sproutt.eussyaeussyaapi.acceptance;
 
-import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
-import com.sproutt.eussyaeussyaapi.domain.Member;
-import com.sproutt.eussyaeussyaapi.domain.MemberRepository;
+import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.domain.member.Member;
+import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -50,10 +50,10 @@ public class MemberAcceptanceTest {
         memberRepository.save(defaultMember());
 
         JoinDTO wrongJoinDTO = JoinDTO.builder()
-                .memberId(DEFAULT_MEMBER_ID)
-                .nickName("test2")
-                .password(DEFAULT_PASSWORD)
-                .build();
+                                      .memberId(DEFAULT_MEMBER_ID)
+                                      .nickName("test2")
+                                      .password(DEFAULT_PASSWORD)
+                                      .build();
 
         ResponseEntity response = template.postForEntity("/members", wrongJoinDTO, String.class);
 
@@ -63,17 +63,17 @@ public class MemberAcceptanceTest {
 
     private JoinDTO defaultSignUpDTO() {
         return JoinDTO.builder()
-                .memberId(DEFAULT_MEMBER_ID)
-                .password(DEFAULT_PASSWORD)
-                .nickName(DEFAULT_NAME)
-                .build();
+                      .memberId(DEFAULT_MEMBER_ID)
+                      .password(DEFAULT_PASSWORD)
+                      .nickName(DEFAULT_NAME)
+                      .build();
     }
 
     private Member defaultMember() {
         return Member.builder()
-                .memberId(DEFAULT_MEMBER_ID)
-                .password(DEFAULT_PASSWORD)
-                .nickName(DEFAULT_NAME)
-                .build();
+                     .memberId(DEFAULT_MEMBER_ID)
+                     .password(DEFAULT_PASSWORD)
+                     .nickName(DEFAULT_NAME)
+                     .build();
     }
 }

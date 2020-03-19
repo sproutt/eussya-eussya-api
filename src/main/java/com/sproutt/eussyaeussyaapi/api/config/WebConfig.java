@@ -1,5 +1,6 @@
-package com.sproutt.eussyaeussyaapi.config;
+package com.sproutt.eussyaeussyaapi.api.config;
 
+import com.sproutt.eussyaeussyaapi.api.security.JwtInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;

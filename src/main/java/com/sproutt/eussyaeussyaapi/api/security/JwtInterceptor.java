@@ -1,6 +1,6 @@
-package com.sproutt.eussyaeussyaapi.config;
+package com.sproutt.eussyaeussyaapi.api.security;
 
-import com.sproutt.eussyaeussyaapi.application.JwtService;
+import com.sproutt.eussyaeussyaapi.api.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
