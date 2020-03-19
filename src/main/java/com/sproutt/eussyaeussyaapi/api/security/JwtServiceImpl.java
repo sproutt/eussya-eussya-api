@@ -1,7 +1,7 @@
-package com.sproutt.eussyaeussyaapi.application;
+package com.sproutt.eussyaeussyaapi.api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sproutt.eussyaeussyaapi.domain.Member;
+import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Service;
 

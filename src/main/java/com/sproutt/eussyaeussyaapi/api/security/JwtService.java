@@ -1,6 +1,6 @@
-package com.sproutt.eussyaeussyaapi.application;
+package com.sproutt.eussyaeussyaapi.api.security;
 
-import com.sproutt.eussyaeussyaapi.domain.Member;
+import com.sproutt.eussyaeussyaapi.domain.member.Member;
 
 public interface JwtService {
 
