@@ -2,8 +2,8 @@ package com.sproutt.eussyaeussyaapi.api.exception;
 
 import com.sproutt.eussyaeussyaapi.api.dto.ErrorResponse;
 import com.sproutt.eussyaeussyaapi.api.dto.ValidateError;
-import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicationMemberException;
-import com.sproutt.eussyaeussyaapi.domain.exceptions.WrongPasswordException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.WrongPasswordException;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

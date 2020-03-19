@@ -1,4 +1,4 @@
-package com.sproutt.eussyaeussyaapi.domain.exceptions;
+package com.sproutt.eussyaeussyaapi.domain.member.exceptions;
 
 import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
 import org.springframework.http.HttpStatus;

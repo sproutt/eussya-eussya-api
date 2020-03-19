@@ -2,9 +2,9 @@ package com.sproutt.eussyaeussyaapi.application.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
-import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicationMemberException;
-import com.sproutt.eussyaeussyaapi.domain.exceptions.NoSuchMemberException;
-import com.sproutt.eussyaeussyaapi.domain.exceptions.WrongPasswordException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.WrongPasswordException;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import lombok.RequiredArgsConstructor;

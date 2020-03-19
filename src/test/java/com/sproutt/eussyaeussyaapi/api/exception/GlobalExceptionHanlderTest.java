@@ -1,6 +1,6 @@
 package com.sproutt.eussyaeussyaapi.api.exception;
 
-import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +23,10 @@ public class GlobalExceptionHanlderTest {
     @Test
     void validationMessageTest() {
         JoinDTO joinDTO = JoinDTO.builder()
-                .memberId("")
-                .password("")
-                .nickName("")
-                .build();
+                                 .memberId("")
+                                 .password("")
+                                 .nickName("")
+                                 .build();
 
         ResponseEntity<String> response = template.postForEntity("/members", joinDTO, String.class);
 

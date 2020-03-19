@@ -3,7 +3,7 @@ package com.sproutt.eussyaeussyaapi.application;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.application.member.MemberServiceImpl;
-import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicationMemberException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
