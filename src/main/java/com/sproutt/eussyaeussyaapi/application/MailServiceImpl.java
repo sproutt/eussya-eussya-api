@@ -1,6 +1,7 @@
 package com.sproutt.eussyaeussyaapi.application;
 
 import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -8,13 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class MailServiceImpl implements MailService {
 
     private final JavaMailSender mailSender;
-
-    public MailServiceImpl(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
 
     @Transactional
     public String sendAuthEmail(String to) {

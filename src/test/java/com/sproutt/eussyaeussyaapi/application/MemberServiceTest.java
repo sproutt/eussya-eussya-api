@@ -47,7 +47,7 @@ public class MemberServiceTest {
         return Member.builder()
                 .memberId(MEMBER_ID)
                 .password(PASSWORD)
-                .name(NICKNAME)
+                .nickName(NICKNAME)
                 .build();
     }
 }

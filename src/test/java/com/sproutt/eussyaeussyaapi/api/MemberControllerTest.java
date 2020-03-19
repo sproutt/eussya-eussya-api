@@ -71,7 +71,7 @@ public class MemberControllerTest {
 
         given(memberService.join(joinDTO)).willThrow(new DuplicatedMemberIdException());
 
-        ResultActions actions = mvc.perform(post("/members", joinDTO)
+        ResultActions actions = mvc.perform(post("/members")
                 .contentType(MediaType.APPLICATION_JSON)).andDo(print());
 
         actions
@@ -134,7 +134,7 @@ public class MemberControllerTest {
         return Member.builder()
                 .memberId(DEFAULT_MEMBER_ID)
                 .password(DEFAULT_PASSWORD)
-                .name(DEFAULT_NAME)
+                .nickName(DEFAULT_NAME)
                 .build();
     }
 }

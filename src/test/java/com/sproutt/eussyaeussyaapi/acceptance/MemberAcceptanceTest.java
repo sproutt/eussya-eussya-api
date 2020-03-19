@@ -69,7 +69,7 @@ public class MemberAcceptanceTest {
         return Member.builder()
                 .memberId(DEFAULT_MEMBER_ID)
                 .password(DEFAULT_PASSWORD)
-                .name(DEFAULT_NAME)
+                .nickName(DEFAULT_NAME)
                 .build();
     }
 }

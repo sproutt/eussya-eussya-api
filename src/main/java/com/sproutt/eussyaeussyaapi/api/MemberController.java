@@ -22,7 +22,7 @@ import javax.validation.Valid;
 public class MemberController {
 
     @Value("${token.key}")
-    private static String TOKEN_KEY;
+    private String TOKEN_KEY;
 
     private final MemberService memberService;
     private final JwtService jwtService;
@@ -35,8 +35,7 @@ public class MemberController {
     }
 
     @PostMapping("/members")
-    public ResponseEntity createMember(@RequestBody JoinDTO joinDTO) {
-        System.out.println("token_key: " + TOKEN_KEY);
+    public ResponseEntity createMember(@Valid @RequestBody JoinDTO joinDTO) {
 
         memberService.join(joinDTO);
 
@@ -47,7 +46,7 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity loginMember(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity loginMember(@Valid @RequestBody LoginDTO loginDTO) {
         Member loginMember = memberService.login(loginDTO);
 
         String token = jwtService.createToken(loginMember);
@@ -60,7 +59,7 @@ public class MemberController {
     }
 
     @PostMapping("/email-auth")
-    public ResponseEntity<String> sendAuthEmail(@RequestBody @Valid EmailDTO emailDTO) {
+    public ResponseEntity<String> sendAuthEmail(@Valid @RequestBody EmailDTO emailDTO) {
         String authCode = mailService.sendAuthEmail(emailDTO.getEmail());
 
         HttpHeaders headers = new HttpHeaders();

@@ -5,16 +5,14 @@ import com.sproutt.eussyaeussyaapi.api.dto.LoginDTO;
 import com.sproutt.eussyaeussyaapi.domain.Member;
 import com.sproutt.eussyaeussyaapi.domain.MemberRepository;
 import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicatedMemberIdException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
-
-    public MemberServiceImpl(MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
-    }
 
     @Override
     public Member login(LoginDTO loginDTO) {
@@ -36,10 +34,10 @@ public class MemberServiceImpl implements MemberService {
         }
 
         Member member = Member.builder()
-                .memberId(joinDTO.getMemberId())
-                .password(joinDTO.getPassword())
-                .name(joinDTO.getNickName())
-                .build();
+                              .memberId(joinDTO.getMemberId())
+                              .password(joinDTO.getPassword())
+                              .nickName(joinDTO.getNickName())
+                              .build();
 
         return memberRepository.save(member);
     }

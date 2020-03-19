@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.api.dto;
 
+import com.sproutt.eussyaeussyaapi.utils.RegexExpression;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @Getter
 @Setter
@@ -17,7 +19,7 @@ public class JoinDTO {
     @NotBlank
     private String memberId;
 
-    @NotBlank
+    @Size(min = 2, max = 10)
     private String nickName;
 
     @Nullable
