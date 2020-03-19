@@ -7,9 +7,8 @@ import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.application.JwtService;
 import com.sproutt.eussyaeussyaapi.application.MailService;
 import com.sproutt.eussyaeussyaapi.application.MemberService;
-import com.sproutt.eussyaeussyaapi.application.exceptions.NotValidEmailException;
 import com.sproutt.eussyaeussyaapi.domain.Member;
-import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicatedMemberIdException;
+import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicationMemberException;
 import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+
+import javax.persistence.PersistenceException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -32,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(MemberController.class)
 public class MemberControllerTest {
     private static final String DEFAULT_MEMBER_ID = "test@gmail.com";
-    private static final String DEFAULT_PASSWORD = "1111";
+    private static final String DEFAULT_PASSWORD = "12345aA!";
     private static final String DEFAULT_NAME = "test";
 
     @Autowired
@@ -69,7 +70,7 @@ public class MemberControllerTest {
     public void createMember_with_exist_memberId() throws Exception {
         JoinDTO joinDTO = defaultSignUpDTO();
 
-        given(memberService.join(joinDTO)).willThrow(new DuplicatedMemberIdException());
+        given(memberService.join(joinDTO)).willThrow(new DuplicationMemberException());
 
         ResultActions actions = mvc.perform(post("/members")
                 .contentType(MediaType.APPLICATION_JSON)).andDo(print());
@@ -102,7 +103,7 @@ public class MemberControllerTest {
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setEmail(email);
 
-        when(mailService.sendAuthEmail(email)).thenThrow(new NotValidEmailException());
+        when(mailService.sendAuthEmail(email)).thenThrow(new PersistenceException());
 
         ResultActions actions = mvc.perform(post("/email-auth")
                 .content(asJsonString(emailDTO))
@@ -111,7 +112,7 @@ public class MemberControllerTest {
         actions
                 .andExpect(status().isBadRequest());
 
-        assertThrows(NotValidEmailException.class, () -> mailService.sendAuthEmail(email));
+        assertThrows(PersistenceException.class, () -> mailService.sendAuthEmail(email));
     }
 
     private static String asJsonString(final Object object) {

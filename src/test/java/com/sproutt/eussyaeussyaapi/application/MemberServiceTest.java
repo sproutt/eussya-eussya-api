@@ -3,7 +3,7 @@ package com.sproutt.eussyaeussyaapi.application;
 import com.sproutt.eussyaeussyaapi.api.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.domain.Member;
 import com.sproutt.eussyaeussyaapi.domain.MemberRepository;
-import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicatedMemberIdException;
+import com.sproutt.eussyaeussyaapi.domain.exceptions.DuplicationMemberException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +40,7 @@ public class MemberServiceTest {
         Member member = defaultMember();
         when(memberRepository.findByMemberId(MEMBER_ID)).thenReturn(Optional.of(member));
 
-        assertThrows(DuplicatedMemberIdException.class, () -> memberService.join(joinDTO));
+        assertThrows(DuplicationMemberException.class, () -> memberService.join(joinDTO));
     }
 
     private Member defaultMember() {
