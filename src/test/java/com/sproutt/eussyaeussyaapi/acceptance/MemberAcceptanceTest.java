@@ -5,6 +5,7 @@ import com.sproutt.eussyaeussyaapi.domain.Member;
 import com.sproutt.eussyaeussyaapi.domain.MemberRepository;
 import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Tag("integration")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class MemberAcceptanceTest {
