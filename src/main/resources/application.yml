@@ -12,8 +12,8 @@ spring:
     port: 587
     default-encoding: UTF-8
     protocol: smtp
-    username: [gmail계정@gmail.com]
-    password: [gmail비밀번호]
+    username: $MAIL_EMAIL
+    password: $MAIL_PASSWORD
     properties:
       mail:
         smtp:
