@@ -4,9 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import javax.validation.constraints.Email;
 
 @Entity
 @Getter
@@ -14,20 +13,25 @@ import javax.persistence.Id;
 public class Member {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    Long id;
+
+    @Email
+    @Column(unique = true)
     private String memberId;
 
-    @Column(nullable = false)
+    @Column
     private String password;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(unique = true)
+    private String nickName;
 
 
     @Builder
-    public Member(String memberId, String password, String name) {
+    public Member(String memberId, String password, String nickName) {
         this.memberId = memberId;
         this.password = password;
-        this.name = name;
+        this.nickName = nickName;
     }
 
     public boolean isEqualId(String memberId) {

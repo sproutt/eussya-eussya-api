@@ -3,9 +3,9 @@ package com.sproutt.eussyaeussyaapi.application;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.application.member.MemberServiceImpl;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicatedMemberIdException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
     private static final String MEMBER_ID = "test@gmail.com";
-    private static final String NAME = "test";
+    private static final String NICKNAME = "test";
     private static final String PASSWORD = "1111";
 
     private MemberRepository memberRepository = mock(MemberRepository.class);
@@ -34,22 +34,22 @@ public class MemberServiceTest {
     @Test
     public void createMember_with_exist_memberId() {
         JoinDTO joinDTO = JoinDTO.builder()
-                .memberId(MEMBER_ID)
-                .name(NAME)
-                .password(PASSWORD)
-                .build();
+                                 .memberId(MEMBER_ID)
+                                 .nickName(NICKNAME)
+                                 .password(PASSWORD)
+                                 .build();
 
         Member member = defaultMember();
         when(memberRepository.findByMemberId(MEMBER_ID)).thenReturn(Optional.of(member));
 
-        assertThrows(DuplicatedMemberIdException.class, () -> memberService.join(joinDTO));
+        assertThrows(DuplicationMemberException.class, () -> memberService.join(joinDTO));
     }
 
     private Member defaultMember() {
         return Member.builder()
-                .memberId(MEMBER_ID)
-                .password(PASSWORD)
-                .name(NAME)
-                .build();
+                     .memberId(MEMBER_ID)
+                     .password(PASSWORD)
+                     .nickName(NICKNAME)
+                     .build();
     }
 }
