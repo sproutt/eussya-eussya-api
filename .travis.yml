@@ -18,10 +18,6 @@ cache:
 # gradle build
 script: "./gradlew clean build"
 
-# mail services
-env:
-  - MAIL_EMAIL=$MAIL_EMAIL
-  - MAIL_PASSWORD=$MAIL_PASSWORD
 
 # slack notification
 notifications:
