@@ -3,7 +3,7 @@ jdk:
 - openjdk11
 branches:
   only:
-  - hotfix/deploy_error
+  - master
 
 # 실행전 접근 권한 설정
 before_install:
@@ -17,7 +17,6 @@ cache:
 
 # gradle build
 script: "./gradlew clean build"
-
 
 # slack notification
 notifications:
@@ -59,4 +58,4 @@ deploy:
     wait_until_deployed: true
     on:
       repo: sproutt/eussya-eussya-api #Github 주소
-      branch: hotfix/deploy_error
+      branch: master
