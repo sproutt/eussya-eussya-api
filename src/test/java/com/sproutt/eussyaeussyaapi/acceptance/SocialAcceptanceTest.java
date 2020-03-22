@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -18,10 +19,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, properties = "classpath:application.yml")
 public class SocialAcceptanceTest {
 
-    private static final String GITHUB_ACCESS_TOKEN = "9af3d28fa95a4c086314c1aec2c0d733f7f4bd3c";
+    @Value("${social.github.token}")
+    private String GITHUB_ACCESS_TOKEN;
 
     @Autowired
     private TestRestTemplate template;
@@ -37,7 +39,6 @@ public class SocialAcceptanceTest {
 
     @Test
     public void create_member_by_github() {
-        HttpHeaders headers = new HttpHeaders();
         ResponseEntity response = template.postForEntity("/social/signup/github", getHeader(GITHUB_ACCESS_TOKEN), Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);

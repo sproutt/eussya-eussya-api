@@ -39,6 +39,7 @@ public class GithubOAuth2Service implements OAuth2Service {
             return response.getBody();
 
         } catch (RestClientException e) {
+            e.printStackTrace();
             throw new OAuth2CommunicationException();
         }
     }
