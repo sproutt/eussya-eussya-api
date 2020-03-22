@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class MemberAcceptanceTest {
-    private static final String DEFAULT_MEMBER_ID = "test@gmail.com";
+    private static final String DEFAULT_MEMBER_ID = "kjkun7631@naver.com";
     private static final String DEFAULT_PASSWORD = "12345aA!";
     private static final String DEFAULT_NAME = "test";
 

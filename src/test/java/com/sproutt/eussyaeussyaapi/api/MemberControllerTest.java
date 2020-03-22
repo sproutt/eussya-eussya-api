@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(MemberController.class)
 public class MemberControllerTest {
-    private static final String DEFAULT_MEMBER_ID = "test@gmail.com";
+    private static final String DEFAULT_MEMBER_ID = "kjkun7631@naver.com";
     private static final String DEFAULT_PASSWORD = "12345aA!";
     private static final String DEFAULT_NAME = "test";
 

@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
-    private static final String MEMBER_ID = "test@gmail.com";
+    private static final String MEMBER_ID = "kjkun7631@naver.com";
     private static final String NICKNAME = "test";
     private static final String PASSWORD = "1111";
 
