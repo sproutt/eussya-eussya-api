@@ -24,11 +24,12 @@ public class MemberServiceTest {
     private static final String PASSWORD = "1111";
 
     private MemberRepository memberRepository = mock(MemberRepository.class);
+    private MailService mailService = mock(MailService.class);
     private MemberService memberService;
 
     @BeforeEach
     void setUp() {
-        memberService = new MemberServiceImpl(memberRepository);
+        memberService = new MemberServiceImpl(memberRepository, mailService);
     }
 
     @Test
@@ -42,7 +43,7 @@ public class MemberServiceTest {
         Member member = defaultMember();
         when(memberRepository.findByMemberId(MEMBER_ID)).thenReturn(Optional.of(member));
 
-        assertThrows(DuplicationMemberException.class, () -> memberService.join(joinDTO));
+        assertThrows(DuplicationMemberException.class, () -> memberService.joinWithLocalProvider(joinDTO));
     }
 
     private Member defaultMember() {
