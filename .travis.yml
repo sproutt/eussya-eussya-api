@@ -18,11 +18,6 @@ cache:
 # gradle build
 script: "./gradlew clean build"
 
-# mail services
-env:
-  - MAIL_EMAIL=$MAIL_EMAIL
-  - MAIL_PASSWORD=$MAIL_PASSWORD
-
 # slack notification
 notifications:
   slack:
@@ -46,7 +41,7 @@ deploy:
     region: ap-northeast-2
     skip_cleanup: true
     acl: public_read
-    wait-until-deployed: true
+    wait_until_deployed: true
     on:
       repo: sproutt/eussya-eussya-api #Github 주소
       branch: master
@@ -60,7 +55,7 @@ deploy:
     application: eussya-eussya-api # 웹 콘솔에서 등록한 CodeDeploy 어플리케이션
     deployment_group: sproutt # 웹 콘솔에서 등록한 CodeDeploy 배포 그룹
     region: ap-northeast-2
-    wait-until-deployed: true
+    wait_until_deployed: true
     on:
       repo: sproutt/eussya-eussya-api #Github 주소
       branch: master
