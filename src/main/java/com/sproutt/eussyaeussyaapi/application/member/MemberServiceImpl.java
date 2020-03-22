@@ -67,13 +67,10 @@ public class MemberServiceImpl implements MemberService {
 
         Member member = memberRepository.findByMemberId(emailAuthDTO.getMemberId()).orElseThrow(NoSuchMemberException::new);
 
-        String authCode = member.getAuthentication();
-
-        if (!authCode.equals(emailAuthDTO.getAuthCode())) {
+        if (!member.verifyEmail(emailAuthDTO.getAuthCode())) {
             throw new VerificationException();
         }
 
-        member.verifyEmail();
         return memberRepository.save(member);
     }
 }

@@ -1,11 +1,15 @@
 package com.sproutt.eussyaeussyaapi.application;
 
+import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.application.member.MemberServiceImpl;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
+import com.sproutt.eussyaeussyaapi.domain.member.Provider;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationException;
+import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,11 +50,27 @@ public class MemberServiceTest {
         assertThrows(DuplicationMemberException.class, () -> memberService.joinWithLocalProvider(joinDTO));
     }
 
+    @Test
+    public void authenticateEmail_with_unMatched_authCode() {
+        Member member = defaultMember();
+
+        EmailAuthDTO emailAuthDTO = EmailAuthDTO.builder()
+                                                .memberId(MEMBER_ID)
+                                                .authCode("1111")
+                                                .build();
+
+        when(memberRepository.findByMemberId(MEMBER_ID)).thenReturn(Optional.of(member));
+
+        assertThrows(VerificationException.class, () -> memberService.authenticateEmail(emailAuthDTO));
+    }
+
     private Member defaultMember() {
         return Member.builder()
                      .memberId(MEMBER_ID)
                      .password(PASSWORD)
                      .nickName(NICKNAME)
+                     .provider(Provider.LOCAL)
+                     .authentication(RandomGenerator.createAuthenticationCode())
                      .build();
     }
 }

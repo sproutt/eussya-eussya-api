@@ -10,7 +10,6 @@ import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.Provider;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationException;
 import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,11 +22,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)

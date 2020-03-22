@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Getter
@@ -51,7 +52,14 @@ public class Member {
         return this.password.equals(password);
     }
 
-    public void verifyEmail() {
-        this.authentication = "Y";
+    public boolean verifyEmail(String authCode) {
+
+        if (this.authentication.equals(authCode)) {
+            this.authentication = "Y";
+
+            return true;
+        }
+
+        return false;
     }
 }
