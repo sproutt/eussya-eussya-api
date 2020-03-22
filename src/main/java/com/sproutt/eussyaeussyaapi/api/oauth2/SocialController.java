@@ -2,6 +2,7 @@ package com.sproutt.eussyaeussyaapi.api.oauth2;
 
 import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GithubOAuth2UserDto;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.GithubOAuth2Service;
+import com.sproutt.eussyaeussyaapi.api.oauth2.service.GoogleOAuth2Service;
 import com.sproutt.eussyaeussyaapi.api.security.JwtService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SocialController {
 
     private final GithubOAuth2Service githubOAuth2Service;
+    private final GoogleOAuth2Service googleOAuth2Service;
     private final JwtService jwtService;
 
     @Value("${token.key}")
