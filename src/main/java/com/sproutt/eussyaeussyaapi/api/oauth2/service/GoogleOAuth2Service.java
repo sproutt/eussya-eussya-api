@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 @RequiredArgsConstructor
 @Service
-public class GoogleOAuth2Service{
+public class GoogleOAuth2Service implements OAuth2Service {
 
     private final RestTemplate restTemplate;
     private final MemberRepository memberRepository;
@@ -43,12 +43,14 @@ public class GoogleOAuth2Service{
         throw new RuntimeException();
     }
 
+    @Override
     public Member getMemberInfo(String accessToken) {
         GoogleOAuth2UserDto googleOAuth2UserDto = getGithubUserInfo(accessToken);
 
         return memberRepository.findByMemberId(googleOAuth2UserDto.getId()).orElseThrow(RuntimeException::new);
     }
 
+    @Override
     public Member createMember(String accessToken) {
         GoogleOAuth2UserDto googleOAuth2User = getGithubUserInfo(accessToken);
 
@@ -59,5 +61,10 @@ public class GoogleOAuth2Service{
         }
 
         return memberRepository.save(googleOAuth2User.toEntity());
+    }
+
+    @Override
+    public String getProvider() {
+        return "google";
     }
 }

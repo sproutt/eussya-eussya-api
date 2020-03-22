@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 @RequiredArgsConstructor
 @Service
-public class FacebookOAuth2Service {
+public class FacebookOAuth2Service implements OAuth2Service{
 
     private final RestTemplate restTemplate;
     private final MemberRepository memberRepository;
@@ -42,12 +42,14 @@ public class FacebookOAuth2Service {
         throw new RuntimeException();
     }
 
+    @Override
     public Member getMemberInfo(String accessToken) {
         FacebookOAuth2UserDto FacebookOAuth2UserDto = getGithubUserInfo(accessToken);
 
         return memberRepository.findByMemberId(FacebookOAuth2UserDto.getId()).orElseThrow(RuntimeException::new);
     }
 
+    @Override
     public Member createMember(String accessToken) {
         FacebookOAuth2UserDto FacebookOAuth2UserDto = getGithubUserInfo(accessToken);
 
@@ -58,5 +60,10 @@ public class FacebookOAuth2Service {
         }
 
         return memberRepository.save(FacebookOAuth2UserDto.toEntity());
+    }
+
+    @Override
+    public String getProvider() {
+        return "facebook";
     }
 }

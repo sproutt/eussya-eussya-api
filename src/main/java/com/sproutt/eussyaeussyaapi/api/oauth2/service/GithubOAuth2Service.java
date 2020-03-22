@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 @RequiredArgsConstructor
 @Service
-public class GithubOAuth2Service {
+public class GithubOAuth2Service implements OAuth2Service{
 
     private final RestTemplate restTemplate;
     private final MemberRepository memberRepository;
@@ -42,12 +42,14 @@ public class GithubOAuth2Service {
         throw new RuntimeException();
     }
 
+    @Override
     public Member getMemberInfo(String accessToken) {
         GithubOAuth2UserDto githubOAuth2UserDto = getGithubUserInfo(accessToken);
 
         return memberRepository.findByMemberId(githubOAuth2UserDto.getId()).orElseThrow(RuntimeException::new);
     }
 
+    @Override
     public Member createMember(String accessToken) {
         GithubOAuth2UserDto githubOAuth2User = getGithubUserInfo(accessToken);
 
@@ -58,6 +60,11 @@ public class GithubOAuth2Service {
         }
 
         return memberRepository.save(githubOAuth2User.toEntity());
+    }
+
+    @Override
+    public String getProvider() {
+        return "github";
     }
 
 }
