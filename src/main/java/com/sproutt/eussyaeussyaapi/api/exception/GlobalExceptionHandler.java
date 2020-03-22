@@ -3,6 +3,7 @@ package com.sproutt.eussyaeussyaapi.api.exception;
 import com.sproutt.eussyaeussyaapi.api.dto.ErrorResponse;
 import com.sproutt.eussyaeussyaapi.api.dto.ValidateError;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
+import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportOAuth2Exception;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.WrongPasswordException;
 import javassist.NotFoundException;
@@ -78,6 +79,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = OAuth2CommunicationException.class)
     public ResponseEntity handleOAuth2CommunicationException(OAuth2CommunicationException exception) {
         log.info("handleOAuth2CommunicationException : {}", exception);
+
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(value = UnSupportOAuth2Exception.class)
+    public ResponseEntity handleUnSupportOAuth2Exception(UnSupportOAuth2Exception exception) {
+        log.info("handleUnSupportOAuth2Exception : {}", exception);
 
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
     }

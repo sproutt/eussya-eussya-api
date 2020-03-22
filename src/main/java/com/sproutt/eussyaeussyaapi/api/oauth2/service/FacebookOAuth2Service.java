@@ -5,6 +5,7 @@ import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationExcep
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,7 @@ public class FacebookOAuth2Service implements OAuth2Service {
     public Member getMemberInfo(String accessToken) {
         FacebookOAuth2UserDto FacebookOAuth2UserDto = getGithubUserInfo(accessToken);
 
-        return memberRepository.findByMemberId(FacebookOAuth2UserDto.getId()).orElseThrow(RuntimeException::new);
+        return memberRepository.findByMemberId(FacebookOAuth2UserDto.getId()).orElseThrow(NoSuchMemberException::new);
     }
 
     @Override
@@ -53,7 +54,7 @@ public class FacebookOAuth2Service implements OAuth2Service {
 
         Member member = memberRepository.findByMemberId(facebookOAuth2UserDto.getId()).orElse(null);
 
-        if (member == null) {
+        if (member != null) {
             throw new DuplicationMemberException();
         }
 

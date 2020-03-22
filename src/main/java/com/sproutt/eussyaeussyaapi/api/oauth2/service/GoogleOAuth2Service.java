@@ -5,6 +5,7 @@ import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationExcep
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -45,7 +46,7 @@ public class GoogleOAuth2Service implements OAuth2Service {
     public Member getMemberInfo(String accessToken) {
         GoogleOAuth2UserDto googleOAuth2UserDto = getGithubUserInfo(accessToken);
 
-        return memberRepository.findByMemberId(googleOAuth2UserDto.getId()).orElseThrow(RuntimeException::new);
+        return memberRepository.findByMemberId(googleOAuth2UserDto.getId()).orElseThrow(NoSuchMemberException::new);
     }
 
     @Override
@@ -54,7 +55,7 @@ public class GoogleOAuth2Service implements OAuth2Service {
 
         Member member = memberRepository.findByMemberId(googleOAuth2User.getId()).orElse(null);
 
-        if (member == null) {
+        if (member != null) {
             throw new DuplicationMemberException();
         }
 
