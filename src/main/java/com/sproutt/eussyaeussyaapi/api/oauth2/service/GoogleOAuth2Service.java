@@ -2,6 +2,7 @@ package com.sproutt.eussyaeussyaapi.api.oauth2.service;
 
 import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GithubOAuth2UserDto;
 import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GoogleOAuth2UserDto;
+import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
@@ -37,10 +38,8 @@ public class GoogleOAuth2Service implements OAuth2Service {
             return response.getBody();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new OAuth2CommunicationException();
         }
-
-        throw new RuntimeException();
     }
 
     @Override

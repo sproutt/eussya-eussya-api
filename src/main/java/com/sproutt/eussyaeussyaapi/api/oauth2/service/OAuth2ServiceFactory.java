@@ -1,10 +1,8 @@
 package com.sproutt.eussyaeussyaapi.api.oauth2.service;
 
-import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GoogleOAuth2UserDto;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
