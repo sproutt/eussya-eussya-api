@@ -22,7 +22,7 @@ public class GoogleOAuth2Service{
     private final RestTemplate restTemplate;
     private final MemberRepository memberRepository;
 
-    @Value("${social.github.url}")
+    @Value("${social.google.url}")
     private String requestUrl;
 
     private GoogleOAuth2UserDto getGithubUserInfo(String accessToken) {
@@ -50,14 +50,14 @@ public class GoogleOAuth2Service{
     }
 
     public Member createMember(String accessToken) {
-        GoogleOAuth2UserDto githubOAuth2User = getGithubUserInfo(accessToken);
+        GoogleOAuth2UserDto googleOAuth2User = getGithubUserInfo(accessToken);
 
-        Optional<Member> member = memberRepository.findByMemberId(githubOAuth2User.getId());
+        Optional<Member> member = memberRepository.findByMemberId(googleOAuth2User.getId());
 
         if (member.isPresent()) {
             throw new DuplicationMemberException();
         }
 
-        return memberRepository.save(githubOAuth2User.toEntity());
+        return memberRepository.save(googleOAuth2User.toEntity());
     }
 }
