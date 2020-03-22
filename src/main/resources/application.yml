@@ -26,8 +26,8 @@ token:
 
 social:
   github:
-    client_id: 129232facea28c8d152b
     url: https://api.github.com/user
   google:
-    client_id: 270372707971-82pnb1eqkm76q9lafh2f7q7f17tehrdh.apps.googleusercontent.com
     url: https://www.googleapis.com/oauth2/v2/userinfo
+  facebook:
+    url: https://graph.facebook.com/v6.0/me
