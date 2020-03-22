@@ -5,8 +5,6 @@ import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationExcep
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
-import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -51,15 +49,15 @@ public class FacebookOAuth2Service implements OAuth2Service {
 
     @Override
     public Member createMember(String accessToken) {
-        FacebookOAuth2UserDto FacebookOAuth2UserDto = getGithubUserInfo(accessToken);
+        FacebookOAuth2UserDto facebookOAuth2UserDto = getGithubUserInfo(accessToken);
 
-        Optional<Member> member = memberRepository.findByMemberId(FacebookOAuth2UserDto.getId());
+        Member member = memberRepository.findByMemberId(facebookOAuth2UserDto.getId()).orElse(null);
 
-        if (member.isPresent()) {
+        if (member == null) {
             throw new DuplicationMemberException();
         }
 
-        return memberRepository.save(FacebookOAuth2UserDto.toEntity());
+        return memberRepository.save(facebookOAuth2UserDto.toEntity());
     }
 
     @Override

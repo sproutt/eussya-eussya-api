@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SocialController {
 
-    private final GithubOAuth2Service githubOAuth2Service;
     private final JwtService jwtService;
 
     @Value("${token.key}")

@@ -1,12 +1,10 @@
 package com.sproutt.eussyaeussyaapi.api.oauth2.service;
 
-import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GithubOAuth2UserDto;
 import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GoogleOAuth2UserDto;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -14,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @RequiredArgsConstructor
@@ -37,7 +36,7 @@ public class GoogleOAuth2Service implements OAuth2Service {
 
             return response.getBody();
 
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             throw new OAuth2CommunicationException();
         }
     }
@@ -53,9 +52,9 @@ public class GoogleOAuth2Service implements OAuth2Service {
     public Member createMember(String accessToken) {
         GoogleOAuth2UserDto googleOAuth2User = getGithubUserInfo(accessToken);
 
-        Optional<Member> member = memberRepository.findByMemberId(googleOAuth2User.getId());
+        Member member = memberRepository.findByMemberId(googleOAuth2User.getId()).orElse(null);
 
-        if (member.isPresent()) {
+        if (member == null) {
             throw new DuplicationMemberException();
         }
 
