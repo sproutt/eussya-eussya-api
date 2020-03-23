@@ -13,14 +13,14 @@ public class JwtInterceptor implements HandlerInterceptor {
     private final static String SECRET_KEY = "secret";
 
     @Autowired
-    private JwtService jwtService;
+    private JwtHelper jwtHelper;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         String token = request.getHeader(SECRET_KEY);
 
-        if (token == null || !jwtService.isUsable(token)) {
+        if (token == null || !jwtHelper.isUsable(token)) {
             throw new RuntimeException();
         }
 
