@@ -27,6 +27,29 @@ public class GithubOAuth2Service implements OAuth2Service {
     @Value("${social.github.url}")
     private String requestUrl;
 
+    @Override
+    public Member getMemberInfo(String accessToken) {
+        GithubOAuth2UserDto githubOAuth2UserDto = getGithubUserInfo(accessToken);
+
+        return memberRepository.findByMemberId(githubOAuth2UserDto.getId()).orElseThrow(NoSuchMemberException::new);
+    }
+
+    @Override
+    public Member createMember(String accessToken) {
+        GithubOAuth2UserDto githubOAuth2User = getGithubUserInfo(accessToken);
+
+        if (memberRepository.existsByMemberId(githubOAuth2User.getId())) {
+            throw new DuplicationMemberException();
+        }
+
+        return memberRepository.save(githubOAuth2User.toEntity());
+    }
+
+    @Override
+    public String getProvider() {
+        return "github";
+    }
+
     private GithubOAuth2UserDto getGithubUserInfo(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "token " + accessToken);
@@ -39,34 +62,8 @@ public class GithubOAuth2Service implements OAuth2Service {
             return response.getBody();
 
         } catch (RestClientException e) {
-            e.printStackTrace();
             throw new OAuth2CommunicationException();
         }
-    }
-
-    @Override
-    public Member getMemberInfo(String accessToken) {
-        GithubOAuth2UserDto githubOAuth2UserDto = getGithubUserInfo(accessToken);
-
-        return memberRepository.findByMemberId(githubOAuth2UserDto.getId()).orElseThrow(NoSuchMemberException::new);
-    }
-
-    @Override
-    public Member createMember(String accessToken) {
-        GithubOAuth2UserDto githubOAuth2User = getGithubUserInfo(accessToken);
-
-        Member member = memberRepository.findByMemberId(githubOAuth2User.getId()).orElse(null);
-
-        if (member != null) {
-            throw new DuplicationMemberException();
-        }
-
-        return memberRepository.save(githubOAuth2User.toEntity());
-    }
-
-    @Override
-    public String getProvider() {
-        return "github";
     }
 
 }

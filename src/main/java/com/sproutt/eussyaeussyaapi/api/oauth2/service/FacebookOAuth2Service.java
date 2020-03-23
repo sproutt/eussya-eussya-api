@@ -23,24 +23,6 @@ public class FacebookOAuth2Service implements OAuth2Service {
     @Value("${social.facebook.url}")
     private String requestUrl;
 
-    private FacebookOAuth2UserDto getGithubUserInfo(String accessToken) {
-
-        StringBuilder request = new StringBuilder();
-        request.append(requestUrl)
-            .append("?fields=id,name")
-            .append("&access_token")
-            .append(accessToken);
-
-        try {
-            ResponseEntity<FacebookOAuth2UserDto> response = restTemplate
-                .getForEntity(request.toString(), FacebookOAuth2UserDto.class);
-
-            return response.getBody();
-        } catch (RestClientException e) {
-            throw new OAuth2CommunicationException();
-        }
-    }
-
     @Override
     public Member getMemberInfo(String accessToken) {
         FacebookOAuth2UserDto FacebookOAuth2UserDto = getGithubUserInfo(accessToken);
@@ -52,9 +34,7 @@ public class FacebookOAuth2Service implements OAuth2Service {
     public Member createMember(String accessToken) {
         FacebookOAuth2UserDto facebookOAuth2UserDto = getGithubUserInfo(accessToken);
 
-        Member member = memberRepository.findByMemberId(facebookOAuth2UserDto.getId()).orElse(null);
-
-        if (member != null) {
+        if (memberRepository.existsByMemberId(facebookOAuth2UserDto.getId())) {
             throw new DuplicationMemberException();
         }
 
@@ -64,5 +44,23 @@ public class FacebookOAuth2Service implements OAuth2Service {
     @Override
     public String getProvider() {
         return "facebook";
+    }
+
+    private FacebookOAuth2UserDto getGithubUserInfo(String accessToken) {
+
+        StringBuilder request = new StringBuilder();
+        request.append(requestUrl)
+               .append("?fields=id,name")
+               .append("&access_token")
+               .append(accessToken);
+
+        try {
+            ResponseEntity<FacebookOAuth2UserDto> response = restTemplate
+                .getForEntity(request.toString(), FacebookOAuth2UserDto.class);
+
+            return response.getBody();
+        } catch (RestClientException e) {
+            throw new OAuth2CommunicationException();
+        }
     }
 }
