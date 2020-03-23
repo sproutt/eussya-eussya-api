@@ -3,7 +3,9 @@ package com.sproutt.eussyaeussyaapi.acceptance;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
+import com.sproutt.eussyaeussyaapi.domain.member.Provider;
 import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
+import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -21,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class MemberAcceptanceTest {
-    private static final String DEFAULT_MEMBER_ID = "test@gmail.com";
+    private static final String DEFAULT_MEMBER_ID = "kjkun7631@naver.com";
     private static final String DEFAULT_PASSWORD = "12345aA!";
     private static final String DEFAULT_NAME = "test";
 
@@ -74,6 +76,8 @@ public class MemberAcceptanceTest {
                      .memberId(DEFAULT_MEMBER_ID)
                      .password(DEFAULT_PASSWORD)
                      .nickName(DEFAULT_NAME)
+                     .provider(Provider.LOCAL)
+                     .authentication(RandomGenerator.createAuthenticationCode())
                      .build();
     }
 }

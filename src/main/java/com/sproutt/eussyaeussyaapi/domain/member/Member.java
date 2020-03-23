@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Getter
@@ -26,12 +27,21 @@ public class Member {
     @Column(unique = true)
     private String nickName;
 
+    @Column
+    private String authentication;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
+
 
     @Builder
-    public Member(String memberId, String password, String nickName) {
+    public Member(String memberId, String password, String nickName, String authentication, Provider provider) {
         this.memberId = memberId;
         this.password = password;
         this.nickName = nickName;
+        this.authentication = authentication;
+        this.provider = provider;
     }
 
     public boolean isEqualId(String memberId) {
@@ -40,5 +50,16 @@ public class Member {
 
     public boolean isEqualPassword(String password) {
         return this.password.equals(password);
+    }
+
+    public boolean verifyEmail(String authCode) {
+
+        if (this.authentication.equals(authCode)) {
+            this.authentication = "Y";
+
+            return true;
+        }
+
+        return false;
     }
 }
