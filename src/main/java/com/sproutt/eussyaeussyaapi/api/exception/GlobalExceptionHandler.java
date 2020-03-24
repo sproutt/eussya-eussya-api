@@ -5,6 +5,8 @@ import com.sproutt.eussyaeussyaapi.api.dto.ValidateError;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportOAuth2Exception;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.WrongPasswordException;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -64,14 +66,28 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = WrongPasswordException.class)
     public ResponseEntity handleWrongPasswordException(WrongPasswordException exception) {
-        log.info("handleDuplicationMemberException : {}", exception);
+        log.info("handleWrongPasswordException : {}", exception);
+
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(value = VerificationException.class)
+    public ResponseEntity handleVerificationException(VerificationException exception) {
+        log.info("handleVerificationException : {}", exception);
 
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
     }
 
     @ExceptionHandler(value = NotFoundException.class)
     public ResponseEntity handleNotFoundException(NotFoundException exception) {
-        log.info("handleDuplicationMemberException : {}", exception);
+        log.info("handleNotFoundException : {}", exception);
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(value = NoSuchMemberException.class)
+    public ResponseEntity handleNoSuchMemberException(NoSuchMemberException exception) {
+        log.info("handleNoSuchMemberException : {}", exception);
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(exception.getMessage());
     }

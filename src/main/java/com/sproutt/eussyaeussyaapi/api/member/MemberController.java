@@ -1,12 +1,12 @@
 package com.sproutt.eussyaeussyaapi.api.member;
 
-import com.sproutt.eussyaeussyaapi.api.dto.EmailDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
 import com.sproutt.eussyaeussyaapi.api.security.JwtService;
 import com.sproutt.eussyaeussyaapi.application.MailService;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+@Slf4j
 @RestController
 public class MemberController {
 
@@ -26,18 +27,16 @@ public class MemberController {
 
     private final MemberService memberService;
     private final JwtService jwtService;
-    private final MailService mailService;
 
-    public MemberController(MemberService memberService, JwtService jwtService, MailService mailService) {
+    public MemberController(MemberService memberService, JwtService jwtService) {
         this.memberService = memberService;
         this.jwtService = jwtService;
-        this.mailService = mailService;
     }
 
     @PostMapping("/members")
-    public ResponseEntity createMember(@Valid @RequestBody JoinDTO joinDTO) {
+    public ResponseEntity createMemberWithLocalProvider(@Valid @RequestBody JoinDTO joinDTO) {
 
-        memberService.join(joinDTO);
+        memberService.joinWithLocalProvider(joinDTO);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -59,12 +58,12 @@ public class MemberController {
     }
 
     @PostMapping("/email-auth")
-    public ResponseEntity<String> sendAuthEmail(@Valid @RequestBody EmailDTO emailDTO) {
-        String authCode = mailService.sendAuthEmail(emailDTO.getEmail());
-
+    public ResponseEntity<String> authenticateEmail(@Valid @RequestBody EmailAuthDTO emailAuthDTO) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        return new ResponseEntity<>(authCode, headers, HttpStatus.OK);
+        memberService.authenticateEmail(emailAuthDTO);
+
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 }
