@@ -3,6 +3,7 @@ package com.sproutt.eussyaeussyaapi.application;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.GithubOAuth2Service;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
+import com.sproutt.eussyaeussyaapi.domain.member.Provider;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,9 +71,10 @@ public class GithubOAuth2ServiceTest {
 
     private Member githubMember() {
         return Member.builder()
-            .memberId("41421173")
-            .nickName("Byeongjae Jung")
-            .build();
+                     .memberId("41421173")
+                     .nickName("Byeongjae Jung")
+                     .provider(Provider.GITHUB)
+                     .build();
     }
 
 }

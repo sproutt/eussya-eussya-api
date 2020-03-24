@@ -2,6 +2,7 @@ package com.sproutt.eussyaeussyaapi.acceptance;
 
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
+import com.sproutt.eussyaeussyaapi.domain.member.Provider;
 import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,22 +40,24 @@ public class SocialAcceptanceTest {
 
     @Test
     public void create_member_by_github() {
-        ResponseEntity response = template.postForEntity("/social/signup/github", getHeader(GITHUB_ACCESS_TOKEN), Void.class);
+        ResponseEntity response = template
+            .postForEntity("/social/signup/github", getHeader(GITHUB_ACCESS_TOKEN), Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 
     @Test
-    public void create_member_by_github_but_already_exist_memberId(){
+    public void create_member_by_github_but_already_exist_memberId() {
         memberRepository.save(githubMember());
 
-        ResponseEntity response = template.postForEntity("/social/signup/github", getHeader(GITHUB_ACCESS_TOKEN), String.class);
+        ResponseEntity response = template
+            .postForEntity("/social/signup/github", getHeader(GITHUB_ACCESS_TOKEN), String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody().toString()).contains(ExceptionMessage.DUPLICATED_MEMBER_ID);
     }
 
-    private HttpHeaders getHeader(String accessToken){
+    private HttpHeaders getHeader(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("accessToken", accessToken);
 
@@ -63,7 +66,8 @@ public class SocialAcceptanceTest {
 
     private Member githubMember() {
         return Member.builder()
-            .memberId("41421173")
-            .build();
+                     .memberId("41421173")
+                     .provider(Provider.GITHUB)
+                     .build();
     }
 }

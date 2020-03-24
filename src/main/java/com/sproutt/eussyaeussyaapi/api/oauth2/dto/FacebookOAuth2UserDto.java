@@ -1,6 +1,7 @@
 package com.sproutt.eussyaeussyaapi.api.oauth2.dto;
 
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
+import com.sproutt.eussyaeussyaapi.domain.member.Provider;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,8 +17,9 @@ public class FacebookOAuth2UserDto {
 
     public Member toEntity() {
         return Member.builder()
-            .memberId(id)
-            .nickName(name)
-            .build();
+                     .memberId(id)
+                     .nickName(name)
+                     .provider(Provider.FACEBOOK)
+                     .build();
     }
 }

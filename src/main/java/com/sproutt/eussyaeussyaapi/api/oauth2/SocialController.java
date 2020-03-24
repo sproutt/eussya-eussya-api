@@ -1,6 +1,5 @@
 package com.sproutt.eussyaeussyaapi.api.oauth2;
 
-import com.sproutt.eussyaeussyaapi.api.oauth2.service.GithubOAuth2;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.GithubOAuth2Service;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2Service;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2ServiceFactory;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class SocialController {
 
     private final JwtService jwtService;
-    private final GithubOAuth2Service githubOAuth2Service;
 
     @Value("${token.key}")
     private String TOKEN_KEY;
