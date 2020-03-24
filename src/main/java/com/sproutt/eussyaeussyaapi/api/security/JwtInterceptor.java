@@ -20,9 +20,9 @@ public class JwtInterceptor implements HandlerInterceptor {
 
         String token = request.getHeader(SECRET_KEY);
 
-        if (token == null || !jwtHelper.isUsable(token)) {
-            throw new RuntimeException();
-        }
+//        if (token == null || !jwtService.isUsable(token)) {
+//            throw new RuntimeException();
+//        }
 
         return true;
     }

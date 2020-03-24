@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 @Entity
 @Getter
@@ -17,12 +16,15 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
 
-    @Email
     @Column(unique = true)
     private String memberId;
 
     @Column
     private String password;
+
+    @Email
+    @Column(nullable = true)
+    private String email;
 
     @Column(unique = true)
     private String nickName;
@@ -36,9 +38,10 @@ public class Member {
 
 
     @Builder
-    public Member(String memberId, String password, String nickName, String authentication, Provider provider) {
+    public Member(String memberId, String password, String email, String nickName, String authentication, Provider provider) {
         this.memberId = memberId;
         this.password = password;
+        this.email = email;
         this.nickName = nickName;
         this.authentication = authentication;
         this.provider = provider;
