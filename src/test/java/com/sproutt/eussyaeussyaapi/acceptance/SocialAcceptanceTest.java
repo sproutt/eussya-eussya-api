@@ -1,8 +1,9 @@
 package com.sproutt.eussyaeussyaapi.acceptance;
 
-import com.sproutt.eussyaeussyaapi.domain.member.Member;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
-import com.sproutt.eussyaeussyaapi.domain.member.Provider;
+import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,8 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, properties = "classpath:application.yml")
@@ -48,7 +47,7 @@ public class SocialAcceptanceTest {
 
     @Test
     public void create_member_by_github_but_already_exist_memberId() {
-        memberRepository.save(githubMember());
+        memberRepository.save(MemberFactory.getGithubMember());
 
         ResponseEntity response = template
             .postForEntity("/social/signup/github", getHeader(GITHUB_ACCESS_TOKEN), String.class);
@@ -62,12 +61,5 @@ public class SocialAcceptanceTest {
         headers.set("accessToken", accessToken);
 
         return headers;
-    }
-
-    private Member githubMember() {
-        return Member.builder()
-                     .memberId("41421173")
-                     .provider(Provider.GITHUB)
-                     .build();
     }
 }

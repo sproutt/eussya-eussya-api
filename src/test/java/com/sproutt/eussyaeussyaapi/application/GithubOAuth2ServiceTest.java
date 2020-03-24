@@ -6,6 +6,7 @@ import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.domain.member.Provider;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
+import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +48,7 @@ public class GithubOAuth2ServiceTest {
 
     @Test
     public void create_member_with_Github_이미_가입된() {
-        Member githubMember = githubMember();
+        Member githubMember = MemberFactory.getGithubMember();
         memberRepository.save(githubMember);
 
         assertThrows(DuplicationMemberException.class, () -> githubOAuth2Service.createMember(GITHUB_ACCESS_TOKEN));
@@ -55,7 +56,7 @@ public class GithubOAuth2ServiceTest {
 
     @Test
     public void getMemberInfo() {
-        Member githubMember = githubMember();
+        Member githubMember = MemberFactory.getGithubMember();
         memberRepository.save(githubMember);
 
         Member savedMember = githubOAuth2Service.getMemberInfo(GITHUB_ACCESS_TOKEN);
@@ -68,13 +69,4 @@ public class GithubOAuth2ServiceTest {
     public void getMemberInfo_저장되지않은() {
         assertThrows(NoSuchMemberException.class, () -> githubOAuth2Service.getMemberInfo(GITHUB_ACCESS_TOKEN));
     }
-
-    private Member githubMember() {
-        return Member.builder()
-                     .memberId("41421173")
-                     .nickName("Byeongjae Jung")
-                     .provider(Provider.GITHUB)
-                     .build();
-    }
-
 }
