@@ -1,31 +1,30 @@
 package com.sproutt.eussyaeussyaapi.application;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.application.member.MemberServiceImpl;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
-import com.sproutt.eussyaeussyaapi.domain.member.Provider;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationException;
-import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
+import com.sproutt.eussyaeussyaapi.object.MemberFactory;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
+
     private static final String MEMBER_ID = "kjkun7631@naver.com";
     private static final String NICKNAME = "test";
-    private static final String PASSWORD = "1111";
+    private static final String PASSWORD = "12345aA!";
 
     private MemberRepository memberRepository = mock(MemberRepository.class);
     private MailService mailService = mock(MailService.class);
@@ -44,7 +43,7 @@ public class MemberServiceTest {
                                  .password(PASSWORD)
                                  .build();
 
-        Member member = defaultMember();
+        Member member = MemberFactory.getDefaultMember();
         when(memberRepository.findByMemberId(MEMBER_ID)).thenReturn(Optional.of(member));
 
         assertThrows(DuplicationMemberException.class, () -> memberService.joinWithLocalProvider(joinDTO));
@@ -52,7 +51,7 @@ public class MemberServiceTest {
 
     @Test
     public void authenticateEmail_with_unMatched_authCode() {
-        Member member = defaultMember();
+        Member member = MemberFactory.getDefaultMember();
 
         EmailAuthDTO emailAuthDTO = EmailAuthDTO.builder()
                                                 .memberId(MEMBER_ID)
@@ -62,15 +61,5 @@ public class MemberServiceTest {
         when(memberRepository.findByMemberId(MEMBER_ID)).thenReturn(Optional.of(member));
 
         assertThrows(VerificationException.class, () -> memberService.authenticateEmail(emailAuthDTO));
-    }
-
-    private Member defaultMember() {
-        return Member.builder()
-                     .memberId(MEMBER_ID)
-                     .password(PASSWORD)
-                     .nickName(NICKNAME)
-                     .provider(Provider.LOCAL)
-                     .authentication(RandomGenerator.createAuthenticationCode())
-                     .build();
     }
 }

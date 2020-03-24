@@ -1,6 +1,12 @@
 package com.sproutt.eussyaeussyaapi.api;
 
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
 import com.sproutt.eussyaeussyaapi.api.member.MemberController;
@@ -8,9 +14,8 @@ import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.api.security.JwtService;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
-import com.sproutt.eussyaeussyaapi.domain.member.Provider;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
-import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
+import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +26,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(MemberController.class)
 public class MemberControllerTest {
+
     private static final String DEFAULT_MEMBER_ID = "kjkun7631@naver.com";
     private static final String DEFAULT_PASSWORD = "12345aA!";
     private static final String DEFAULT_NAME = "test";
@@ -47,17 +47,17 @@ public class MemberControllerTest {
     @Test
     public void createMemberWithLocalProvider() throws Exception {
         JoinDTO joinDTO = defaultSignUpDTO();
-        Member member = defaultMember();
+        Member member = MemberFactory.getDefaultMember();
 
         given(memberService.joinWithLocalProvider(joinDTO)).willReturn(member);
 
         ResultActions actions = mvc.perform(post("/members")
-                .content(asJsonString(joinDTO))
-                .contentType(MediaType.APPLICATION_JSON))
+            .content(asJsonString(joinDTO))
+            .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
         actions
-                .andExpect(status().isCreated());
+            .andExpect(status().isCreated());
     }
 
     @Test
@@ -67,15 +67,15 @@ public class MemberControllerTest {
         given(memberService.joinWithLocalProvider(joinDTO)).willThrow(new DuplicationMemberException());
 
         ResultActions actions = mvc.perform(post("/members")
-                .contentType(MediaType.APPLICATION_JSON)).andDo(print());
+            .contentType(MediaType.APPLICATION_JSON)).andDo(print());
 
         actions
-                .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest());
     }
 
     @Test
     public void authenticateEmail() throws Exception {
-        Member member = defaultMember();
+        Member member = MemberFactory.getDefaultMember();
 
         EmailAuthDTO emailAuthDTO = EmailAuthDTO.builder()
                                                 .memberId(member.getMemberId())
@@ -85,12 +85,12 @@ public class MemberControllerTest {
         when(memberService.authenticateEmail(emailAuthDTO)).thenReturn(member);
 
         ResultActions actions = mvc.perform(post("/email-auth")
-                .content(asJsonString(emailAuthDTO))
-                .contentType(MediaType.APPLICATION_JSON))
+            .content(asJsonString(emailAuthDTO))
+            .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
         actions
-                .andExpect(status().isOk());
+            .andExpect(status().isOk());
     }
 
     private static String asJsonString(final Object object) {
@@ -107,15 +107,5 @@ public class MemberControllerTest {
                       .password(DEFAULT_PASSWORD)
                       .nickName(DEFAULT_NAME)
                       .build();
-    }
-
-    private Member defaultMember() {
-        return Member.builder()
-                     .memberId(DEFAULT_MEMBER_ID)
-                     .password(DEFAULT_PASSWORD)
-                     .nickName(DEFAULT_NAME)
-                     .provider(Provider.LOCAL)
-                     .authentication(RandomGenerator.createAuthenticationCode())
-                     .build();
     }
 }
