@@ -1,9 +1,8 @@
 package com.sproutt.eussyaeussyaapi.api.oauth2;
 
-import com.sproutt.eussyaeussyaapi.api.oauth2.service.GithubOAuth2Service;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2Service;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2ServiceFactory;
-import com.sproutt.eussyaeussyaapi.api.security.JwtService;
+import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SocialController {
 
-    private final JwtService jwtService;
+    private final JwtHelper jwtHelper;
 
     @Value("${token.key}")
     private String TOKEN_KEY;
@@ -33,7 +32,7 @@ public class SocialController {
         OAuth2Service oAuth2Service = OAuth2ServiceFactory.getOAuth2Service(provider);
         Member member = oAuth2Service.getMemberInfo(accessToken);
 
-        String token = jwtService.createToken(member);
+        String token = jwtHelper.createToken(member);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(TOKEN_KEY, token);
