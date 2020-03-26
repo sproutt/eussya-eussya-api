@@ -1,5 +1,7 @@
 package com.sproutt.eussyaeussyaapi.application;
 
+import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,17 +20,25 @@ public class MailServiceTest {
     @Autowired
     private MailService mailService;
 
+    private String authCode;
+
+
+    @BeforeEach
+    void setUp() {
+        authCode = RandomGenerator.createAuthenticationCode();
+    }
+
     @Test
     public void send_mail() {
         String to = "kjkun7631@naver.com";
 
-        mailService.sendAuthEmail(to);
+        mailService.sendAuthEmail(to, authCode);
     }
 
     @Test
     public void send_wrong_email_address() {
         String to = "wrongAddress";
 
-        assertThrows(MailSendException.class, () -> mailService.sendAuthEmail(to));
+        assertThrows(MailSendException.class, () -> mailService.sendAuthEmail(to, authCode));
     }
 }

@@ -1,12 +1,6 @@
 package com.sproutt.eussyaeussyaapi.api;
 
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
 import com.sproutt.eussyaeussyaapi.api.member.MemberController;
@@ -25,6 +19,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(MemberController.class)
@@ -52,12 +52,12 @@ public class MemberControllerTest {
         given(memberService.joinWithLocalProvider(joinDTO)).willReturn(member);
 
         ResultActions actions = mvc.perform(post("/members")
-            .content(asJsonString(joinDTO))
-            .contentType(MediaType.APPLICATION_JSON))
+                .content(asJsonString(joinDTO))
+                .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
         actions
-            .andExpect(status().isCreated());
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -67,10 +67,25 @@ public class MemberControllerTest {
         given(memberService.joinWithLocalProvider(joinDTO)).willThrow(new DuplicationMemberException());
 
         ResultActions actions = mvc.perform(post("/members")
-            .contentType(MediaType.APPLICATION_JSON)).andDo(print());
+                .contentType(MediaType.APPLICATION_JSON)).andDo(print());
 
         actions
-            .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void send_authCode_to_email() throws Exception {
+        Member member = MemberFactory.getDefaultMember();
+        String email = member.getMemberId();
+
+        given(memberService.sendAuthCodeToEmail(email)).willReturn(member);
+
+        ResultActions actions = mvc.perform(post("/members/" + email + "/authcode")
+                .contentType(MediaType.APPLICATION_JSON))
+                                   .andDo(print());
+
+        actions
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -85,12 +100,12 @@ public class MemberControllerTest {
         when(memberService.authenticateEmail(emailAuthDTO)).thenReturn(member);
 
         ResultActions actions = mvc.perform(post("/email-auth")
-            .content(asJsonString(emailAuthDTO))
-            .contentType(MediaType.APPLICATION_JSON))
+                .content(asJsonString(emailAuthDTO))
+                .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
         actions
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
     }
 
     private static String asJsonString(final Object object) {
