@@ -20,6 +20,9 @@ spring:
           auth: true
           starttls:
             enable: true
+    smtp:
+      ssl:
+        enable: true
 
 token:
   key: Authorization
