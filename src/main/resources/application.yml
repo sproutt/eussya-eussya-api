@@ -12,8 +12,8 @@ spring:
     port: 587
     default-encoding: UTF-8
     protocol: smtp
-    username: ${MAIL_EMAIL}
-    password: ${MAIL_PASSWORD}
+    username: ENC(xlN3wtz+fDZrT+mUEaeNDCbQoIJ0+DxHH+tEuk5U/gGOIGO8/EKnCQ==)
+    password: ENC(G5glDs8r2PONsoehu5ofY5GRngLYlA4s)
     properties:
       mail:
         smtp:
@@ -27,8 +27,12 @@ token:
 social:
   github:
     url: https://api.github.com/user
-    token: ${GIT_TOKEN}
   google:
     url: https://www.googleapis.com/oauth2/v2/userinfo
   facebook:
     url: https://graph.facebook.com/v6.0/me
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+    password: ${JASYPT_PASSWORD}
