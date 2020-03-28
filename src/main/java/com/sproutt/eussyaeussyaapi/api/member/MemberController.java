@@ -58,7 +58,7 @@ public class MemberController {
     }
 
     @PostMapping("/members/{memberId}/authcode")
-    public ResponseEntity sendAuthCodeEmail(@Email @PathVariable String memberId) {
+    public ResponseEntity sendAuthCodeEmail(@PathVariable String memberId) {
 
         memberService.sendAuthCodeToEmail(memberId);
 

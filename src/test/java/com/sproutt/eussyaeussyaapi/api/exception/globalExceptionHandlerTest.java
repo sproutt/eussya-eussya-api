@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class GlobalExceptionHanlderTest {
+public class globalExceptionHandlerTest {
 
     @Autowired
     private TestRestTemplate template;
