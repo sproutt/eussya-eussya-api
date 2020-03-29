@@ -3,6 +3,7 @@ package com.sproutt.eussyaeussyaapi.acceptance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
+import com.sproutt.eussyaeussyaapi.object.EncryptedResourceGenerator;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,11 +20,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, properties = "classpath:application.yml")
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class SocialAcceptanceTest {
 
-    @Value("${social.github.token}")
-    private String GITHUB_ACCESS_TOKEN;
+    private String githubToken = EncryptedResourceGenerator.getGitToken();
 
     @Autowired
     private TestRestTemplate template;
@@ -40,7 +40,7 @@ public class SocialAcceptanceTest {
     @Test
     public void create_member_by_github() {
         ResponseEntity response = template
-            .postForEntity("/social/signup/github", getHeader(GITHUB_ACCESS_TOKEN), Void.class);
+            .postForEntity("/social/signup/github", getHeader(githubToken), Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
@@ -50,7 +50,7 @@ public class SocialAcceptanceTest {
         memberRepository.save(MemberFactory.getGithubMember());
 
         ResponseEntity response = template
-            .postForEntity("/social/signup/github", getHeader(GITHUB_ACCESS_TOKEN), String.class);
+            .postForEntity("/social/signup/github", getHeader(githubToken), String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody().toString()).contains(ExceptionMessage.DUPLICATED_MEMBER_ID);
