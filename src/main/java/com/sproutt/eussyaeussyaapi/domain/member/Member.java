@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.domain.member;
 
+import com.sproutt.eussyaeussyaapi.api.member.dto.NickNameUpdateDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -64,5 +65,13 @@ public class Member {
         }
 
         return false;
+    }
+
+    public void updateNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
     }
 }

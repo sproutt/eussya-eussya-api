@@ -4,10 +4,7 @@ import com.sproutt.eussyaeussyaapi.api.dto.ErrorResponse;
 import com.sproutt.eussyaeussyaapi.api.dto.ValidateError;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportOAuth2Exception;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationException;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.WrongPasswordException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.*;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -60,6 +57,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = DuplicationMemberException.class)
     public ResponseEntity handleDuplicationMemberException(DuplicationMemberException exception) {
         log.info("handleDuplicationMemberException : {}", exception);
+
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(value = DuplicationNickNameException.class)
+    public ResponseEntity handleDuplicationNickNameException(DuplicationNickNameException exception) {
+        log.info("handleDuplicationNickNameException : {}", exception);
 
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
     }
