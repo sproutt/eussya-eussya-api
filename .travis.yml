@@ -3,7 +3,7 @@ jdk:
 - openjdk11
 branches:
   only:
-  - fix/Issue-51
+  - Fix/Issue-51
 
 # 실행전 접근 권한 설정
 before_install:
