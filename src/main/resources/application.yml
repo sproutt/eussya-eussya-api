@@ -12,8 +12,8 @@ spring:
     port: 587
     default-encoding: UTF-8
     protocol: smtp
-    username: ENC(7dt2qHAoXS3ytaPHpfNyDNFfabPx9AA5HBn9tC8mCLbNaWinrzV2ug==)
-    password: ENC(8RE4xhtV72XAEhsn+6dCHsyJHbCaknq4)
+    username: ENC(9NlYFfJbK5Epx/lOVqJGRvbtU5BWSytOZx8qNOgf1tE=)
+    password: ENC(wHLmmtZ0B/Y5Zqi78lHAcwIC7nV7OCGw)
     properties:
       mail:
         smtp:
