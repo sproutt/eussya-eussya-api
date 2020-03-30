@@ -45,7 +45,9 @@ dependencies {
 }
 
 test {
-    useJUnitPlatform()
+    useJUnitPlatform{
+        excludeTags 'integration'
+    }
 }
 
 jacocoTestReport {
