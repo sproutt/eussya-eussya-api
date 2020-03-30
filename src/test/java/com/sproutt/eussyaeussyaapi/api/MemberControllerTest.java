@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
 import com.sproutt.eussyaeussyaapi.api.member.MemberController;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
-import com.sproutt.eussyaeussyaapi.api.security.JwtService;
+import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
@@ -41,7 +41,7 @@ public class MemberControllerTest {
     private MemberService memberService;
 
     @MockBean
-    private JwtService jwtService;
+    private JwtHelper jwtHelper;
 
 
     @Test

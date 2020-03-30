@@ -4,32 +4,37 @@ import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.NickNameUpdateDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.PasswordUpdateDTO;
-import com.sproutt.eussyaeussyaapi.api.security.JwtService;
+import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
 @Slf4j
 @RestController
+@Api(description = "으쌰으쌰 회원 관련 API", tags = {"Member - 담당자 : 김종근"})
 public class MemberController {
 
     @Value("${token.key}")
     private String TOKEN_KEY;
 
     private final MemberService memberService;
-    private final JwtService jwtService;
+    private final JwtHelper jwtHelper;
 
-    public MemberController(MemberService memberService, JwtService jwtService) {
+    public MemberController(MemberService memberService, JwtHelper jwtHelper) {
         this.memberService = memberService;
-        this.jwtService = jwtService;
+        this.jwtHelper = jwtHelper;
     }
 
     @PostMapping("/members")
@@ -47,7 +52,7 @@ public class MemberController {
     public ResponseEntity loginMember(@Valid @RequestBody LoginDTO loginDTO) {
         Member loginMember = memberService.login(loginDTO);
 
-        String token = jwtService.createToken(loginMember);
+        String token = jwtHelper.createToken(loginMember);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
