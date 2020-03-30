@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.api.oauth2.service;
 
+import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GithubOAuth2UserDto;
 import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GoogleOAuth2UserDto;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
@@ -27,21 +28,14 @@ public class GoogleOAuth2Service implements OAuth2Service {
     private String requestUrl;
 
     @Override
-    public Member getMemberInfo(String accessToken) {
-        GoogleOAuth2UserDto googleOAuth2UserDto = getGithubUserInfo(accessToken);
+    public Member login(String accessToken){
+        GoogleOAuth2UserDto googleOAuth2UserDto = getGoogleUserInfo(accessToken);
 
-        return memberRepository.findByMemberId(googleOAuth2UserDto.getId()).orElseThrow(NoSuchMemberException::new);
-    }
-
-    @Override
-    public Member createMember(String accessToken) {
-        GoogleOAuth2UserDto googleOAuth2User = getGithubUserInfo(accessToken);
-
-        if (memberRepository.existsByMemberId(googleOAuth2User.getId())) {
-            throw new DuplicationMemberException();
+        if (!memberRepository.existsByMemberId(googleOAuth2UserDto.getId())) {
+            return memberRepository.save(googleOAuth2UserDto.toEntity());
         }
 
-        return memberRepository.save(googleOAuth2User.toEntity());
+        return memberRepository.findByMemberId(googleOAuth2UserDto.getId()).orElseThrow(NoSuchMemberException::new);
     }
 
     @Override
@@ -49,7 +43,7 @@ public class GoogleOAuth2Service implements OAuth2Service {
         return "google";
     }
 
-    private GoogleOAuth2UserDto getGithubUserInfo(String accessToken) {
+    private GoogleOAuth2UserDto getGoogleUserInfo(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
 

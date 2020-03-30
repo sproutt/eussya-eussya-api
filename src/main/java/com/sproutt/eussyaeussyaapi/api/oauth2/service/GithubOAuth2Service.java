@@ -28,21 +28,14 @@ public class GithubOAuth2Service implements OAuth2Service {
     private String requestUrl;
 
     @Override
-    public Member getMemberInfo(String accessToken) {
+    public Member login(String accessToken){
         GithubOAuth2UserDto githubOAuth2UserDto = getGithubUserInfo(accessToken);
 
-        return memberRepository.findByMemberId(githubOAuth2UserDto.getId()).orElseThrow(NoSuchMemberException::new);
-    }
-
-    @Override
-    public Member createMember(String accessToken) {
-        GithubOAuth2UserDto githubOAuth2User = getGithubUserInfo(accessToken);
-
-        if (memberRepository.existsByMemberId(githubOAuth2User.getId())) {
-            throw new DuplicationMemberException();
+        if (!memberRepository.existsByMemberId(githubOAuth2UserDto.getId())) {
+            return memberRepository.save(githubOAuth2UserDto.toEntity());
         }
 
-        return memberRepository.save(githubOAuth2User.toEntity());
+        return memberRepository.findByMemberId(githubOAuth2UserDto.getId()).orElseThrow(NoSuchMemberException::new);
     }
 
     @Override

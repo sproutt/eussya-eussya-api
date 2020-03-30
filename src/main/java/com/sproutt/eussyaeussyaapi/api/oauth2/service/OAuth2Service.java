@@ -4,10 +4,7 @@ import com.sproutt.eussyaeussyaapi.domain.member.Member;
 
 public interface OAuth2Service {
 
-    Member getMemberInfo(String accessToken);
-
-    Member createMember(String accessToken);
+    Member login(String accessToken);
 
     String getProvider();
-
 }

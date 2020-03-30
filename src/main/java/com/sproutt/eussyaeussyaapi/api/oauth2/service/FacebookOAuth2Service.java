@@ -1,6 +1,7 @@
 package com.sproutt.eussyaeussyaapi.api.oauth2.service;
 
 import com.sproutt.eussyaeussyaapi.api.oauth2.dto.FacebookOAuth2UserDto;
+import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GoogleOAuth2UserDto;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
@@ -24,21 +25,14 @@ public class FacebookOAuth2Service implements OAuth2Service {
     private String requestUrl;
 
     @Override
-    public Member getMemberInfo(String accessToken) {
-        FacebookOAuth2UserDto FacebookOAuth2UserDto = getGithubUserInfo(accessToken);
+    public Member login(String accessToken){
+        FacebookOAuth2UserDto facebookOAuth2UserDto = getFacebookUserInfo(accessToken);
 
-        return memberRepository.findByMemberId(FacebookOAuth2UserDto.getId()).orElseThrow(NoSuchMemberException::new);
-    }
-
-    @Override
-    public Member createMember(String accessToken) {
-        FacebookOAuth2UserDto facebookOAuth2UserDto = getGithubUserInfo(accessToken);
-
-        if (memberRepository.existsByMemberId(facebookOAuth2UserDto.getId())) {
-            throw new DuplicationMemberException();
+        if (!memberRepository.existsByMemberId(facebookOAuth2UserDto.getId())) {
+            return memberRepository.save(facebookOAuth2UserDto.toEntity());
         }
 
-        return memberRepository.save(facebookOAuth2UserDto.toEntity());
+        return memberRepository.findByMemberId(facebookOAuth2UserDto.getId()).orElseThrow(NoSuchMemberException::new);
     }
 
     @Override
@@ -46,7 +40,7 @@ public class FacebookOAuth2Service implements OAuth2Service {
         return "facebook";
     }
 
-    private FacebookOAuth2UserDto getGithubUserInfo(String accessToken) {
+    private FacebookOAuth2UserDto getFacebookUserInfo(String accessToken) {
 
         StringBuilder request = new StringBuilder();
         request.append(requestUrl)

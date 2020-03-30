@@ -26,29 +26,16 @@ public class SocialController {
     @Value("${token.key}")
     private String TOKEN_KEY;
 
-    @PostMapping("/signin/{provider}")
-    public ResponseEntity signInByProvider(@PathVariable String provider, @RequestParam String accessToken) {
-
+    @PostMapping("/login/{provider}")
+    public ResponseEntity loginByProvider(@PathVariable String provider, @RequestParam String accessToken){
         OAuth2Service oAuth2Service = OAuth2ServiceFactory.getOAuth2Service(provider);
-        Member member = oAuth2Service.getMemberInfo(accessToken);
 
+        Member member = oAuth2Service.login(accessToken);
         String token = jwtHelper.createToken(member);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(TOKEN_KEY, token);
         return new ResponseEntity<>(headers, HttpStatus.OK);
-    }
-
-    @PostMapping("/signup/{provider}")
-    public ResponseEntity signUpByProvider(@PathVariable String provider, @RequestParam String accessToken) {
-
-        OAuth2Service oAuth2Service = OAuth2ServiceFactory.getOAuth2Service(provider);
-        oAuth2Service.createMember(accessToken);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        return new ResponseEntity(headers, HttpStatus.CREATED);
     }
 
 }
