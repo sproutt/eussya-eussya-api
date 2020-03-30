@@ -14,4 +14,6 @@ public interface MemberService {
     Member joinWithOAuth2Provider();
 
     Member authenticateEmail(EmailAuthDTO emailAuthDTO);
+
+    Member sendAuthCodeToEmail(String email);
 }

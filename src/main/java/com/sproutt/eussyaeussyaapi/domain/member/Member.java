@@ -65,4 +65,8 @@ public class Member {
 
         return false;
     }
+
+    public void changeAuthCode(String authCode) {
+        this.authentication = authCode;
+    }
 }

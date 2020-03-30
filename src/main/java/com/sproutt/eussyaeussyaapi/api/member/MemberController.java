@@ -12,11 +12,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 
 @Slf4j
 @RestController
@@ -56,6 +55,17 @@ public class MemberController {
         headers.set(TOKEN_KEY, token);
 
         return new ResponseEntity<>(headers, HttpStatus.OK);
+    }
+
+    @PostMapping("/members/{memberId}/authcode")
+    public ResponseEntity sendAuthCodeEmail(@PathVariable String memberId) {
+
+        memberService.sendAuthCodeToEmail(memberId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return new ResponseEntity(headers, HttpStatus.OK);
     }
 
     @PostMapping("/email-auth")
