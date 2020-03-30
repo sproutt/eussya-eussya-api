@@ -3,7 +3,6 @@ package com.sproutt.eussyaeussyaapi.application.member;
 import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
-import com.sproutt.eussyaeussyaapi.api.member.dto.NickNameUpdateDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 
 public interface MemberService {
@@ -21,4 +20,6 @@ public interface MemberService {
     Member updatePassword(Member member, String password);
 
     Member findMemberById(String memberId);
+
+    Member sendAuthCodeToEmail(String email);
 }

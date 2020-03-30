@@ -8,6 +8,7 @@ import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.domain.member.Provider;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.*;
+import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +40,8 @@ public class MemberServiceImpl implements MemberService {
             throw new DuplicationMemberException();
         }
 
-        String authCode = mailService.sendAuthEmail(joinDTO.getMemberId());
+        String authCode = RandomGenerator.createAuthenticationCode();
+        mailService.sendAuthEmail(joinDTO.getMemberId(), authCode);
 
         Member member = Member.builder()
                               .memberId(joinDTO.getMemberId())
@@ -56,6 +58,19 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Member joinWithOAuth2Provider() {
         return null;
+    }
+
+    @Override
+    @Transactional
+    public Member sendAuthCodeToEmail(String email) {
+
+        Member member = memberRepository.findByMemberId(email).orElseThrow(NoSuchMemberException::new);
+        String authCode = RandomGenerator.createAuthenticationCode();
+
+        member.changeAuthCode(authCode);
+        mailService.sendAuthEmail(email, authCode);
+
+        return memberRepository.save(member);
     }
 
     @Override
