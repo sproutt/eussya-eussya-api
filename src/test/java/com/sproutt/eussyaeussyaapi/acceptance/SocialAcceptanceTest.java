@@ -38,22 +38,30 @@ public class SocialAcceptanceTest {
     }
 
     @Test
-    public void create_member_by_github() {
-        ResponseEntity response = template
-            .postForEntity("/social/signup/github", getHeader(githubToken), Void.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    }
-
-    @Test
-    public void create_member_by_github_but_already_exist_memberId() {
+    public void login_with_existed_id_by_github() {
         memberRepository.save(MemberFactory.getGithubMember());
 
         ResponseEntity response = template
-            .postForEntity("/social/signup/github", getHeader(githubToken), String.class);
+                .postForEntity("/social/login/github", getHeader(githubToken), Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    public void login_with_no_existed_id_by_github() {
+        ResponseEntity response = template
+                .postForEntity("/social/login/github", getHeader(githubToken), Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    public void login_with_wrong_token_by_github() {
+        String wrongAccessToken = "wrongwrong";
+        ResponseEntity response = template
+                .postForEntity("/social/login/github", getHeader(wrongAccessToken), Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody().toString()).contains(ExceptionMessage.DUPLICATED_MEMBER_ID);
     }
 
     private HttpHeaders getHeader(String accessToken) {

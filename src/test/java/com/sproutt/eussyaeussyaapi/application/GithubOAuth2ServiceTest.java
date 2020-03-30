@@ -3,6 +3,8 @@ package com.sproutt.eussyaeussyaapi.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.sproutt.eussyaeussyaapi.api.oauth2.exception.NotFoundOAuth2Exception;
+import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.GithubOAuth2Service;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mail.MailSendException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -36,8 +39,8 @@ public class GithubOAuth2ServiceTest {
     }
 
     @Test
-    public void create_member_with_Github() {
-        Member member = githubOAuth2Service.createMember(githubToken);
+    public void login_with_no_existed_id_by_github() {
+        Member member = githubOAuth2Service.login(githubToken);
         Member createdMember = memberRepository.findAll().get(0);
 
         assertThat(createdMember.getMemberId()).isEqualTo(member.getMemberId());
@@ -45,26 +48,21 @@ public class GithubOAuth2ServiceTest {
     }
 
     @Test
-    public void create_member_with_Github_이미_가입된() {
+    public void login_with_existed_id_by_github() {
         Member githubMember = MemberFactory.getGithubMember();
         memberRepository.save(githubMember);
 
-        assertThrows(DuplicationMemberException.class, () -> githubOAuth2Service.createMember(githubToken));
+        Member existedMember = githubOAuth2Service.login(githubToken);
+        assertThat(existedMember.getMemberId()).isEqualTo(githubMember.getMemberId());
+        assertThat(existedMember.getNickName()).isEqualTo(githubMember.getNickName());
     }
 
     @Test
-    public void getMemberInfo() {
-        Member githubMember = MemberFactory.getGithubMember();
-        memberRepository.save(githubMember);
+    public void login_with_wrong_token_by_github() {
+        String wrongAccessToken = "wrongwrong";
 
-        Member savedMember = githubOAuth2Service.getMemberInfo(githubToken);
-
-        assertThat(savedMember.getMemberId()).isEqualTo(githubMember.getMemberId());
-        assertThat(savedMember.getNickName()).isEqualTo(githubMember.getNickName());
+        assertThrows(OAuth2CommunicationException.class, () -> githubOAuth2Service.login(wrongAccessToken));
     }
 
-    @Test
-    public void getMemberInfo_저장되지않은() {
-        assertThrows(NoSuchMemberException.class, () -> githubOAuth2Service.getMemberInfo(githubToken));
-    }
+
 }
