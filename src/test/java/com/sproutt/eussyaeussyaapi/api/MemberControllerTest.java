@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
 import com.sproutt.eussyaeussyaapi.api.member.MemberController;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.NickNameUpdateDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.PasswordUpdateDTO;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
@@ -23,6 +25,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -101,6 +104,52 @@ public class MemberControllerTest {
 
         ResultActions actions = mvc.perform(post("/email-auth")
                 .content(asJsonString(emailAuthDTO))
+                .contentType(MediaType.APPLICATION_JSON))
+                                   .andDo(print());
+
+        actions
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void changeNickName() throws Exception {
+        Member member = MemberFactory.getDefaultMember();
+        String changedNickName = "change";
+
+        NickNameUpdateDTO nickNameUpdateDTO = new NickNameUpdateDTO();
+        nickNameUpdateDTO.setNickName(changedNickName);
+
+        when(memberService.findById(1L)).thenReturn(member);
+
+        member.updateNickName(changedNickName);
+
+        when(memberService.updateNickName(member, changedNickName)).thenReturn(member);
+
+        ResultActions actions = mvc.perform(put("/members/{id}/nickname", 1)
+                .content(asJsonString(nickNameUpdateDTO))
+                .contentType(MediaType.APPLICATION_JSON))
+                                   .andDo(print());
+
+        actions
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void changePassword() throws Exception {
+        Member member = MemberFactory.getDefaultMember();
+        String changedPassword = "change";
+
+        PasswordUpdateDTO passwordUpdateDTO = new PasswordUpdateDTO();
+        passwordUpdateDTO.setPassword(changedPassword);
+
+        when(memberService.findById(1L)).thenReturn(member);
+
+        member.updatePassword(changedPassword);
+
+        when(memberService.updatePassword(member, changedPassword)).thenReturn(member);
+
+        ResultActions actions = mvc.perform(put("/members/{id}/nickname", 1)
+                .content(asJsonString(passwordUpdateDTO))
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 

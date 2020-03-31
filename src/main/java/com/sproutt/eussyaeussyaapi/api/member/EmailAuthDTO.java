@@ -29,7 +29,7 @@ public class EmailAuthDTO {
     @Override
     public String toString() {
         return "EmailAuthDTO{" +
-                "memberId='" + memberId + '\'' +
+                "id='" + memberId + '\'' +
                 ", authCode='" + authCode + '\'' +
                 '}';
     }

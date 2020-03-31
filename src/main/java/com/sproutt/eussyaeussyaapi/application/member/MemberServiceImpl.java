@@ -111,8 +111,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public Member findMemberById(String memberId) {
+    public Member findById(Long id) {
 
-        return memberRepository.findByMemberId(memberId).orElseThrow(NoSuchMemberException::new);
+        return memberRepository.findById(id).orElseThrow(NoSuchMemberException::new);
     }
 }

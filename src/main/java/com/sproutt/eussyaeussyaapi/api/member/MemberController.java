@@ -79,10 +79,10 @@ public class MemberController {
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @PutMapping("/members/{memberId}/nickname")
-    public ResponseEntity updateMemberNickName(@Valid @RequestBody NickNameUpdateDTO nickNameUpdateDTO) {
+    @PutMapping("/members/{id}/nickname")
+    public ResponseEntity updateMemberNickName(@PathVariable Long id, @Valid @RequestBody NickNameUpdateDTO nickNameUpdateDTO) {
 
-        Member member = memberService.findMemberById(nickNameUpdateDTO.getMemberId());
+        Member member = memberService.findById(id);
         memberService.updateNickName(member, nickNameUpdateDTO.getNickName());
 
         HttpHeaders headers = new HttpHeaders();
@@ -91,10 +91,10 @@ public class MemberController {
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @PutMapping("/members/{memberId}/password")
-    public ResponseEntity updateMemberPassword(@Valid @RequestBody PasswordUpdateDTO passwordUpdateDTO) {
+    @PutMapping("/members/{id}/password")
+    public ResponseEntity updateMemberPassword(@PathVariable Long id, @Valid @RequestBody PasswordUpdateDTO passwordUpdateDTO) {
 
-        Member member = memberService.findMemberById(passwordUpdateDTO.getMemberId());
+        Member member = memberService.findById(id);
         memberService.updatePassword(member, passwordUpdateDTO.getPassword());
 
         HttpHeaders headers = new HttpHeaders();

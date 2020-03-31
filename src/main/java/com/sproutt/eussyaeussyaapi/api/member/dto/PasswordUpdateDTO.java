@@ -15,16 +15,12 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 public class PasswordUpdateDTO {
 
-    @NotBlank
-    private String memberId;
-
     @Nullable
     @Pattern(regexp = RegexExpression.PASSWORD)
     private String password;
 
     @Builder
-    public PasswordUpdateDTO(String memberId, String password) {
-        this.memberId = memberId;
+    public PasswordUpdateDTO(String password) {
         this.password = password;
     }
 }

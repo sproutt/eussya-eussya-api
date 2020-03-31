@@ -19,7 +19,7 @@ public interface MemberService {
 
     Member updatePassword(Member member, String password);
 
-    Member findMemberById(String memberId);
+    Member findById(Long id);
 
     Member sendAuthCodeToEmail(String email);
 }
