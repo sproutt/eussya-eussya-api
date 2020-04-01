@@ -6,6 +6,7 @@ import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationNickNameException;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,7 +87,7 @@ public class MemberController {
         }
 
         if (!nickName.isBlank() && memberService.isDuplicatedNickName(nickName)) {
-            throw new DuplicationMemberException();
+            throw new DuplicationNickNameException();
         }
 
         HttpHeaders headers = new HttpHeaders();
