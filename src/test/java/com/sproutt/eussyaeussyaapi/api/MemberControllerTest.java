@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -106,6 +107,34 @@ public class MemberControllerTest {
 
         actions
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void checkDuplicatedMemberId_when_not_exist() throws Exception {
+        Member member = MemberFactory.getDefaultMember();
+
+        when(memberService.isDuplicatedMemberId(member.getMemberId())).thenReturn(false);
+
+        ResultActions actions = mvc.perform(get("/members?memberId=" + member.getMemberId())
+                .contentType(MediaType.APPLICATION_JSON))
+                                   .andDo(print());
+
+        actions
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void checkDuplicatedMemberId_when_exist() throws Exception {
+        Member member = MemberFactory.getDefaultMember();
+
+        when(memberService.isDuplicatedMemberId(member.getMemberId())).thenReturn(true);
+
+        ResultActions actions = mvc.perform(get("/members?memberId=" + member.getMemberId())
+                .contentType(MediaType.APPLICATION_JSON))
+                                   .andDo(print());
+
+        actions
+                .andExpect(status().isBadRequest());
     }
 
     private static String asJsonString(final Object object) {

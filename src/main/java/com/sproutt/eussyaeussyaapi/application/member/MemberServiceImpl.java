@@ -77,6 +77,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public boolean isDuplicatedMemberId(String memberId) {
+
+        return memberRepository.findByMemberId(memberId).isPresent();
+    }
+
+    @Override
     @Transactional
     public Member authenticateEmail(EmailAuthDTO emailAuthDTO) {
 

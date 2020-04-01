@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -61,5 +62,23 @@ public class MemberServiceTest {
         when(memberRepository.findByMemberId(MEMBER_ID)).thenReturn(Optional.of(member));
 
         assertThrows(VerificationException.class, () -> memberService.authenticateEmail(emailAuthDTO));
+    }
+
+    @Test
+    public void checkDuplicatedMemberId_when_not_exist() {
+        Member member = MemberFactory.getDefaultMember();
+
+        when(memberRepository.findByMemberId(member.getMemberId())).thenReturn(Optional.empty());
+
+        assertThat(memberService.isDuplicatedMemberId(member.getMemberId())).isFalse();
+    }
+
+    @Test
+    public void checkDuplicatedMemberId_when_exist() {
+        Member member = MemberFactory.getDefaultMember();
+
+        when(memberRepository.findByMemberId(member.getMemberId())).thenReturn(Optional.of(member));
+
+        assertThat(memberService.isDuplicatedMemberId(member.getMemberId())).isTrue();
     }
 }

@@ -16,4 +16,6 @@ public interface MemberService {
     Member authenticateEmail(EmailAuthDTO emailAuthDTO);
 
     Member sendAuthCodeToEmail(String email);
+
+    boolean isDuplicatedMemberId(String memberId);
 }

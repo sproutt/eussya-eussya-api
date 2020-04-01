@@ -5,6 +5,7 @@ import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
 
 @Slf4j
 @RestController
@@ -76,5 +76,18 @@ public class MemberController {
         memberService.authenticateEmail(emailAuthDTO);
 
         return new ResponseEntity<>(headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/members")
+    public ResponseEntity checkDuplicatedMemberId(@RequestParam("memberId") String memberId) {
+
+        if (memberService.isDuplicatedMemberId(memberId)) {
+            throw new DuplicationMemberException();
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return new ResponseEntity(headers, HttpStatus.OK);
     }
 }
