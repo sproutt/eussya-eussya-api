@@ -18,4 +18,6 @@ public interface MemberService {
     Member sendAuthCodeToEmail(String email);
 
     boolean isDuplicatedMemberId(String memberId);
+
+    boolean isDuplicatedNickName(String nickName);
 }

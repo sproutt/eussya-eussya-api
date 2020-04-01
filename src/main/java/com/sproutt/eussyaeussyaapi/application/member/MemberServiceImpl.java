@@ -83,6 +83,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public boolean isDuplicatedNickName(String nickName) {
+
+        return memberRepository.findByNickName(nickName).isPresent();
+    }
+
+    @Override
     @Transactional
     public Member authenticateEmail(EmailAuthDTO emailAuthDTO) {
 

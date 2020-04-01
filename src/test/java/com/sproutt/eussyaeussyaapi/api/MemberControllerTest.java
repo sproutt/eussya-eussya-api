@@ -115,7 +115,7 @@ public class MemberControllerTest {
 
         when(memberService.isDuplicatedMemberId(member.getMemberId())).thenReturn(false);
 
-        ResultActions actions = mvc.perform(get("/members?memberId=" + member.getMemberId())
+        ResultActions actions = mvc.perform(get("/members?nickName=&memberId=" + member.getMemberId())
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -129,7 +129,35 @@ public class MemberControllerTest {
 
         when(memberService.isDuplicatedMemberId(member.getMemberId())).thenReturn(true);
 
-        ResultActions actions = mvc.perform(get("/members?memberId=" + member.getMemberId())
+        ResultActions actions = mvc.perform(get("/members?nickName=&memberId=" + member.getMemberId())
+                .contentType(MediaType.APPLICATION_JSON))
+                                   .andDo(print());
+
+        actions
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void checkDuplicatedNickName_when_not_exist() throws Exception {
+        Member member = MemberFactory.getDefaultMember();
+
+        when(memberService.isDuplicatedNickName(member.getNickName())).thenReturn(false);
+
+        ResultActions actions = mvc.perform(get("/members?memberId=&nickName=" + member.getNickName())
+                .contentType(MediaType.APPLICATION_JSON))
+                                   .andDo(print());
+
+        actions
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void checkDuplicatedNickName_when_exist() throws Exception {
+        Member member = MemberFactory.getDefaultMember();
+
+        when(memberService.isDuplicatedNickName(member.getNickName())).thenReturn(true);
+
+        ResultActions actions = mvc.perform(get("/members?memberId=&nickName=" + member.getNickName())
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 

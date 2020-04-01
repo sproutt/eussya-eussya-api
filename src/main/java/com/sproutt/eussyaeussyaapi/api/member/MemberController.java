@@ -79,9 +79,13 @@ public class MemberController {
     }
 
     @GetMapping("/members")
-    public ResponseEntity checkDuplicatedMemberId(@RequestParam("memberId") String memberId) {
+    public ResponseEntity checkMemberIdDuplication(@RequestParam("memberId") String memberId, @RequestParam("nickName") String nickName) {
 
-        if (memberService.isDuplicatedMemberId(memberId)) {
+        if (!memberId.isBlank() && memberService.isDuplicatedMemberId(memberId)) {
+            throw new DuplicationMemberException();
+        }
+
+        if (!nickName.isBlank() && memberService.isDuplicatedNickName(nickName)) {
             throw new DuplicationMemberException();
         }
 

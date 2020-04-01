@@ -81,4 +81,22 @@ public class MemberServiceTest {
 
         assertThat(memberService.isDuplicatedMemberId(member.getMemberId())).isTrue();
     }
+
+    @Test
+    public void checkDuplicatedNickName_when_not_exist() {
+        Member member = MemberFactory.getDefaultMember();
+
+        when(memberRepository.findByNickName(member.getNickName())).thenReturn(Optional.empty());
+
+        assertThat(memberService.isDuplicatedNickName(member.getNickName())).isFalse();
+    }
+
+    @Test
+    public void checkDuplicatedNickName_when_exist() {
+        Member member = MemberFactory.getDefaultMember();
+
+        when(memberRepository.findByNickName(member.getNickName())).thenReturn(Optional.of(member));
+
+        assertThat(memberService.isDuplicatedNickName(member.getNickName())).isTrue();
+    }
 }
