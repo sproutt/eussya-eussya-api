@@ -16,6 +16,7 @@ import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationExceptio
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -37,6 +38,7 @@ public class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("멤버 생성 테스트(중복되지 않은 id인 경우)")
     public void createMember_with_exist_memberId() {
         JoinDTO joinDTO = JoinDTO.builder()
                                  .memberId(MEMBER_ID)
@@ -51,6 +53,7 @@ public class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("멤버 생성 테스트(중복된 id인 경우)")
     public void authenticateEmail_with_unMatched_authCode() {
         Member member = MemberFactory.getDefaultMember();
 
@@ -65,6 +68,7 @@ public class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("memberId 중복 테스트(중복되지 않은 경우)")
     public void checkDuplicatedMemberId_when_not_exist() {
         Member member = MemberFactory.getDefaultMember();
 
@@ -74,6 +78,7 @@ public class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("memberId 중복 테스트(중복된 경우)")
     public void checkDuplicatedMemberId_when_exist() {
         Member member = MemberFactory.getDefaultMember();
 
@@ -83,6 +88,7 @@ public class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("nickName 중복 테스트(중복되지 않은 경우)")
     public void checkDuplicatedNickName_when_not_exist() {
         Member member = MemberFactory.getDefaultMember();
 
@@ -92,6 +98,7 @@ public class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("nickName 중복 테스트(중복된 경우)")
     public void checkDuplicatedNickName_when_exist() {
         Member member = MemberFactory.getDefaultMember();
 

@@ -10,6 +10,7 @@ import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,7 @@ public class MemberControllerTest {
 
 
     @Test
+    @DisplayName("회원가입 테스트(올바른 요청일 경우)")
     public void createMemberWithLocalProvider() throws Exception {
         JoinDTO joinDTO = defaultSignUpDTO();
         Member member = MemberFactory.getDefaultMember();
@@ -62,6 +64,7 @@ public class MemberControllerTest {
     }
 
     @Test
+    @DisplayName("회원가입 테스트(중복된 memberId를 입력한 경우)")
     public void createMember_with_exist_memberId() throws Exception {
         JoinDTO joinDTO = defaultSignUpDTO();
 
@@ -75,6 +78,7 @@ public class MemberControllerTest {
     }
 
     @Test
+    @DisplayName("인증 코드 메일 전송 테스트")
     public void send_authCode_to_email() throws Exception {
         Member member = MemberFactory.getDefaultMember();
         String email = member.getMemberId();
@@ -90,6 +94,7 @@ public class MemberControllerTest {
     }
 
     @Test
+    @DisplayName("이메일 인증 테스트")
     public void authenticateEmail() throws Exception {
         Member member = MemberFactory.getDefaultMember();
 
@@ -110,12 +115,13 @@ public class MemberControllerTest {
     }
 
     @Test
-    public void checkDuplicatedMemberId_when_not_exist() throws Exception {
+    @DisplayName("memberId 중복 체크(중복되지 않은 경우)")
+    void checkDuplicatedMemberId_when_not_exist() throws Exception {
         Member member = MemberFactory.getDefaultMember();
 
         when(memberService.isDuplicatedMemberId(member.getMemberId())).thenReturn(false);
 
-        ResultActions actions = mvc.perform(get("/members?nickName=&memberId=" + member.getMemberId())
+        ResultActions actions = mvc.perform(get("/members/validate/memberid/{memberId}", member.getMemberId())
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -124,12 +130,13 @@ public class MemberControllerTest {
     }
 
     @Test
+    @DisplayName("memberId 중복 체크(중복된 경우)")
     public void checkDuplicatedMemberId_when_exist() throws Exception {
         Member member = MemberFactory.getDefaultMember();
 
         when(memberService.isDuplicatedMemberId(member.getMemberId())).thenReturn(true);
 
-        ResultActions actions = mvc.perform(get("/members?nickName=&memberId=" + member.getMemberId())
+        ResultActions actions = mvc.perform(get("/members/validate/memberid/{memberId}", member.getMemberId())
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -138,12 +145,13 @@ public class MemberControllerTest {
     }
 
     @Test
+    @DisplayName("nickName 중복 체크 체크(중복되지 않은 경우)")
     public void checkDuplicatedNickName_when_not_exist() throws Exception {
         Member member = MemberFactory.getDefaultMember();
 
         when(memberService.isDuplicatedNickName(member.getNickName())).thenReturn(false);
 
-        ResultActions actions = mvc.perform(get("/members?memberId=&nickName=" + member.getNickName())
+        ResultActions actions = mvc.perform(get("/members/validate/nickname/{nickName}", member.getNickName())
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -152,12 +160,13 @@ public class MemberControllerTest {
     }
 
     @Test
+    @DisplayName("nickName 중복 체크 체크(중복된 경우)")
     public void checkDuplicatedNickName_when_exist() throws Exception {
         Member member = MemberFactory.getDefaultMember();
 
         when(memberService.isDuplicatedNickName(member.getNickName())).thenReturn(true);
 
-        ResultActions actions = mvc.perform(get("/members?memberId=&nickName=" + member.getNickName())
+        ResultActions actions = mvc.perform(get("/members/validate/nickname/{nickName}", member.getNickName())
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 

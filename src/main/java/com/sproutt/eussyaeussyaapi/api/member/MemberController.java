@@ -79,14 +79,23 @@ public class MemberController {
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @GetMapping("/members")
-    public ResponseEntity checkMemberIdDuplication(@RequestParam("memberId") String memberId, @RequestParam("nickName") String nickName) {
+    @GetMapping("/members/validate/memberid/{memberId}")
+    public ResponseEntity checkMemberIdDuplication(@PathVariable String memberId) {
 
-        if (!memberId.isBlank() && memberService.isDuplicatedMemberId(memberId)) {
+        if (memberService.isDuplicatedMemberId(memberId)) {
             throw new DuplicationMemberException();
         }
 
-        if (!nickName.isBlank() && memberService.isDuplicatedNickName(nickName)) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return new ResponseEntity(headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/members/validate/nickname/{nickName}")
+    public ResponseEntity checkNickNameDuplication(@PathVariable String nickName) {
+
+        if (memberService.isDuplicatedNickName(nickName)) {
             throw new DuplicationNickNameException();
         }
 
