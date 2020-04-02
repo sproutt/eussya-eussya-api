@@ -6,76 +6,58 @@ import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.object.EncryptedResourceGenerator;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockingDetails;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class SocialServiceTest {
 
     private final String GITHUB = "github";
     private final String githubToken = EncryptedResourceGenerator.getGitToken();
 
-    @Autowired
+    @Mock
+    private MemberRepository memberRepository = mock(MemberRepository.class);
+
     private SocialService socialService;
 
-    @Autowired
-    private MemberRepository memberRepository;
-
     @BeforeEach
-    public void init(){
-        memberRepository.deleteAll();
-        memberRepository.flush();
+    public void init() {
+        socialService = new SocialService(memberRepository);
     }
 
     @Test
-    public void login_with_no_existed_id_by_github() {
+    public void login() {
+        Member defaultMember = MemberFactory.getDefaultMember();
+        when(memberRepository.findByMemberId(defaultMember.getMemberId())).thenReturn(Optional.of(defaultMember));
 
-        Member githubMember = MemberFactory.getGithubMember();
-        //when(oAuth2RequestService.getUserInfo(githubToken, GITHUB)).thenReturn(githubMember);
+        Member loginMember = socialService.login(defaultMember);
 
-        Member member = socialService.login(githubToken, GITHUB);
-
-        assertThat(member.getMemberId()).isEqualTo(githubMember.getMemberId());
-        assertThat(member.getNickName()).isEqualTo(githubMember.getNickName());
+        assertThat(loginMember.getMemberId()).isEqualTo(defaultMember.getId());
+        assertThat(loginMember.getNickName()).isEqualTo(defaultMember.getNickName());
     }
 
     @Test
-    public void login_with_existed_id_by_github() {
+    public void login_by_existed_member() {
+        Member savedMember = MemberFactory.getDefaultMember();
+        when(memberRepository.findByMemberId(savedMember.getMemberId())).thenReturn(Optional.of(savedMember));
 
-        Member githubMember = MemberFactory.getGithubMember();
-        memberRepository.save(githubMember);
-        //when(oAuth2RequestServiceImpl.getUserInfo(githubToken, GITHUB)).thenReturn(githubMember);
+        Member loginMember = socialService.login(savedMember);
 
-        Member member = socialService.login(githubToken, GITHUB);
-
-        assertThat(member.getMemberId()).isEqualTo(githubMember.getMemberId());
-        assertThat(member.getNickName()).isEqualTo(githubMember.getNickName());
+        assertThat(loginMember.getMemberId()).isEqualTo(savedMember.getId());
+        assertThat(loginMember.getNickName()).isEqualTo(savedMember.getNickName());
     }
-
-    @Test
-    public void login_with_wrong_token_by_github(){
-        String wrongAccessToken = "wrongToken";
-        //when(oAuth2RequestServiceImpl.getUserInfo(wrongAccessToken, GITHUB)).thenThrow(OAuth2CommunicationException.class);
-
-        assertThrows(OAuth2CommunicationException.class, ()-> socialService.login(wrongAccessToken, GITHUB));
-    }
-
-    @Test
-    public void login_with_wrong_provider_by_github(){
-        String wrongProvider = "wrongProvider";
-        //when(oAuth2RequestServiceImpl.getUserInfo(githubToken, wrongProvider)).thenThrow(NotFoundOAuth2Exception.class);
-
-        assertThrows(UnSupportedOAuth2Exception.class, ()-> socialService.login(githubToken, wrongProvider));
-    }
-
 
 }
