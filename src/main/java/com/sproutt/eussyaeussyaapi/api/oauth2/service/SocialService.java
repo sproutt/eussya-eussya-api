@@ -10,13 +10,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class SocialService {
 
-    private final OAuth2RequestService oAuth2RequestService;
     private final MemberRepository memberRepository;
 
-    public Member login(String accessToken, String provider) {
-        Member member = oAuth2RequestService.getUserInfo(accessToken, provider);
+    public Member login(Member member) {
 
-        if (!memberRepository.existsByMemberId(member.getMemberId())){
+        if (!memberRepository.existsByMemberId(member.getMemberId())) {
             return memberRepository.save(member);
         }
 

@@ -1,5 +1,7 @@
 package com.sproutt.eussyaeussyaapi.api.oauth2;
 
+import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportedOAuth2Exception;
+import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2RequestService;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.SocialService;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
@@ -9,7 +11,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RequestMapping("/social")
@@ -18,14 +24,42 @@ public class SocialController {
 
     private final JwtHelper jwtHelper;
     private final SocialService socialService;
+    private final OAuth2RequestService oAuth2RequestService;
+
+    @Value("${social.github.url}")
+    private String githubRequestUrl;
+
+    @Value("${social.google.url}")
+    private String googleRequestUrl;
+
+    @Value("${social.facebook.url}")
+    private String facebookRequestUrl;
 
     @Value("${token.key}")
     private String TOKEN_KEY;
 
     @PostMapping("/login/{provider}")
-    public ResponseEntity loginByProvider(@PathVariable String provider, @RequestParam String accessToken) throws Exception{
-        Member member = socialService.login(accessToken, provider);
-        String token = jwtHelper.createToken(member);
+    public ResponseEntity loginByProvider(@PathVariable String provider, @RequestParam String accessToken) {
+        Member loginMember = null;
+
+        if (provider.equals("github")) {
+            loginMember = oAuth2RequestService.getGithubUserInfo(accessToken, githubRequestUrl).toEntity();
+        }
+
+        if (provider.equals("google")) {
+            loginMember = oAuth2RequestService.getGoogleUserInfo(accessToken, githubRequestUrl).toEntity();
+        }
+
+        if (provider.equals("facebook")) {
+            loginMember = oAuth2RequestService.getFacebookUserInfo(accessToken, githubRequestUrl).toEntity();
+        }
+
+        if (loginMember == null) {
+            throw new UnSupportedOAuth2Exception();
+        }
+
+        socialService.login(loginMember);
+        String token = jwtHelper.createToken(loginMember);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

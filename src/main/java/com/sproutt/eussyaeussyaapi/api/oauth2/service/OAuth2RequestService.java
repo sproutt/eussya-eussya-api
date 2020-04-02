@@ -4,10 +4,7 @@ import com.sproutt.eussyaeussyaapi.api.oauth2.dto.FacebookOAuth2UserDto;
 import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GithubOAuth2UserDto;
 import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GoogleOAuth2UserDto;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
-import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportedOAuth2Exception;
-import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -22,39 +19,14 @@ public class OAuth2RequestService {
 
     private final RestTemplate restTemplate;
 
-    @Value("${social.github.url}")
-    private String githubRequestUrl;
-
-    @Value("${social.google.url}")
-    private String googleRequestUrl;
-
-    @Value("${social.facebook.url}")
-    private String facebookRequestUrl;
-
-    public Member getUserInfo(String accessToken, String provider) {
-        if (provider.equals("github")) {
-            return getGithubUserInfo(accessToken).toEntity();
-        }
-
-        if (provider.equals("google")) {
-            return getGoogleUserInfo(accessToken).toEntity();
-        }
-
-        if (provider.equals("facebook")) {
-            return getFacebookUserInfo(accessToken).toEntity();
-        }
-
-        throw new UnSupportedOAuth2Exception();
-    }
-
-    private GithubOAuth2UserDto getGithubUserInfo(String accessToken) {
+    public GithubOAuth2UserDto getGithubUserInfo(String accessToken, String requestUrl) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "token " + accessToken);
 
         HttpEntity request = new HttpEntity(headers);
         try {
             ResponseEntity<GithubOAuth2UserDto> response = restTemplate
-                    .exchange(githubRequestUrl, HttpMethod.GET, request, GithubOAuth2UserDto.class);
+                .exchange(requestUrl, HttpMethod.GET, request, GithubOAuth2UserDto.class);
 
             return response.getBody();
 
@@ -63,17 +35,17 @@ public class OAuth2RequestService {
         }
     }
 
-    private FacebookOAuth2UserDto getFacebookUserInfo(String accessToken) {
+    public FacebookOAuth2UserDto getFacebookUserInfo(String accessToken, String requestUrl) {
 
         StringBuilder request = new StringBuilder();
-        request.append(facebookRequestUrl)
+        request.append(requestUrl)
                .append("?fields=id,name")
                .append("&access_token")
                .append(accessToken);
 
         try {
             ResponseEntity<FacebookOAuth2UserDto> response = restTemplate
-                    .getForEntity(request.toString(), FacebookOAuth2UserDto.class);
+                .getForEntity(request.toString(), FacebookOAuth2UserDto.class);
 
             return response.getBody();
         } catch (RestClientException e) {
@@ -81,14 +53,14 @@ public class OAuth2RequestService {
         }
     }
 
-    private GoogleOAuth2UserDto getGoogleUserInfo(String accessToken) {
+    public GoogleOAuth2UserDto getGoogleUserInfo(String accessToken, String requestUrl) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
 
         HttpEntity request = new HttpEntity(headers);
         try {
             ResponseEntity<GoogleOAuth2UserDto> response = restTemplate
-                    .exchange(googleRequestUrl, HttpMethod.GET, request, GoogleOAuth2UserDto.class);
+                .exchange(requestUrl, HttpMethod.GET, request, GoogleOAuth2UserDto.class);
 
             return response.getBody();
 
