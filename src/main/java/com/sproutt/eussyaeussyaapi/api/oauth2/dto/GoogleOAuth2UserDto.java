@@ -2,7 +2,6 @@ package com.sproutt.eussyaeussyaapi.api.oauth2.dto;
 
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.Provider;
-import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 

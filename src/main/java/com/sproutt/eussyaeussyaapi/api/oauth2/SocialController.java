@@ -1,7 +1,8 @@
 package com.sproutt.eussyaeussyaapi.api.oauth2;
 
-import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2Service;
-import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2ServiceFactory;
+import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportedOAuth2Exception;
+import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2RequestService;
+import com.sproutt.eussyaeussyaapi.api.oauth2.service.SocialService;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import lombok.RequiredArgsConstructor;
@@ -22,33 +23,48 @@ import org.springframework.web.bind.annotation.RestController;
 public class SocialController {
 
     private final JwtHelper jwtHelper;
+    private final SocialService socialService;
+    private final OAuth2RequestService oAuth2RequestService;
+
+    @Value("${social.github.url}")
+    private String githubRequestUrl;
+
+    @Value("${social.google.url}")
+    private String googleRequestUrl;
+
+    @Value("${social.facebook.url}")
+    private String facebookRequestUrl;
 
     @Value("${token.key}")
     private String TOKEN_KEY;
 
-    @PostMapping("/signin/{provider}")
-    public ResponseEntity signInByProvider(@PathVariable String provider, @RequestParam String accessToken) {
+    @PostMapping("/login/{provider}")
+    public ResponseEntity loginByProvider(@PathVariable String provider, @RequestParam String accessToken) {
+        Member loginMember = null;
 
-        OAuth2Service oAuth2Service = OAuth2ServiceFactory.getOAuth2Service(provider);
-        Member member = oAuth2Service.getMemberInfo(accessToken);
+        if (provider.equals("github")) {
+            loginMember = oAuth2RequestService.getGithubUserInfo(accessToken, githubRequestUrl).toEntity();
+        }
 
-        String token = jwtHelper.createToken(member);
+        if (provider.equals("google")) {
+            loginMember = oAuth2RequestService.getGoogleUserInfo(accessToken, githubRequestUrl).toEntity();
+        }
+
+        if (provider.equals("facebook")) {
+            loginMember = oAuth2RequestService.getFacebookUserInfo(accessToken, githubRequestUrl).toEntity();
+        }
+
+        if (loginMember == null) {
+            throw new UnSupportedOAuth2Exception();
+        }
+
+        socialService.login(loginMember);
+        String token = jwtHelper.createToken(loginMember);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(TOKEN_KEY, token);
         return new ResponseEntity<>(headers, HttpStatus.OK);
-    }
-
-    @PostMapping("/signup/{provider}")
-    public ResponseEntity signUpByProvider(@PathVariable String provider, @RequestParam String accessToken) {
-
-        OAuth2Service oAuth2Service = OAuth2ServiceFactory.getOAuth2Service(provider);
-        oAuth2Service.createMember(accessToken);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        return new ResponseEntity(headers, HttpStatus.CREATED);
     }
 
 }
