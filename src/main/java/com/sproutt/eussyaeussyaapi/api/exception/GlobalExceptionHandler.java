@@ -3,7 +3,7 @@ package com.sproutt.eussyaeussyaapi.api.exception;
 import com.sproutt.eussyaeussyaapi.api.dto.ErrorResponse;
 import com.sproutt.eussyaeussyaapi.api.dto.ValidateError;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
-import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportOAuth2Exception;
+import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportedOAuth2Exception;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationException;
@@ -99,9 +99,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
     }
 
-    @ExceptionHandler(value = UnSupportOAuth2Exception.class)
-    public ResponseEntity handleUnSupportOAuth2Exception(UnSupportOAuth2Exception exception) {
-        log.info("handleUnSupportOAuth2Exception : {}", exception);
+    @ExceptionHandler(value = UnSupportedOAuth2Exception.class)
+    public ResponseEntity handleUnSupportOAuth2Exception(UnSupportedOAuth2Exception exception) {
+        log.info("handleUnSupportedOAuth2Exception : {}", exception);
 
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
     }
