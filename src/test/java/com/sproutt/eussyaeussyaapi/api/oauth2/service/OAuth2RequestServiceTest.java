@@ -11,6 +11,7 @@ import com.sproutt.eussyaeussyaapi.object.DtoFactory;
 import com.sproutt.eussyaeussyaapi.object.EncryptedResourceGenerator;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OAuth2RequestServiceTest {
 
     private final String githubRequestUrl = "https://api.github.com/user";
@@ -44,6 +44,7 @@ class OAuth2RequestServiceTest {
         oAuth2RequestService = new OAuth2RequestService(restTemplate);
     }
 
+    @DisplayName("github에서 user 정보 가져오기")
     @Test
     public void getUserInfo_by_github() {
 
@@ -59,6 +60,7 @@ class OAuth2RequestServiceTest {
         assertThat(githubOAuth2UserDto.getName()).isEqualTo(defaultGithubDto.getName());
     }
 
+    @DisplayName("github에서 user 정보 가져오기 - accessToken이 잘못되었을 때")
     @Test
     public void getUserInfo_with_wrong_accessToken_by_github() {
 

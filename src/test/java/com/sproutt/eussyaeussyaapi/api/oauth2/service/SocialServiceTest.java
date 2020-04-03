@@ -10,6 +10,7 @@ import com.sproutt.eussyaeussyaapi.object.EncryptedResourceGenerator;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -28,6 +29,7 @@ class SocialServiceTest {
         socialService = new SocialService(memberRepository);
     }
 
+    @DisplayName("소셜 로그인")
     @Test
     public void login() {
         Member defaultMember = MemberFactory.getGithubMember();
@@ -40,6 +42,7 @@ class SocialServiceTest {
         assertThat(loginMember.getNickName()).isEqualTo(defaultMember.getNickName());
     }
 
+    @DisplayName("소셜 로그인 - DB에 저장되어있지 않을 때")
     @Test
     public void login_by_existed_member() {
         Member savedMember = MemberFactory.getGithubMember();
