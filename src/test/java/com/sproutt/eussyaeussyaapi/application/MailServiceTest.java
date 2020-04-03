@@ -2,6 +2,7 @@ package com.sproutt.eussyaeussyaapi.application;
 
 import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +30,7 @@ public class MailServiceTest {
     }
 
     @Test
+    @DisplayName("메일 전송 테스트")
     public void send_mail() {
         String to = "kjkun7631@naver.com";
 
@@ -36,6 +38,7 @@ public class MailServiceTest {
     }
 
     @Test
+    @DisplayName("잘못된 메일 주소로 전송한 경우")
     public void send_wrong_email_address() {
         String to = "wrongAddress";
 

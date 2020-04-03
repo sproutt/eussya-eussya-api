@@ -4,7 +4,7 @@ import com.sproutt.eussyaeussyaapi.api.dto.ErrorResponse;
 import com.sproutt.eussyaeussyaapi.api.dto.ValidateError;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportedOAuth2Exception;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.WrongPasswordException;
@@ -57,9 +57,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = DuplicationMemberException.class)
-    public ResponseEntity handleDuplicationMemberException(DuplicationMemberException exception) {
-        log.info("handleDuplicationMemberException : {}", exception);
+    @ExceptionHandler(value = DuplicationException.class)
+    public ResponseEntity handleDuplicationException(DuplicationException exception) {
+        log.info("handleDuplicationException : {}", exception);
 
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
     }

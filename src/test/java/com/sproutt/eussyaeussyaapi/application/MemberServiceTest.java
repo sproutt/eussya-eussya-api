@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -15,6 +16,7 @@ import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationExceptio
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -36,6 +38,7 @@ public class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("멤버 생성 테스트(중복되지 않은 id인 경우)")
     public void createMember_with_exist_memberId() {
         JoinDTO joinDTO = JoinDTO.builder()
                                  .memberId(MEMBER_ID)
@@ -50,6 +53,7 @@ public class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("멤버 생성 테스트(중복된 id인 경우)")
     public void authenticateEmail_with_unMatched_authCode() {
         Member member = MemberFactory.getDefaultMember();
 
@@ -61,5 +65,45 @@ public class MemberServiceTest {
         when(memberRepository.findByMemberId(MEMBER_ID)).thenReturn(Optional.of(member));
 
         assertThrows(VerificationException.class, () -> memberService.authenticateEmail(emailAuthDTO));
+    }
+
+    @Test
+    @DisplayName("memberId 중복 테스트(중복되지 않은 경우)")
+    public void checkDuplicatedMemberId_when_not_exist() {
+        Member member = MemberFactory.getDefaultMember();
+
+        when(memberRepository.findByMemberId(member.getMemberId())).thenReturn(Optional.empty());
+
+        assertThat(memberService.isDuplicatedMemberId(member.getMemberId())).isFalse();
+    }
+
+    @Test
+    @DisplayName("memberId 중복 테스트(중복된 경우)")
+    public void checkDuplicatedMemberId_when_exist() {
+        Member member = MemberFactory.getDefaultMember();
+
+        when(memberRepository.findByMemberId(member.getMemberId())).thenReturn(Optional.of(member));
+
+        assertThat(memberService.isDuplicatedMemberId(member.getMemberId())).isTrue();
+    }
+
+    @Test
+    @DisplayName("nickName 중복 테스트(중복되지 않은 경우)")
+    public void checkDuplicatedNickName_when_not_exist() {
+        Member member = MemberFactory.getDefaultMember();
+
+        when(memberRepository.findByNickName(member.getNickName())).thenReturn(Optional.empty());
+
+        assertThat(memberService.isDuplicatedNickName(member.getNickName())).isFalse();
+    }
+
+    @Test
+    @DisplayName("nickName 중복 테스트(중복된 경우)")
+    public void checkDuplicatedNickName_when_exist() {
+        Member member = MemberFactory.getDefaultMember();
+
+        when(memberRepository.findByNickName(member.getNickName())).thenReturn(Optional.of(member));
+
+        assertThat(memberService.isDuplicatedNickName(member.getNickName())).isTrue();
     }
 }
