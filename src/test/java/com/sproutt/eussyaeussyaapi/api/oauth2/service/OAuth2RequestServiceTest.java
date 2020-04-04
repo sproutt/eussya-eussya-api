@@ -9,8 +9,10 @@ import com.sproutt.eussyaeussyaapi.api.oauth2.dto.FacebookOAuth2UserDto;
 import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GithubOAuth2UserDto;
 import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GoogleOAuth2UserDto;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
+import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportedOAuth2Exception;
+import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.object.DtoFactory;
-import com.sproutt.eussyaeussyaapi.object.EncryptedResourceGenerator;
+import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,16 +48,17 @@ class OAuth2RequestServiceTest {
     public void getUserInfo_by_github() {
 
         GithubOAuth2UserDto defaultGithubDto = DtoFactory.getGithubOAuth2UserDto();
+        Member defaultGitHubMember = MemberFactory.getGithubMember();
 
         when(restTemplate
             .exchange(GITHUB_REQUEST_URL, HttpMethod.GET, getGithubRequest(MOCK_TOKEN), GithubOAuth2UserDto.class))
             .thenReturn(getResponseEntity(defaultGithubDto));
 
-        GithubOAuth2UserDto githubOAuth2UserDto = oAuth2RequestService.getGithubUserInfo(MOCK_TOKEN,
-            GITHUB_REQUEST_URL);
+        Member githubMember = oAuth2RequestService
+            .getUserInfoByProvider(MOCK_TOKEN, "github", DtoFactory.getRequestUrlDto());
 
-        assertThat(githubOAuth2UserDto.getId()).isEqualTo(defaultGithubDto.getId());
-        assertThat(githubOAuth2UserDto.getName()).isEqualTo(defaultGithubDto.getName());
+        assertThat(githubMember.getId()).isEqualTo(defaultGitHubMember.getId());
+        assertThat(githubMember.getNickName()).isEqualTo(defaultGitHubMember.getNickName());
     }
 
     @DisplayName("github에서 user 정보 가져오기 - accessToken이 잘못되었을 때")
@@ -67,7 +70,7 @@ class OAuth2RequestServiceTest {
             .thenThrow(OAuth2CommunicationException.class);
 
         assertThrows(OAuth2CommunicationException.class,
-            () -> oAuth2RequestService.getGithubUserInfo(WRONG_TOKEN, GITHUB_REQUEST_URL));
+            () -> oAuth2RequestService.getUserInfoByProvider(WRONG_TOKEN, "github", DtoFactory.getRequestUrlDto()));
     }
 
     @DisplayName("facebook에 user 정보 가져오기 ")
@@ -75,15 +78,17 @@ class OAuth2RequestServiceTest {
     public void getUserInfo_by_Facebook() {
 
         FacebookOAuth2UserDto defaultFacebookDto = DtoFactory.getFacebookOAuth2UserDto();
+        Member defaultFacebookMember = MemberFactory.getFacebookMember();
 
         when(restTemplate.getForEntity(getFacebookRequest(MOCK_TOKEN), FacebookOAuth2UserDto.class))
             .thenReturn(getResponseEntity(defaultFacebookDto));
 
-        FacebookOAuth2UserDto facebookOAuth2UserDto = oAuth2RequestService
-            .getFacebookUserInfo(MOCK_TOKEN, FACEBOOK_REQUEST_URL);
+        Member facebookMember = oAuth2RequestService
+            .getUserInfoByProvider(MOCK_TOKEN, "facebook", DtoFactory.getRequestUrlDto());
 
-        assertThat(facebookOAuth2UserDto.getId()).isEqualTo(defaultFacebookDto.getId());
-        assertThat(facebookOAuth2UserDto.getName()).isEqualTo(defaultFacebookDto.getName());
+        assertThat(facebookMember.getId()).isEqualTo(defaultFacebookMember.getId());
+        assertThat(facebookMember.getNickName()).isEqualTo(defaultFacebookMember.getNickName());
+        assertThat(facebookMember.getEmail()).isEqualTo(defaultFacebookMember.getEmail());
     }
 
     @DisplayName("facebook에서 user 정보 가져오기 - accessToken이 잘못되었을 때")
@@ -94,7 +99,7 @@ class OAuth2RequestServiceTest {
             .thenThrow(OAuth2CommunicationException.class);
 
         assertThrows(OAuth2CommunicationException.class,
-            () -> oAuth2RequestService.getFacebookUserInfo(WRONG_TOKEN, FACEBOOK_REQUEST_URL));
+            () -> oAuth2RequestService.getUserInfoByProvider(WRONG_TOKEN, "facebook", DtoFactory.getRequestUrlDto()));
 
     }
 
@@ -103,16 +108,18 @@ class OAuth2RequestServiceTest {
     public void getUserInfo_by_Google() {
 
         GoogleOAuth2UserDto defaultGoogleDto = DtoFactory.getGoogleOAuth2UserDto();
+        Member defaultGoogleMember = MemberFactory.getGoogleMember();
 
         when(restTemplate
             .exchange(GOOGLE_REQUEST_URL, HttpMethod.GET, getGoogleRequest(MOCK_TOKEN), GoogleOAuth2UserDto.class))
             .thenReturn(getResponseEntity(defaultGoogleDto));
 
-        GoogleOAuth2UserDto googleOAuth2UserDto = oAuth2RequestService
-            .getGoogleUserInfo(MOCK_TOKEN, GOOGLE_REQUEST_URL);
+        Member googleMember = oAuth2RequestService
+            .getUserInfoByProvider(MOCK_TOKEN, "google", DtoFactory.getRequestUrlDto());
 
-        assertThat(googleOAuth2UserDto.getId()).isEqualTo(defaultGoogleDto.getId());
-        assertThat(googleOAuth2UserDto.getName()).isEqualTo(defaultGoogleDto.getName());
+        assertThat(googleMember.getId()).isEqualTo(defaultGoogleMember.getId());
+        assertThat(googleMember.getNickName()).isEqualTo(defaultGoogleMember.getNickName());
+        assertThat(googleMember.getEmail()).isEqualTo(defaultGoogleMember.getEmail());
     }
 
     @DisplayName("google에서 user 정보 가져오기 - accessToken이 잘못되었을 때")
@@ -124,7 +131,14 @@ class OAuth2RequestServiceTest {
             .thenThrow(OAuth2CommunicationException.class);
 
         assertThrows(OAuth2CommunicationException.class,
-            () -> oAuth2RequestService.getGoogleUserInfo(WRONG_TOKEN, GOOGLE_REQUEST_URL));
+            () -> oAuth2RequestService.getUserInfoByProvider(WRONG_TOKEN, "google", DtoFactory.getRequestUrlDto()));
+    }
+
+    @DisplayName("지원하지 않는 social login일 때")
+    @Test
+    public void getUserInfo_by_strange_Provider() {
+        assertThrows(UnSupportedOAuth2Exception.class, () -> oAuth2RequestService
+            .getUserInfoByProvider("AnyToken", "worngProvider", DtoFactory.getRequestUrlDto()));
     }
 
     private HttpEntity getGithubRequest(String token) {

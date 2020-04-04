@@ -19,6 +19,7 @@ public class FacebookOAuth2UserDto {
         return Member.builder()
                      .memberId(id)
                      .nickName(name)
+                     .email(email)
                      .provider(Provider.FACEBOOK)
                      .build();
     }

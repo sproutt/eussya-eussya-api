@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
-import com.sproutt.eussyaeussyaapi.object.EncryptedResourceGenerator;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;

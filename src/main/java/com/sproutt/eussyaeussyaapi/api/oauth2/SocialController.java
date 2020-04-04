@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.api.oauth2;
 
+import com.sproutt.eussyaeussyaapi.api.oauth2.dto.RequestUrlDto;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportedOAuth2Exception;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2RequestService;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.SocialService;
@@ -40,25 +41,11 @@ public class SocialController {
 
     @PostMapping("/login/{provider}")
     public ResponseEntity loginByProvider(@PathVariable String provider, @RequestParam String accessToken) {
-        Member loginMember = null;
+        RequestUrlDto requestUrlDto = new RequestUrlDto(googleRequestUrl, githubRequestUrl, facebookRequestUrl);
 
-        if (provider.equals("github")) {
-            loginMember = oAuth2RequestService.getGithubUserInfo(accessToken, githubRequestUrl).toEntity();
-        }
-
-        if (provider.equals("google")) {
-            loginMember = oAuth2RequestService.getGoogleUserInfo(accessToken, googleRequestUrl).toEntity();
-        }
-
-        if (provider.equals("facebook")) {
-            loginMember = oAuth2RequestService.getFacebookUserInfo(accessToken, facebookRequestUrl).toEntity();
-        }
-
-        if (loginMember == null) {
-            throw new UnSupportedOAuth2Exception();
-        }
-
+        Member loginMember = oAuth2RequestService.getUserInfoByProvider(accessToken, provider, requestUrlDto);
         socialService.login(loginMember);
+
         String token = jwtHelper.createToken(loginMember);
 
         HttpHeaders headers = new HttpHeaders();

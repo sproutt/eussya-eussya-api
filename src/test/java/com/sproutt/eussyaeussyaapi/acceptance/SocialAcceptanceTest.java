@@ -1,5 +1,7 @@
 package com.sproutt.eussyaeussyaapi.acceptance;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.object.EncryptedResourceGenerator;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
@@ -15,8 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -42,7 +42,7 @@ public class SocialAcceptanceTest {
         memberRepository.save(MemberFactory.getGithubMember());
 
         ResponseEntity response = template
-                .postForEntity("/social/login/github", getHeader(githubToken), Void.class);
+            .postForEntity("/social/login/github", getHeader(githubToken), Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -51,7 +51,7 @@ public class SocialAcceptanceTest {
     @Test
     public void login_with_no_existed_id_by_github() {
         ResponseEntity response = template
-                .postForEntity("/social/login/github", getHeader(githubToken), Void.class);
+            .postForEntity("/social/login/github", getHeader(githubToken), Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -61,8 +61,20 @@ public class SocialAcceptanceTest {
     public void login_with_wrong_token_by_github() {
         String wrongAccessToken = "wrongwrong";
         ResponseEntity response = template
-                .postForEntity("/social/login/github", getHeader(wrongAccessToken), Void.class);
+            .postForEntity("/social/login/github", getHeader(wrongAccessToken), String.class);
 
+        assertThat(response.getBody()).isEqualTo("oauth 통신 중 오류가 발생하였습니다.");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @DisplayName("지원하지 않는 로그인 주소일 때")
+    @Test
+    public void wrong_provider() {
+
+        ResponseEntity response = template
+            .postForEntity("/social/login/wrong", getHeader("anything"), String.class);
+
+        assertThat(response.getBody()).isEqualTo("지원하지 않거나 존재하지 않는 oauth 입니다.");
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
