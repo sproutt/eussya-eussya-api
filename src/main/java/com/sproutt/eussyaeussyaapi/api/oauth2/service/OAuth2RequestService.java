@@ -40,7 +40,7 @@ public class OAuth2RequestService {
         StringBuilder request = new StringBuilder();
         request.append(requestUrl)
                .append("?fields=id,name")
-               .append("&access_token")
+               .append("&access_token=")
                .append(accessToken);
 
         try {

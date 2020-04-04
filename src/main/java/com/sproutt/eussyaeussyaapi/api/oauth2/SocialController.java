@@ -47,11 +47,11 @@ public class SocialController {
         }
 
         if (provider.equals("google")) {
-            loginMember = oAuth2RequestService.getGoogleUserInfo(accessToken, githubRequestUrl).toEntity();
+            loginMember = oAuth2RequestService.getGoogleUserInfo(accessToken, googleRequestUrl).toEntity();
         }
 
         if (provider.equals("facebook")) {
-            loginMember = oAuth2RequestService.getFacebookUserInfo(accessToken, githubRequestUrl).toEntity();
+            loginMember = oAuth2RequestService.getFacebookUserInfo(accessToken, facebookRequestUrl).toEntity();
         }
 
         if (loginMember == null) {
