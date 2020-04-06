@@ -1,36 +1,47 @@
 package com.sproutt.eussyaeussyaapi.api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sproutt.eussyaeussyaapi.domain.member.Member;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
+import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
+import io.jsonwebtoken.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtHelper {
 
-    private static final String CLAIM_KEY = "member";
-    private static final String SECRET_KEY = "secret";
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-    public String createToken(Member member) {
+    private static final long VALID_MILLISECOND = 1000L * 60 * 60; // 1 hour
+
+    private static final String CLAIM_KEY = "member";
+
+    public String createToken(JwtMemberDTO jwtMemberDTO) {
+
+        log.info("token: {}", secretKey);
+
+        Claims claims = Jwts.claims().setSubject(CLAIM_KEY);
+        claims.put(CLAIM_KEY, jwtMemberDTO);
+
+        Date now = new Date();
 
         String token = Jwts.builder()
                            .setHeaderParam("typ", "jwt")
-                           .claim(CLAIM_KEY, member)
-                           .setExpiration(new Date(System.currentTimeMillis() + 3600000))
-                           .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                           .setClaims(claims)
+                           .setIssuedAt(now)
+                           .setExpiration(new Date(now.getTime() + VALID_MILLISECOND))
+                           .signWith(SignatureAlgorithm.HS256, secretKey)
                            .compact();
 
         return token;
     }
 
-    public Member decryptToken(String token) {
+    public JwtMemberDTO decryptToken(String token) {
         Jws<Claims> claims = null;
 
         try {
@@ -44,19 +55,22 @@ public class JwtHelper {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        return objectMapper.convertValue(claims.getBody().get(CLAIM_KEY), Member.class);
+        return objectMapper.convertValue(claims.getBody().get(CLAIM_KEY), JwtMemberDTO.class);
     }
 
     public boolean isUsable(String token) {
-        try{
-
+        try {
             Jws<Claims> claims = getClaims(token);
 
-            return true;
+            return !isExpired(claims);
 
-        }catch (Exception e) {
-            throw new RuntimeException();
+        } catch (Exception e) {
+            return false;
         }
+    }
+
+    private boolean isExpired(Jws<Claims> claims) {
+        return claims.getBody().getExpiration().before(new Date());
     }
 
     private Jws<Claims> getClaims(String token) {
@@ -72,7 +86,7 @@ public class JwtHelper {
         byte[] key = null;
 
         try {
-            key = SECRET_KEY.getBytes("UTF-8");
+            key = secretKey.getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

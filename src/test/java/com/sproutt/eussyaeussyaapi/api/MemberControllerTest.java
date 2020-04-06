@@ -5,15 +5,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
 import com.sproutt.eussyaeussyaapi.api.member.MemberController;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
+import com.sproutt.eussyaeussyaapi.domain.member.Provider;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -35,6 +39,10 @@ public class MemberControllerTest {
     private static final String DEFAULT_MEMBER_ID = "kjkun7631@naver.com";
     private static final String DEFAULT_PASSWORD = "12345aA!";
     private static final String DEFAULT_NAME = "test";
+    private String token;
+
+    @Value("${jwt.header}")
+    private String headerKey;
 
     @Autowired
     private MockMvc mvc;
@@ -45,6 +53,10 @@ public class MemberControllerTest {
     @MockBean
     private JwtHelper jwtHelper;
 
+    @BeforeEach
+    void setUp() {
+        token = jwtHelper.createToken(MemberFactory.getDefaultMember().toJwtInfo());
+    }
 
     @Test
     @DisplayName("회원가입 테스트(올바른 요청일 경우)")
@@ -86,6 +98,7 @@ public class MemberControllerTest {
         given(memberService.sendAuthCodeToEmail(email)).willReturn(member);
 
         ResultActions actions = mvc.perform(post("/members/" + email + "/authcode")
+                .header(headerKey, token)
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -106,6 +119,7 @@ public class MemberControllerTest {
         when(memberService.authenticateEmail(emailAuthDTO)).thenReturn(member);
 
         ResultActions actions = mvc.perform(post("/email-auth")
+                .header(headerKey, token)
                 .content(asJsonString(emailAuthDTO))
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
@@ -122,6 +136,7 @@ public class MemberControllerTest {
         when(memberService.isDuplicatedMemberId(member.getMemberId())).thenReturn(false);
 
         ResultActions actions = mvc.perform(get("/members/validate/memberid/{memberId}", member.getMemberId())
+                .header(headerKey, token)
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -137,6 +152,7 @@ public class MemberControllerTest {
         when(memberService.isDuplicatedMemberId(member.getMemberId())).thenReturn(true);
 
         ResultActions actions = mvc.perform(get("/members/validate/memberid/{memberId}", member.getMemberId())
+                .header(headerKey, token)
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -152,6 +168,7 @@ public class MemberControllerTest {
         when(memberService.isDuplicatedNickName(member.getNickName())).thenReturn(false);
 
         ResultActions actions = mvc.perform(get("/members/validate/nickname/{nickName}", member.getNickName())
+                .header(headerKey, token)
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -167,6 +184,7 @@ public class MemberControllerTest {
         when(memberService.isDuplicatedNickName(member.getNickName())).thenReturn(true);
 
         ResultActions actions = mvc.perform(get("/members/validate/nickname/{nickName}", member.getNickName())
+                .header(headerKey, token)
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 

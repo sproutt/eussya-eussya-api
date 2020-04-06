@@ -59,7 +59,7 @@ public class SocialController {
         }
 
         socialService.login(loginMember);
-        String token = jwtHelper.createToken(loginMember);
+        String token = jwtHelper.createToken(loginMember.toJwtInfo());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
