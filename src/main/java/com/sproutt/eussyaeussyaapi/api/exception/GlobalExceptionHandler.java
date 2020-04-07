@@ -34,7 +34,8 @@ public class GlobalExceptionHandler {
     private final MessageSourceAccessor messageSourceAccessor;
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+        MethodArgumentNotValidException exception) {
         log.info("handleMethodArgumentNotValidException : {}", exception);
 
         ErrorResponse response = new ErrorResponse();

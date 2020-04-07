@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -24,6 +25,7 @@ class JasyptTest {
         encryptor.setStringOutputType("base64");
     }
 
+    @DisplayName("복호화 테스트")
     @Test
     public void decryptTest() throws Exception{
 
@@ -32,6 +34,7 @@ class JasyptTest {
         assertThat(decryptedText).isEqualTo(defualtRawText);
     }
 
+    @DisplayName("암호화 테스트")
     @Test
     public void encryptTest() throws Exception {
 

@@ -27,4 +27,21 @@ public class MemberFactory {
                      .provider(Provider.GITHUB)
                      .build();
     }
+
+    public static Member getGoogleMember() {
+        return Member.builder()
+                     .memberId("105393180124787452232")
+                     .nickName("Byeongjae Jung")
+                     .provider(Provider.GOOGLE)
+                     .email("jbj616@gmail.com")
+                     .build();
+    }
+
+    public static Member getFacebookMember() {
+        return Member.builder()
+                     .memberId("2989263527824872")
+                     .nickName("정병재")
+                     .email("jbj616@naver.com")
+                     .build();
+    }
 }
