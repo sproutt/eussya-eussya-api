@@ -35,8 +35,11 @@ public class SocialController {
     @Value("${social.facebook.url}")
     private String facebookRequestUrl;
 
-    @Value("${token.key}")
-    private String TOKEN_KEY;
+    @Value("${jwt.header}")
+    private String tokenKey;
+
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     @PostMapping("/login/{provider}")
     public ResponseEntity loginByProvider(@PathVariable String provider, @RequestParam String accessToken) {
@@ -59,11 +62,11 @@ public class SocialController {
         }
 
         socialService.login(loginMember);
-        String token = jwtHelper.createToken(loginMember.toJwtInfo());
+        String token = jwtHelper.createToken(secretKey, loginMember.toJwtInfo());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(TOKEN_KEY, token);
+        headers.set(tokenKey, token);
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 

@@ -40,4 +40,4 @@ jasypt:
 
 api:
   cors:
-    allow-origins: http://49.50.164.30
+    allow-origins: http://localhost:8080

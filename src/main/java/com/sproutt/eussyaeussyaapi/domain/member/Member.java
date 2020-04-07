@@ -74,10 +74,7 @@ public class Member {
     public JwtMemberDTO toJwtInfo() {
         return JwtMemberDTO.builder()
                 .id(this.id)
-                .memberId(this.memberId)
-                .email(this.email)
                 .nickName(this.nickName)
-                .provider(this.provider)
                 .build();
     }
 }
