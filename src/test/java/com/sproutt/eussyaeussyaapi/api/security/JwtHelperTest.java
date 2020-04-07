@@ -11,7 +11,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Slf4j
 @ExtendWith(SpringExtension.class)
 class JwtHelperTest {
 
@@ -28,10 +27,7 @@ class JwtHelperTest {
     @Test
     @DisplayName("토큰 생성이 잘 되는지 테스트")
     void create() {
-
         String token = jwtHelper.createToken(secretKey, MemberFactory.getDefaultMember().toJwtInfo());
-
-        log.info("token: ()", token);
 
         assertThat(token == null).isFalse();
     }
