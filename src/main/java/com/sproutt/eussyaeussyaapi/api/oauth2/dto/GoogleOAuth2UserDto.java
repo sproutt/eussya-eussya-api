@@ -19,6 +19,7 @@ public class GoogleOAuth2UserDto {
         return Member.builder()
                      .memberId(id)
                      .nickName(name)
+                     .email(email)
                      .provider(Provider.GOOGLE)
                      .build();
     }
