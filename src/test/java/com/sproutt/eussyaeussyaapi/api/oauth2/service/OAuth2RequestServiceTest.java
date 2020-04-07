@@ -61,7 +61,7 @@ class OAuth2RequestServiceTest {
         assertThat(githubMember.getNickName()).isEqualTo(defaultGitHubMember.getNickName());
     }
 
-    @DisplayName("github에서 user 정보 가져오기 - accessToken이 잘못되었을 때")
+    @DisplayName("github에서 user 정보 가져오기 - accessToken이 잘못되었을 때 OAuth2CommunicationException에러 발생 ")
     @Test
     public void getUserInfo_with_wrong_accessToken_by_github() {
 
@@ -91,7 +91,7 @@ class OAuth2RequestServiceTest {
         assertThat(facebookMember.getEmail()).isEqualTo(defaultFacebookMember.getEmail());
     }
 
-    @DisplayName("facebook에서 user 정보 가져오기 - accessToken이 잘못되었을 때")
+    @DisplayName("facebook에서 user 정보 가져오기 - accessToken이 잘못되었을 때 OAuth2CommunicationException 에러 발생")
     @Test
     public void getUserInfo_with_wrong_accessToken_by_Facebook() {
 
@@ -122,7 +122,7 @@ class OAuth2RequestServiceTest {
         assertThat(googleMember.getEmail()).isEqualTo(defaultGoogleMember.getEmail());
     }
 
-    @DisplayName("google에서 user 정보 가져오기 - accessToken이 잘못되었을 때")
+    @DisplayName("google에서 user 정보 가져오기 - accessToken이 잘못되었을 때 OAuth2CommunicationException 에러 발생")
     @Test
     public void getUserInfo_with_wrong_accessToken_by_Google() {
 
@@ -134,7 +134,7 @@ class OAuth2RequestServiceTest {
             () -> oAuth2RequestService.getUserInfoByProvider(WRONG_TOKEN, "google", DtoFactory.getRequestUrlDto()));
     }
 
-    @DisplayName("지원하지 않는 social login일 때")
+    @DisplayName("지원하지 않는 social login일 때 UnSupportedOAuth2Exception 발생")
     @Test
     public void getUserInfo_by_strange_Provider() {
         assertThrows(UnSupportedOAuth2Exception.class, () -> oAuth2RequestService

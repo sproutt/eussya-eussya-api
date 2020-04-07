@@ -94,7 +94,7 @@ class SocialControllerTest {
             .andExpect(status().isOk());
     }
 
-    @DisplayName("지원하지 않는 oauth2 로그인")
+    @DisplayName("지원하지 않는 oauth2 로그인 시 UnSupportedException 발생")
     @Test
     public void login_by_no_provider() throws Exception {
         when(oAuth2RequestService.getUserInfoByProvider(eq("token"), eq("wrong"), any()))
