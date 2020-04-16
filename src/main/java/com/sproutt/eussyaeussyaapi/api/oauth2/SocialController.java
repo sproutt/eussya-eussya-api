@@ -6,6 +6,7 @@ import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2RequestService;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.SocialService;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
+import com.sproutt.eussyaeussyaapi.utils.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -48,10 +49,7 @@ public class SocialController {
 
         String token = jwtHelper.createToken(loginMember);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(TOKEN_KEY, token);
-        return new ResponseEntity<>(headers, HttpStatus.OK);
+        return Result.okWithToken(TOKEN_KEY, token);
     }
 
 }
