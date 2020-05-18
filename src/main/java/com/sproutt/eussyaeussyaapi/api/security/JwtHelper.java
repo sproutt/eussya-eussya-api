@@ -1,41 +1,43 @@
 package com.sproutt.eussyaeussyaapi.api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sproutt.eussyaeussyaapi.domain.member.Member;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
+import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
+import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 @Component
 public class JwtHelper {
 
-    private static final String CLAIM_KEY = "member";
-    private static final String SECRET_KEY = "secret";
+    private static final long VALID_MILLISECOND = 1000L * 60 * 60; // 1 hour
 
-    public String createToken(Member member) {
+    private static final String CLAIM_KEY = "member";
+
+    public String createToken(String secretKey, JwtMemberDTO jwtMemberDTO) {
+
+        Claims claims = Jwts.claims().setSubject(CLAIM_KEY);
+        claims.put(CLAIM_KEY, jwtMemberDTO);
+
+        Date now = new Date();
 
         String token = Jwts.builder()
                            .setHeaderParam("typ", "jwt")
-                           .claim(CLAIM_KEY, member)
-                           .setExpiration(new Date(System.currentTimeMillis() + 3600000))
-                           .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                           .setClaims(claims)
+                           .setIssuedAt(now)
+                           .setExpiration(new Date(now.getTime() + VALID_MILLISECOND))
+                           .signWith(SignatureAlgorithm.HS256, secretKey)
                            .compact();
 
         return token;
     }
 
-    public Member decryptToken(String token) {
+    public JwtMemberDTO decryptToken(String secretKey, String token) {
         Jws<Claims> claims = null;
 
         try {
 
-            claims = getClaims(token);
+            claims = getClaims(secretKey, token);
 
         } catch (Exception e) {
 
@@ -44,39 +46,29 @@ public class JwtHelper {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        return objectMapper.convertValue(claims.getBody().get(CLAIM_KEY), Member.class);
+        return objectMapper.convertValue(claims.getBody().get(CLAIM_KEY), JwtMemberDTO.class);
     }
 
-    public boolean isUsable(String token) {
-        try{
+    public boolean isUsable(String secretKey, String token) {
+        try {
+            Jws<Claims> claims = getClaims(secretKey, token);
 
-            Jws<Claims> claims = getClaims(token);
+            return !isExpired(claims);
 
-            return true;
-
-        }catch (Exception e) {
-            throw new RuntimeException();
+        } catch (Exception e) {
+            return false;
         }
     }
 
-    private Jws<Claims> getClaims(String token) {
+    private boolean isExpired(Jws<Claims> claims) {
+        return claims.getBody().getExpiration().before(new Date());
+    }
+
+    private Jws<Claims> getClaims(String secretKey, String token) {
         Jws<Claims> claims = Jwts.parser()
-                                 .setSigningKey(this.generateKey())
+                                 .setSigningKey(secretKey)
                                  .parseClaimsJws(token);
 
         return claims;
-    }
-
-    private byte[] generateKey() {
-
-        byte[] key = null;
-
-        try {
-            key = SECRET_KEY.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        return key;
     }
 }

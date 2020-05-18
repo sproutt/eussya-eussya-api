@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.domain.member;
 
+import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -68,5 +69,12 @@ public class Member {
 
     public void changeAuthCode(String authCode) {
         this.authentication = authCode;
+    }
+
+    public JwtMemberDTO toJwtInfo() {
+        return JwtMemberDTO.builder()
+                .id(this.id)
+                .nickName(this.nickName)
+                .build();
     }
 }

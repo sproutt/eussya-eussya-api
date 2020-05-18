@@ -21,8 +21,9 @@ spring:
           starttls:
             enable: true
 
-token:
-  key: Authorization
+jwt:
+  header: Authorization
+  secret: secret
 
 social:
   github:

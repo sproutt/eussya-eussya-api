@@ -1,7 +1,6 @@
 package com.sproutt.eussyaeussyaapi.api.oauth2;
 
 import com.sproutt.eussyaeussyaapi.api.oauth2.dto.RequestUrlDto;
-import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportedOAuth2Exception;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2RequestService;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.SocialService;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
@@ -12,11 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/social")
@@ -36,8 +31,11 @@ public class SocialController {
     @Value("${social.facebook.url}")
     private String facebookRequestUrl;
 
-    @Value("${token.key}")
-    private String TOKEN_KEY;
+    @Value("${jwt.header}")
+    private String tokenKey;
+
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     @PostMapping("/login/{provider}")
     public ResponseEntity loginByProvider(@PathVariable String provider, @RequestParam String accessToken) {
@@ -45,12 +43,11 @@ public class SocialController {
 
         Member loginMember = oAuth2RequestService.getUserInfoByProvider(accessToken, provider, requestUrlDto);
         socialService.login(loginMember);
-
-        String token = jwtHelper.createToken(loginMember);
+        String token = jwtHelper.createToken(secretKey, loginMember.toJwtInfo());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(TOKEN_KEY, token);
+        headers.set(tokenKey, token);
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 

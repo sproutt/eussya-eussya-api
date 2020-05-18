@@ -4,6 +4,7 @@ import com.sproutt.eussyaeussyaapi.api.dto.ErrorResponse;
 import com.sproutt.eussyaeussyaapi.api.dto.ValidateError;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportedOAuth2Exception;
+import com.sproutt.eussyaeussyaapi.api.security.exception.InvalidTokenException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationException;
@@ -56,6 +57,13 @@ public class GlobalExceptionHandler {
         log.info("response: {}", response.toString());
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = InvalidTokenException.class)
+    public ResponseEntity handleInvalidTokenException(InvalidTokenException exception) {
+        log.info("handleInvalidTokenException : {}", exception);
+
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
     }
 
     @ExceptionHandler(value = DuplicationException.class)

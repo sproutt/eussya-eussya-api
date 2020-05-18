@@ -1,12 +1,5 @@
 package com.sproutt.eussyaeussyaapi.api.oauth2;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportedOAuth2Exception;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2RequestService;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.SocialService;
@@ -23,6 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(SocialController.class)
@@ -46,16 +46,16 @@ class SocialControllerTest {
         Member githubMember = MemberFactory.getGithubMember();
 
         when(oAuth2RequestService.getUserInfoByProvider(eq("token"), eq("github"), any()))
-            .thenReturn(githubMember);
+                .thenReturn(githubMember);
         when(socialService.login(githubMember)).thenReturn(githubMember);
-        when(jwtHelper.createToken(githubMember)).thenReturn("token");
+        when(jwtHelper.createToken(any(), any())).thenReturn("token");
 
         ResultActions actions = mockMvc.perform(post("/social/login/github")
-            .param("accessToken", "token")
-            .contentType(MediaType.APPLICATION_JSON)).andDo(print());
+                .param("accessToken", "token")
+                .contentType(MediaType.APPLICATION_JSON)).andDo(print());
 
         actions
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
     }
 
     @DisplayName("facebook으로 로그인")
@@ -64,16 +64,16 @@ class SocialControllerTest {
         Member githubMember = MemberFactory.getGithubMember();
 
         when(oAuth2RequestService.getUserInfoByProvider(eq("token"), eq("facebook"), any()))
-            .thenReturn(githubMember);
+                .thenReturn(githubMember);
         when(socialService.login(githubMember)).thenReturn(githubMember);
-        when(jwtHelper.createToken(githubMember)).thenReturn("token");
+        when(jwtHelper.createToken(any(), any())).thenReturn("token");
 
         ResultActions actions = mockMvc.perform(post("/social/login/facebook")
-            .param("accessToken", "token")
-            .contentType(MediaType.APPLICATION_JSON)).andDo(print());
+                .param("accessToken", "token")
+                .contentType(MediaType.APPLICATION_JSON)).andDo(print());
 
         actions
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
     }
 
     @DisplayName("google으로 로그인")
@@ -82,30 +82,30 @@ class SocialControllerTest {
         Member githubMember = MemberFactory.getGithubMember();
 
         when(oAuth2RequestService.getUserInfoByProvider(eq("token"), eq("google"), any()))
-            .thenReturn(githubMember);
+                .thenReturn(githubMember);
         when(socialService.login(githubMember)).thenReturn(githubMember);
-        when(jwtHelper.createToken(githubMember)).thenReturn("token");
+        when(jwtHelper.createToken(any(), any())).thenReturn("token");
 
         ResultActions actions = mockMvc.perform(post("/social/login/google")
-            .param("accessToken", "token")
-            .contentType(MediaType.APPLICATION_JSON)).andDo(print());
+                .param("accessToken", "token")
+                .contentType(MediaType.APPLICATION_JSON)).andDo(print());
 
         actions
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
     }
 
     @DisplayName("지원하지 않는 oauth2 로그인 시 UnSupportedException 발생")
     @Test
     public void login_by_no_provider() throws Exception {
         when(oAuth2RequestService.getUserInfoByProvider(eq("token"), eq("wrong"), any()))
-            .thenThrow(UnSupportedOAuth2Exception.class);
+                .thenThrow(UnSupportedOAuth2Exception.class);
 
         ResultActions actions = mockMvc.perform(post("/social/login/wrong")
-            .param("accessToken", "token")
-            .contentType(MediaType.APPLICATION_JSON)).andDo(print());
+                .param("accessToken", "token")
+                .contentType(MediaType.APPLICATION_JSON)).andDo(print());
 
         actions
-            .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
 }

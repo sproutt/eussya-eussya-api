@@ -45,7 +45,6 @@ public class MemberControllerTest {
     @MockBean
     private JwtHelper jwtHelper;
 
-
     @Test
     @DisplayName("회원가입 테스트(올바른 요청일 경우)")
     public void createMemberWithLocalProvider() throws Exception {

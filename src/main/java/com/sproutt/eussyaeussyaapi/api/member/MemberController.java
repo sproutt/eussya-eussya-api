@@ -23,8 +23,11 @@ import javax.validation.Valid;
 @Api(description = "으쌰으쌰 회원 관련 API", tags = {"Member - 담당자 : 김종근"})
 public class MemberController {
 
-    @Value("${token.key}")
-    private String TOKEN_KEY;
+    @Value("${jwt.header}")
+    private String tokenKey;
+
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     private final MemberService memberService;
     private final JwtHelper jwtHelper;
@@ -49,11 +52,11 @@ public class MemberController {
     public ResponseEntity loginMember(@Valid @RequestBody LoginDTO loginDTO) {
         Member loginMember = memberService.login(loginDTO);
 
-        String token = jwtHelper.createToken(loginMember);
+        String token = jwtHelper.createToken(secretKey, loginMember.toJwtInfo());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(TOKEN_KEY, token);
+        headers.set(tokenKey, token);
 
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
