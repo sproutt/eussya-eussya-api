@@ -20,4 +20,9 @@ public class PhraseServiceImpl implements PhraseService {
 
         return phrase.toResponseDTO();
     }
+
+    @Override
+    public Phrase create(String phraseText) {
+        return phraseRepository.save(new Phrase(phraseText));
+    }
 }

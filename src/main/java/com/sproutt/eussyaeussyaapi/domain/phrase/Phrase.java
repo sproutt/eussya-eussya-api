@@ -21,4 +21,8 @@ public class Phrase {
     public PhraseResponseDTO toResponseDTO() {
         return new PhraseResponseDTO(this.text);
     }
+
+    public Phrase(String text) {
+        this.text = text;
+    }
 }

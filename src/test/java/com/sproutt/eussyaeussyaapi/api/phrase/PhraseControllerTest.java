@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.api.phrase;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutt.eussyaeussyaapi.api.HeaderSetUpWithToken;
 import com.sproutt.eussyaeussyaapi.api.phrase.dto.PhraseResponseDTO;
 import com.sproutt.eussyaeussyaapi.application.phrase.PhraseService;
@@ -19,6 +20,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -54,5 +56,31 @@ public class PhraseControllerTest extends HeaderSetUpWithToken {
                                    .andDo(print());
 
         actions.andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("동기부여 글귀 추가 api 테스트")
+    void createPhraseTest() throws Exception {
+        String phraseText = "this is test text";
+        Phrase phrase = new Phrase(phraseText);
+
+        given(phraseService.create(phraseText)).willReturn(phrase);
+
+        ResultActions actions = mvc.perform(post("/phrase")
+                .headers(headers)
+                .characterEncoding("utf-8")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(phraseText)))
+                                   .andDo(print());
+
+        actions.andExpect(status().isCreated());
+    }
+
+    private static String asJsonString(final Object object) {
+        try {
+            return new ObjectMapper().writeValueAsString(object);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
