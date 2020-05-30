@@ -40,4 +40,6 @@ jasypt:
 
 api:
   cors:
-    allow-origins: http://49.50.164.30
+    allow-origins:
+      -ENC(7Al74gfGXcAvd/D4S93NeuVCbIR8UHqwaGnaWbvkzc8=)
+      -ENC(jCH7aQtVVnhYmIhR4YQgnQbLMjjSZt7EGObYZbE4clY=)
