@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.domain.project;
 
+import com.sproutt.eussyaeussyaapi.api.project.dto.ProjectUpdateDto;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -56,6 +57,19 @@ public class Project {
         this.startDate = startDate;
         this.finishDate = finishDate;
         this.countOfGoal = countOfGoal;
+    }
+
+    public Project update(ProjectUpdateDto updateDto) {
+        this.title = updateDto.getTitle();
+        this.countOfGoal = updateDto.getCountOfGoal();
+        this.finishDate = updateDto.getFinishDate();
+        this.startDate = updateDto.getStartDate();
+
+        return this;
+    }
+
+    public boolean isSameWriter(Member member) {
+        return this.writer.isEqualId(member.getMemberId());
     }
 
 }
