@@ -9,6 +9,7 @@ import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoPermissionException;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotAvailableTimeException;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotSatisfiedCondition;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -246,15 +248,6 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     @Test
     @DisplayName("미션 삭제 요청 - 정상적인 경우")
     void deleteMissionTest() throws Exception {
-        MissionDTO missionDTO = new MissionDTO()
-                .builder()
-                .title("test_title")
-                .contents("test_contents")
-                .goalHours(2)
-                .build();
-
-        Mission mission = new Mission(loginMember, missionDTO);
-
         ResultActions actions = mvc.perform(delete("/missions/0")
                 .headers(headers)
                 .characterEncoding("utf-8")
@@ -280,17 +273,50 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
 
     @Test
     @DisplayName("미션 달성 요청 - 정상적인 경우")
-    void setAchieveMissionTest() {
+    void setAchieveMissionTest() throws Exception {
+        headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
+
+        doNothing().when(missionService).completeMission(any(), any());
+
+        ResultActions actions = mvc.perform(put("/missions/0/complete")
+                .headers(headers)
+                .characterEncoding("utf-8")
+                .contentType(MediaType.APPLICATION_JSON))
+                                   .andDo(print());
+
+        actions.andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("미션 달성 요청 - 달성 가능 시간이 아닌 경우")
-    void setAchieveMissionTest_withWrongTime() {
+    void setAchieveMissionTest_withWrongTime() throws Exception {
+        headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 10, 0, 0, 0, ZoneId.of("Asia/Seoul")));
+
+        doNothing().when(missionService).completeMission(any(), any());
+
+        ResultActions actions = mvc.perform(put("/missions/0/complete")
+                .headers(headers)
+                .characterEncoding("utf-8")
+                .contentType(MediaType.APPLICATION_JSON))
+                                   .andDo(print());
+
+        actions.andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("미션 달성 요청 - 목표 시간을 채우지 못한 경우")
-    void setAchieveMissionTest_withWrongProgressTime() {
+    void setAchieveMissionTest_withWrongProgressTime() throws Exception {
+        headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
+
+        doThrow(NotSatisfiedCondition.class).when(missionService).completeMission(any(), any());
+
+        ResultActions actions = mvc.perform(put("/missions/0/complete")
+                .headers(headers)
+                .characterEncoding("utf-8")
+                .contentType(MediaType.APPLICATION_JSON))
+                                   .andDo(print());
+
+        actions.andExpect(status().isBadRequest());
     }
 
     private static String asJsonString(final Object object) {

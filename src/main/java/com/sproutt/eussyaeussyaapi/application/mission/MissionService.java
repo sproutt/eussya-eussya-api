@@ -20,4 +20,8 @@ public interface MissionService {
     List<Mission> findAll();
 
     List<Mission> filterDate(String afterDate, String beforeDate, List<Mission> missionList);
+
+    void completeMission(Member loginMember, Long missionId);
+
+    void addProcessTime(Member loginMember, Long missionId, long processSeconds);
 }

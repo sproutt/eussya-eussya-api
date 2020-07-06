@@ -6,6 +6,7 @@ import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionRepository;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoPermissionException;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoSuchMissionException;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotSatisfiedCondition;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -80,5 +81,33 @@ public class MissionServiceImpl implements MissionService {
         }
 
         return missionList;
+    }
+
+    @Override
+    public void completeMission(Member loginMember, Long missionId) {
+        Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
+
+        if (!mission.isSameWriter(loginMember)) {
+            throw new NoPermissionException();
+        }
+
+        if (!mission.isSatisfiedWithGoalTime()) {
+            throw new NotSatisfiedCondition();
+        }
+
+        mission.complete();
+        missionRepository.save(mission);
+    }
+
+    @Override
+    public void addProcessTime(Member loginMember, Long missionId, long processSeconds) {
+        Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
+
+        if (!mission.isSameWriter(loginMember)) {
+            throw new NoPermissionException();
+        }
+
+        mission.addProcessTime(processSeconds);
+        missionRepository.save(mission);
     }
 }

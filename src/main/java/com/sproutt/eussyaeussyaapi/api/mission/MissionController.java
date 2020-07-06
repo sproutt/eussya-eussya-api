@@ -18,11 +18,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,6 +32,7 @@ public class MissionController {
     @Value("${jwt.secret}")
     private String secretKey;
 
+    private static final String ZONE_SEOUL = "Asia/Seoul";
     private static final LocalTime START_AVAILABLE_LOCAL_TIME = LocalTime.of(4, 0);
     private static final LocalTime END_AVAILABLE_LOCAL_TIME = LocalTime.of(9, 0);
 
@@ -117,9 +116,43 @@ public class MissionController {
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
+    @PutMapping("/missions/{missionId}/seconds")
+    public ResponseEntity addProcessTime(@RequestHeader HttpHeaders requestHeaders, @PathVariable Long missionId, @RequestBody long processSeconds) {
+        String token = requestHeaders.get(tokenKey).get(0);
+        Member loginMember = getTokenOwner(token);
+
+        if (!isAvailableTime(requestHeaders.getDate())) {
+            throw new NotAvailableTimeException();
+        }
+
+        missionService.addProcessTime(loginMember, missionId, processSeconds);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return new ResponseEntity<>(headers, HttpStatus.OK);
+    }
+
+    @PutMapping("/missions/{missionId}/complete")
+    public ResponseEntity completeMission(@RequestHeader HttpHeaders requestHeaders, @PathVariable Long missionId) {
+        String token = requestHeaders.get(tokenKey).get(0);
+        Member loginMember = getTokenOwner(token);
+
+        if (!isAvailableTime(requestHeaders.getDate())) {
+            throw new NotAvailableTimeException();
+        }
+
+        missionService.completeMission(loginMember, missionId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return new ResponseEntity<>(headers, HttpStatus.OK);
+    }
+
     private boolean isAvailableTime(long epochMilli) {
         Instant requestInstant = Instant.ofEpochMilli(epochMilli);
-        LocalTime now = requestInstant.atZone(ZoneId.of("Asia/Seoul")).toLocalTime();
+        LocalTime now = requestInstant.atZone(ZoneId.of(ZONE_SEOUL)).toLocalTime();
 
         return now.isAfter(START_AVAILABLE_LOCAL_TIME) && now.isBefore(END_AVAILABLE_LOCAL_TIME);
     }

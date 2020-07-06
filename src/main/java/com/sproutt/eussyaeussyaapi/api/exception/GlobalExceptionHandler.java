@@ -12,6 +12,7 @@ import com.sproutt.eussyaeussyaapi.domain.member.exceptions.WrongPasswordExcepti
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoPermissionException;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoSuchMissionException;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotAvailableTimeException;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotSatisfiedCondition;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -60,6 +61,13 @@ public class GlobalExceptionHandler {
         log.info("response: {}", response.toString());
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = NotSatisfiedCondition.class)
+    public ResponseEntity NotSatisfiedCondition(NotSatisfiedCondition exception) {
+        log.info("NotSatisfiedCondition : {}", exception);
+
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
     }
 
     @ExceptionHandler(value = NoPermissionException.class)

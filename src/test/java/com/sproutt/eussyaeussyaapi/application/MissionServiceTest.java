@@ -6,7 +6,6 @@ import com.sproutt.eussyaeussyaapi.application.mission.MissionServiceImpl;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionRepository;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoSuchMissionException;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +19,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,7 +39,7 @@ public class MissionServiceTest {
 
     @Test
     @DisplayName("미션 생성 테스트")
-    public void createMission() {
+    void createMission() {
         MissionDTO missionDTO = MissionDTO
                 .builder()
                 .title("test_title")
@@ -59,13 +57,13 @@ public class MissionServiceTest {
 
     @Test
     @DisplayName("미션 조회 테스트")
-    public void searchMission() {
+    void searchMission() {
         Mission mission = Mission.builder()
-                .title("test")
-                .contents("test_contents")
-                .goalSeconds(2)
-                .writer(loginMember)
-                .build();
+                                 .title("test")
+                                 .contents("test_contents")
+                                 .goalSeconds(2)
+                                 .writer(loginMember)
+                                 .build();
 
         when(missionRepository.findById(any(Long.class))).thenReturn(Optional.of(mission));
 
@@ -76,7 +74,7 @@ public class MissionServiceTest {
 
     @Test
     @DisplayName("미션리스트 작성자 기준 조회 테스트")
-    public void searchMissionList_withWriter() {
+    void searchMissionList_withWriter() {
         List<Mission> filteredMissionList = mockedMissionList.stream()
                                                              .filter(mission -> mission.getWriter().equals(loginMember))
                                                              .collect(Collectors.toList());
@@ -91,7 +89,7 @@ public class MissionServiceTest {
 
     @Test
     @DisplayName("미션리스트 날짜 기준 조회 테스트")
-    public void searchMissionList_withDate() {
+    void searchMissionList_withDate() {
         List<Mission> missionList = missionService.filterDate(null, null, mockedMissionList);
 
         assertEquals(3, missionList.size());
@@ -99,7 +97,7 @@ public class MissionServiceTest {
 
     @Test
     @DisplayName("미션 수정 테스트")
-    public void updateMission() {
+    void updateMission() {
 //        MissionDTO missionDTO = MissionDTO
 //                .builder()
 //                .title("test_title")
@@ -126,7 +124,7 @@ public class MissionServiceTest {
 
     @Test
     @DisplayName("미션 삭제 테스트")
-    public void deleteMission() {
+    void deleteMission() {
 //        MissionDTO missionDTO = MissionDTO
 //                .builder()
 //                .title("test_title")
@@ -140,6 +138,24 @@ public class MissionServiceTest {
 //        missionService.delete(loginMember, 0l);
 //
 //        assertThrows(NoSuchMissionException.class,() -> missionService.findById(0l));
+    }
+
+    @Test
+    @DisplayName("미션 완료 테스트")
+    void completeMission() {
+//        MissionDTO missionDTO = MissionDTO
+//                .builder()
+//                .title("test_title")
+//                .contents("test_contents")
+//                .goalHours(2)
+//                .build();
+//
+//        Mission mission = new Mission(loginMember, missionDTO);
+//
+//        when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
+//        missionService.completeMission(loginMember, 0l);
+//
+//        assertEquals(true, missionService.findById(0l));
     }
 
     private List<Mission> setMockMissionList() {

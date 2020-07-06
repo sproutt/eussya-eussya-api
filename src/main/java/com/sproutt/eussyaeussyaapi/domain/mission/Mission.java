@@ -90,4 +90,16 @@ public class Mission {
 
         return this;
     }
+
+    public boolean isSatisfiedWithGoalTime() {
+        return this.progressSeconds >= this.goalSeconds;
+    }
+
+    public void addProcessTime(long runningSeconds) {
+        this.progressSeconds += runningSeconds;
+    }
+
+    public void complete() {
+        this.achievement = true;
+    }
 }
