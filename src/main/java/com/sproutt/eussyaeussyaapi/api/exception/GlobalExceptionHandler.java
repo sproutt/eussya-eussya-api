@@ -9,6 +9,9 @@ import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationException
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.WrongPasswordException;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoPermissionException;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoSuchMissionException;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotAvailableTimeException;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -59,11 +62,32 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(value = NoPermissionException.class)
+    public ResponseEntity NoPermissionException(NoPermissionException exception) {
+        log.info("NoPermissionException : {}", exception);
+
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(value = NotAvailableTimeException.class)
+    public ResponseEntity notAvailableTimeException(NotAvailableTimeException exception) {
+        log.info("notAvailableTimeException : {}", exception);
+
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(value = NoSuchMissionException.class)
+    public ResponseEntity noSuchMissionException(NoSuchMissionException exception) {
+        log.info("NoSuchMissionException : {}", exception);
+
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
+    }
+
     @ExceptionHandler(value = InvalidTokenException.class)
     public ResponseEntity handleInvalidTokenException(InvalidTokenException exception) {
         log.info("handleInvalidTokenException : {}", exception);
 
-        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
     }
 
     @ExceptionHandler(value = DuplicationException.class)

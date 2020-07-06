@@ -4,13 +4,14 @@ import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.api.security.JwtInterceptor;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.time.ZonedDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -38,8 +39,10 @@ public class HeaderSetUpWithToken {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(tokenKey, token);
+        headers.setZonedDateTime("date", ZonedDateTime.now());
 
         when(jwtInterceptor.preHandle(any(), any(), any())).thenReturn(true);
+        when(jwtHelper.decryptToken(secretKey, token)).thenReturn(loginMember.toJwtInfo());
 
         return headers;
     }

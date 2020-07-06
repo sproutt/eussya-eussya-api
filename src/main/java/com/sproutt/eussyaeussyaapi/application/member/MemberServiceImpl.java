@@ -2,6 +2,7 @@ package com.sproutt.eussyaeussyaapi.application.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
 import com.sproutt.eussyaeussyaapi.application.MailService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
@@ -77,6 +78,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public Member findTokenOwner(JwtMemberDTO jwtMemberDTO) {
+        return memberRepository.findById(jwtMemberDTO.getId()).orElseThrow(NoSuchMemberException::new);
+    }
+
+    @Override
     public boolean isDuplicatedMemberId(String memberId) {
 
         return memberRepository.findByMemberId(memberId).isPresent();
@@ -86,6 +92,12 @@ public class MemberServiceImpl implements MemberService {
     public boolean isDuplicatedNickName(String nickName) {
 
         return memberRepository.findByNickName(nickName).isPresent();
+    }
+
+    @Override
+    public Member findByMemberId(String memberId) {
+
+        return memberRepository.findByMemberId(memberId).orElseThrow(NoSuchMemberException::new);
     }
 
     @Override

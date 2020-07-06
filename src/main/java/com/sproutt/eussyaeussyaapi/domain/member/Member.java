@@ -1,12 +1,16 @@
 package com.sproutt.eussyaeussyaapi.domain.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
+import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -37,6 +41,9 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
+    @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
+    private List<Mission> missions = new ArrayList<>();
+
 
     @Builder
     public Member(String memberId, String password, String email, String nickName, String authentication, Provider provider) {
@@ -46,10 +53,6 @@ public class Member {
         this.nickName = nickName;
         this.authentication = authentication;
         this.provider = provider;
-    }
-
-    public boolean isEqualId(String memberId) {
-        return this.memberId.equals(memberId);
     }
 
     public boolean isEqualPassword(String password) {
@@ -76,5 +79,13 @@ public class Member {
                 .id(this.id)
                 .nickName(this.nickName)
                 .build();
+    }
+
+    public void addMission(Mission mission) {
+        missions.add(mission);
+    }
+
+    public boolean isSameMember(Member member) {
+        return this.getId().equals(member.getId());
     }
 }

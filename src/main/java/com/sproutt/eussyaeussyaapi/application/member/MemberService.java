@@ -2,8 +2,12 @@ package com.sproutt.eussyaeussyaapi.application.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
+import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
+
+import java.util.List;
 
 public interface MemberService {
 
@@ -17,7 +21,11 @@ public interface MemberService {
 
     Member sendAuthCodeToEmail(String email);
 
+    Member findTokenOwner(JwtMemberDTO jwtMemberDTO);
+
     boolean isDuplicatedMemberId(String memberId);
 
     boolean isDuplicatedNickName(String nickName);
+
+    Member findByMemberId(String memberId);
 }
