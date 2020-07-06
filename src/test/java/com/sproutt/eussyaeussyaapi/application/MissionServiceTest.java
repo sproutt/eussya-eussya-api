@@ -65,7 +65,7 @@ public class MissionServiceTest {
                                  .writer(loginMember)
                                  .build();
 
-        when(missionRepository.findById(any(Long.class))).thenReturn(Optional.of(mission));
+        when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
 
         Mission searchedMission = missionService.findById(mission.getId());
 
