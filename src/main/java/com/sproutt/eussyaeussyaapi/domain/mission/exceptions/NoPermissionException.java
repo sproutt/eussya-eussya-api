@@ -4,6 +4,6 @@ import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
 
 public class NoPermissionException extends RuntimeException {
     public NoPermissionException() {
-        super(ExceptionMessage.No_PERMISSION);
+        super(ExceptionMessage.NO_PERMISSION);
     }
 }

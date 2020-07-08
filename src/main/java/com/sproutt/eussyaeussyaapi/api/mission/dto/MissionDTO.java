@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Getter
@@ -13,20 +13,20 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class MissionDTO {
 
-    @NotNull
+    @NotBlank
     @Size(max = 80)
     private String title;
 
-    @NotNull
+    @NotBlank
     private String contents;
 
-    @NotNull
-    private int goalHours;
+    @NotBlank
+    private String deadlineTime;
 
     @Builder
-    public MissionDTO(@NotNull @Size(max = 80) String title, @NotNull String contents, @NotNull int goalHours) {
+    public MissionDTO(String title, String contents, String deadlineTime) {
         this.title = title;
         this.contents = contents;
-        this.goalHours = goalHours;
+        this.deadlineTime = deadlineTime;
     }
 }

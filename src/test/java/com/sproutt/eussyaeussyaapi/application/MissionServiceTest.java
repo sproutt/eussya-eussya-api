@@ -6,6 +6,8 @@ import com.sproutt.eussyaeussyaapi.application.mission.MissionServiceImpl;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionRepository;
+import com.sproutt.eussyaeussyaapi.domain.mission.MissionStatus;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoSuchMissionException;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,12 +15,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -44,7 +48,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .goalHours(2)
+                .deadlineTime("09:00:00")
                 .build();
 
         Mission mission = new Mission(loginMember, missionDTO);
@@ -61,7 +65,7 @@ public class MissionServiceTest {
         Mission mission = Mission.builder()
                                  .title("test")
                                  .contents("test_contents")
-                                 .goalSeconds(2)
+                                 .deadlineTime(LocalTime.of(9, 0))
                                  .writer(loginMember)
                                  .build();
 
@@ -98,85 +102,104 @@ public class MissionServiceTest {
     @Test
     @DisplayName("미션 수정 테스트")
     void updateMission() {
-//        MissionDTO missionDTO = MissionDTO
-//                .builder()
-//                .title("test_title")
-//                .contents("test_contents")
-//                .goalHours(2)
-//                .build();
-//
-//        Mission mission = new Mission(loginMember, missionDTO);
-//
-//        MissionDTO updatedMissionDTO = MissionDTO
-//                .builder()
-//                .title("test_title2")
-//                .contents("test_contents2")
-//                .goalHours(3)
-//                .build();
-//
-//        when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
-//        when(missionRepository.save(any())).thenReturn(new Mission(loginMember, updatedMissionDTO));
-//
-//        Mission updatedMission = missionService.update(loginMember, 0l, missionDTO);
-//
-//        assertEquals(updatedMissionDTO.getTitle(), updatedMission.getTitle());
+        MissionDTO missionDTO = MissionDTO
+                .builder()
+                .title("test_title")
+                .contents("test_contents")
+                .deadlineTime("09:00:00")
+                .build();
+
+        Mission mission = new Mission(loginMember, missionDTO);
+
+        MissionDTO updatedMissionDTO = MissionDTO
+                .builder()
+                .title("test_title2")
+                .contents("test_contents2")
+                .deadlineTime("09:00:00")
+                .build();
+
+        when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
+        when(missionRepository.save(any())).thenReturn(new Mission(loginMember, updatedMissionDTO));
+
+        Mission updatedMission = missionService.update(loginMember, 0l, missionDTO);
+
+        assertEquals(updatedMissionDTO.getTitle(), updatedMission.getTitle());
     }
 
     @Test
     @DisplayName("미션 삭제 테스트")
     void deleteMission() {
-//        MissionDTO missionDTO = MissionDTO
-//                .builder()
-//                .title("test_title")
-//                .contents("test_contents")
-//                .goalHours(2)
-//                .build();
-//
-//        Mission mission = new Mission(loginMember, missionDTO);
-//
-//        when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
-//        missionService.delete(loginMember, 0l);
-//
-//        assertThrows(NoSuchMissionException.class,() -> missionService.findById(0l));
+        MissionDTO missionDTO = MissionDTO
+                .builder()
+                .title("test_title")
+                .contents("test_contents")
+                .deadlineTime("09:00:00")
+                .build();
+
+        Mission mission = new Mission(loginMember, missionDTO);
+
+        when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
+        missionService.delete(loginMember, 0l);
+        when(missionRepository.findById(0l)).thenReturn(Optional.empty());
+
+        assertThrows(NoSuchMissionException.class, () -> missionService.findById(0l));
+    }
+
+    @Test
+    @DisplayName("미션 시작 테스트")
+    void startMission() {
+        MissionDTO missionDTO = MissionDTO
+                .builder()
+                .title("test_title")
+                .contents("test_contents")
+                .deadlineTime("09:00:00")
+                .build();
+
+        Mission mission = new Mission(loginMember, missionDTO);
+
+        when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
+        missionService.startMission(loginMember, 0l, LocalTime.of(9, 1));
+
+        assertEquals(MissionStatus.IN_PROGRESS, missionService.findById(0l).getStatus());
     }
 
     @Test
     @DisplayName("미션 완료 테스트")
     void completeMission() {
-//        MissionDTO missionDTO = MissionDTO
-//                .builder()
-//                .title("test_title")
-//                .contents("test_contents")
-//                .goalHours(2)
-//                .build();
-//
-//        Mission mission = new Mission(loginMember, missionDTO);
-//
-//        when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
-//        missionService.completeMission(loginMember, 0l);
-//
-//        assertEquals(true, missionService.findById(0l));
+        MissionDTO missionDTO = MissionDTO
+                .builder()
+                .title("test_title")
+                .contents("test_contents")
+                .deadlineTime("09:00:00")
+                .build();
+
+        Mission mission = new Mission(loginMember, missionDTO);
+
+        when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
+        missionService.completeMission(loginMember, 0l, LocalTime.of(9, 1));
+
+        assertEquals(MissionStatus.COMPLETE, missionService.findById(0l).getStatus());
     }
 
     private List<Mission> setMockMissionList() {
         Mission mission1 = Mission.builder()
                                   .title("test1")
                                   .contents("test_contents")
-                                  .goalSeconds(2)
+                                  .deadlineTime(LocalTime.of(9, 0))
                                   .writer(loginMember)
                                   .build();
 
         Mission mission2 = Mission.builder()
                                   .title("test2")
                                   .contents("test_contents")
-                                  .goalSeconds(2)
+                                  .deadlineTime(LocalTime.of(9, 0))
                                   .writer(loginMember)
                                   .build();
 
         Mission mission3 = Mission.builder()
                                   .title("test3")
                                   .contents("test_contents")
-                                  .goalSeconds(2)
+                                  .deadlineTime(LocalTime.of(9, 0))
                                   .writer(new Member())
                                   .build();
 

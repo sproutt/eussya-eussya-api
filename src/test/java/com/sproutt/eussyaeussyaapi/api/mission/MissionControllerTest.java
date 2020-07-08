@@ -24,6 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -66,11 +67,11 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     void createMissionTest() throws Exception {
         headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
 
-        MissionDTO missionDTO = new MissionDTO()
+        MissionDTO missionDTO = MissionDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .goalHours(2)
+                .deadlineTime("09:00:00")
                 .build();
 
         Mission mission = new Mission(loginMember, missionDTO);
@@ -91,7 +92,12 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     @Test
     @DisplayName("미션 등록 요청 - 입력이 잘못된 경우")
     void createMissionTest_withWrongInput() throws Exception {
-        MissionDTO wrongMissionDTO = new MissionDTO();
+        MissionDTO wrongMissionDTO = MissionDTO
+                .builder()
+                .title("")
+                .contents(" ")
+                .deadlineTime("09:00:00")
+                .build();
 
         Mission mission = new Mission(loginMember, wrongMissionDTO);
 
@@ -112,11 +118,11 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     void createMissionTest_withWrongTime() throws Exception {
         headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 10, 0, 0, 0, ZoneId.of("Asia/Seoul")));
 
-        MissionDTO missionDTO = new MissionDTO()
+        MissionDTO missionDTO = MissionDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .goalHours(2)
+                .deadlineTime("09:00:00")
                 .build();
 
         given(missionService.create(loginMember, missionDTO)).willThrow(new NotAvailableTimeException());
@@ -150,24 +156,17 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     void updateMissionTest() throws Exception {
         headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
 
-        MissionDTO missionDTO = new MissionDTO()
-                .builder()
-                .title("test_title")
-                .contents("test_contents")
-                .goalHours(2)
-                .build();
-
         MissionDTO updatedMissionDTO = MissionDTO
                 .builder()
                 .title("update")
                 .contents("update_contents")
-                .goalHours(2)
+                .deadlineTime("09:00")
                 .build();
 
-        Mission mission = new Mission(loginMember, missionDTO);
+
         Mission updatedMission = new Mission(loginMember, updatedMissionDTO);
 
-        given(missionService.findById(0l)).willReturn(mission);
+        given(memberService.findTokenOwner(any())).willReturn(loginMember);
         given(missionService.update(loginMember, 0l, updatedMissionDTO)).willReturn(updatedMission);
 
         ResultActions actions = mvc.perform(put("/missions/0")
@@ -185,14 +184,19 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     void updateMissionTest_withWrongInput() throws Exception {
         headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
 
-        MissionDTO missionDTO = new MissionDTO()
+        MissionDTO missionDTO = MissionDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .goalHours(2)
+                .deadlineTime("09:00:00")
                 .build();
 
-        MissionDTO wrongUpdatedMissionDTO = new MissionDTO();
+        MissionDTO wrongUpdatedMissionDTO = MissionDTO
+                .builder()
+                .title("")
+                .contents(" ")
+                .deadlineTime("09:00:00")
+                .build();
 
         Mission mission = new Mission(loginMember, missionDTO);
         Mission updatedMission = new Mission(loginMember, wrongUpdatedMissionDTO);
@@ -219,14 +223,14 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .goalHours(2)
+                .deadlineTime("09:00:00")
                 .build();
 
         MissionDTO updatedMissionDTO = MissionDTO
                 .builder()
                 .title("update")
                 .contents("update_contents")
-                .goalHours(2)
+                .deadlineTime("09:00:00")
                 .build();
 
         Mission mission = new Mission(loginMember, missionDTO);
@@ -272,11 +276,27 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     }
 
     @Test
-    @DisplayName("미션 달성 요청 - 정상적인 경우")
-    void setAchieveMissionTest() throws Exception {
+    @DisplayName("미션 시작 요청")
+    void startMissionTest() throws Exception {
         headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
 
-        doNothing().when(missionService).completeMission(any(), any());
+        doNothing().when(missionService).startMission(any(), any(), any());
+
+        ResultActions actions = mvc.perform(put("/missions/0/progress")
+                .headers(headers)
+                .characterEncoding("utf-8")
+                .contentType(MediaType.APPLICATION_JSON))
+                                   .andDo(print());
+
+        actions.andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("미션 달성 요청 - 정상적인 경우")
+    void completeMissionTest() throws Exception {
+        headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
+
+        doNothing().when(missionService).completeMission(any(), any(), any());
 
         ResultActions actions = mvc.perform(put("/missions/0/complete")
                 .headers(headers)
@@ -289,10 +309,10 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
 
     @Test
     @DisplayName("미션 달성 요청 - 달성 가능 시간이 아닌 경우")
-    void setAchieveMissionTest_withWrongTime() throws Exception {
+    void completeMissionTest_withWrongTime() throws Exception {
         headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 10, 0, 0, 0, ZoneId.of("Asia/Seoul")));
 
-        doNothing().when(missionService).completeMission(any(), any());
+        doNothing().when(missionService).completeMission(any(), any(), any());
 
         ResultActions actions = mvc.perform(put("/missions/0/complete")
                 .headers(headers)
@@ -305,10 +325,10 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
 
     @Test
     @DisplayName("미션 달성 요청 - 목표 시간을 채우지 못한 경우")
-    void setAchieveMissionTest_withWrongProgressTime() throws Exception {
+    void completeMissionTest_withWrongProgressTime() throws Exception {
         headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
 
-        doThrow(NotSatisfiedCondition.class).when(missionService).completeMission(any(), any());
+        doThrow(NotSatisfiedCondition.class).when(missionService).completeMission(any(), any(), any());
 
         ResultActions actions = mvc.perform(put("/missions/0/complete")
                 .headers(headers)
@@ -331,21 +351,21 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
         Mission mission1 = Mission.builder()
                                   .title("test1")
                                   .contents("test_contents")
-                                  .goalSeconds(2)
+                                  .deadlineTime(LocalTime.of(9, 0))
                                   .writer(loginMember)
                                   .build();
 
         Mission mission2 = Mission.builder()
                                   .title("test2")
                                   .contents("test_contents")
-                                  .goalSeconds(2)
+                                  .deadlineTime(LocalTime.of(9, 0))
                                   .writer(loginMember)
                                   .build();
 
         Mission mission3 = Mission.builder()
                                   .title("test3")
                                   .contents("test_contents")
-                                  .goalSeconds(2)
+                                  .deadlineTime(LocalTime.of(9, 0))
                                   .writer(new Member())
                                   .build();
 

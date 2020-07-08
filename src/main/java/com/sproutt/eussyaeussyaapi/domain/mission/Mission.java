@@ -10,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Getter
@@ -37,69 +38,54 @@ public class Mission {
     private LocalDateTime updatedTime;
 
     @Column
-    private int goalSeconds;
+    private LocalTime deadlineTime;
 
     @Column
-    private int progressSeconds = 0;
+    private LocalTime runningTime = LocalTime.of(0, 0);
 
     @Column
-    private boolean achievement = false;
+    private MissionStatus status = MissionStatus.BEFORE_START;
 
     @Builder
-    public Mission(String title, String contents, Member writer, int goalSeconds) {
+    public Mission(String title, String contents, Member writer, LocalTime deadlineTime) {
         this.title = title;
         this.contents = contents;
         this.writer = writer;
-        this.goalSeconds = goalSeconds;
+        this.deadlineTime = deadlineTime;
     }
 
     public Mission(Member writer, MissionDTO missionDTO) {
         this.title = missionDTO.getTitle();
         this.contents = missionDTO.getContents();
-        this.goalSeconds = changeHoursToSeconds(missionDTO.getGoalHours());
+        this.deadlineTime = LocalTime.parse(missionDTO.getDeadlineTime());
         this.writer = writer;
     }
 
-    private int changeHoursToSeconds(int goalHours) {
-        return goalHours * 60 * 60;
-    }
-
-    @Override
-    public String toString() {
-        return "Mission{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", contents='" + contents + '\'' +
-                ", writer=" + writer +
-                ", createdTime=" + createdTime +
-                ", updatedTime=" + updatedTime +
-                ", goalSeconds=" + goalSeconds +
-                ", progressSeconds=" + progressSeconds +
-                ", achievement=" + achievement +
-                '}';
-    }
-
-    public boolean isSameWriter(Member member) {
-        return this.writer.isSameMember(member);
+    public boolean isWriter(Member member) {
+        return this.writer.isSame(member);
     }
 
     public Mission update(MissionDTO missionDTO) {
         this.title = missionDTO.getTitle();
         this.contents = missionDTO.getContents();
-        this.goalSeconds = changeHoursToSeconds(missionDTO.getGoalHours());
+        this.deadlineTime = LocalTime.parse(missionDTO.getDeadlineTime());
 
         return this;
     }
 
-    public boolean isSatisfiedWithGoalTime() {
-        return this.progressSeconds >= this.goalSeconds;
-    }
-
-    public void addProcessTime(long runningSeconds) {
-        this.progressSeconds += runningSeconds;
+    public boolean isDeadlinePassed(LocalTime now) {
+        return deadlineTime.isBefore(now);
     }
 
     public void complete() {
-        this.achievement = true;
+        this.status = MissionStatus.COMPLETE;
+    }
+
+    public void passRunningTime(long runningSeconds) {
+        this.runningTime = this.runningTime.plusSeconds(runningSeconds);
+    }
+
+    public void start() {
+        this.status = MissionStatus.IN_PROGRESS;
     }
 }

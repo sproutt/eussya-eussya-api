@@ -85,7 +85,7 @@ public class Member {
         missions.add(mission);
     }
 
-    public boolean isSameMember(Member member) {
-        return this.getId().equals(member.getId());
+    public boolean isSame(Member member) {
+        return this == member;
     }
 }

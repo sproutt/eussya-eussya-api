@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class MissionServiceImpl implements MissionService {
     public Mission update(Member loginMember, Long missionId, MissionDTO missionDTO) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
 
-        if (!mission.isSameWriter(loginMember)) {
+        if (!mission.isWriter(loginMember)) {
             throw new RuntimeException();
         }
 
@@ -42,7 +43,7 @@ public class MissionServiceImpl implements MissionService {
     public void delete(Member loginMember, Long missionId) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
 
-        if (!mission.isSameWriter(loginMember)) {
+        if (!mission.isWriter(loginMember)) {
             throw new NoPermissionException();
         }
 
@@ -84,14 +85,14 @@ public class MissionServiceImpl implements MissionService {
     }
 
     @Override
-    public void completeMission(Member loginMember, Long missionId) {
+    public void completeMission(Member loginMember, Long missionId, LocalTime now) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
 
-        if (!mission.isSameWriter(loginMember)) {
+        if (!mission.isWriter(loginMember)) {
             throw new NoPermissionException();
         }
 
-        if (!mission.isSatisfiedWithGoalTime()) {
+        if (!mission.isDeadlinePassed(now)) {
             throw new NotSatisfiedCondition();
         }
 
@@ -100,14 +101,30 @@ public class MissionServiceImpl implements MissionService {
     }
 
     @Override
-    public void addProcessTime(Member loginMember, Long missionId, long processSeconds) {
+    public void passRunningTime(Member loginMember, Long missionId, long runningSeconds) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
 
-        if (!mission.isSameWriter(loginMember)) {
+        if (!mission.isWriter(loginMember)) {
             throw new NoPermissionException();
         }
 
-        mission.addProcessTime(processSeconds);
+        mission.passRunningTime(runningSeconds);
+        missionRepository.save(mission);
+    }
+
+    @Override
+    public void startMission(Member loginMember, Long missionId, LocalTime now) {
+        Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
+
+        if (!mission.isWriter(loginMember)) {
+            throw new NoPermissionException();
+        }
+
+        if (!mission.isDeadlinePassed(now)) {
+            throw new NotSatisfiedCondition();
+        }
+
+        mission.start();
         missionRepository.save(mission);
     }
 }

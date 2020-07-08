@@ -4,6 +4,7 @@ import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 
+import java.time.LocalTime;
 import java.util.List;
 
 public interface MissionService {
@@ -21,7 +22,9 @@ public interface MissionService {
 
     List<Mission> filterDate(String afterDate, String beforeDate, List<Mission> missionList);
 
-    void completeMission(Member loginMember, Long missionId);
+    void completeMission(Member loginMember, Long missionId, LocalTime now);
 
-    void addProcessTime(Member loginMember, Long missionId, long processSeconds);
+    void passRunningTime(Member loginMember, Long missionId, long processSeconds);
+
+    void startMission(Member loginMember, Long missionId, LocalTime now);
 }
