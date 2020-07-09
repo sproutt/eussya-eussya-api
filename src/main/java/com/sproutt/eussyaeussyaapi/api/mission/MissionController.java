@@ -1,15 +1,15 @@
 package com.sproutt.eussyaeussyaapi.api.mission;
 
-import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
+import com.sproutt.eussyaeussyaapi.api.aspect.member.LoginMember;
+import com.sproutt.eussyaeussyaapi.api.aspect.mission.AvailableTime;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
-import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotAvailableTimeException;
+import com.sproutt.eussyaeussyaapi.domain.mission.MissionStatus;
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,33 +24,17 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Api(description = "으쌰으쌰 미션 관련 API", tags = {"Mission - 담당자 : 김종근"})
 public class MissionController {
 
-    @Value("${jwt.header}")
-    private String tokenKey;
-
-    @Value("${jwt.secret}")
-    private String secretKey;
-
     private static final String ZONE_SEOUL = "Asia/Seoul";
-    private static final LocalTime START_AVAILABLE_LOCAL_TIME = LocalTime.of(4, 0);
-    private static final LocalTime END_AVAILABLE_LOCAL_TIME = LocalTime.of(9, 0);
 
     private final MemberService memberService;
     private final MissionService missionService;
-    private final JwtHelper jwtHelper;
 
+    @AvailableTime
     @PostMapping("/missions")
-    public ResponseEntity createMission(@RequestHeader HttpHeaders requestHeaders, @RequestBody @Valid MissionDTO missionDTO) {
-        String token = requestHeaders.get(tokenKey).get(0);
-        Member loginMember = getTokenOwner(token);
-
-        LocalTime now = changeEpochMilliToLocalTime(requestHeaders.getDate());
-
-        if (!isAvailableTime(now)) {
-            throw new NotAvailableTimeException();
-        }
-
+    public ResponseEntity createMission(@LoginMember Member loginMember, @RequestBody @Valid MissionDTO missionDTO) {
         missionService.create(loginMember, missionDTO);
 
         HttpHeaders headers = new HttpHeaders();
@@ -74,7 +58,7 @@ public class MissionController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        if(memberId == null) {
+        if (memberId == null) {
             return new ResponseEntity<>(missionService.findAll(), headers, HttpStatus.OK);
         }
 
@@ -86,17 +70,9 @@ public class MissionController {
         return new ResponseEntity<>(rangedMissions, headers, HttpStatus.OK);
     }
 
+    @AvailableTime
     @PutMapping("/missions/{missionId}")
-    public ResponseEntity updateMission(@RequestHeader HttpHeaders requestHeaders, @PathVariable Long missionId, @RequestBody @Valid MissionDTO missionDTO) {
-        String token = requestHeaders.get(tokenKey).get(0);
-        Member loginMember = getTokenOwner(token);
-
-        LocalTime now = changeEpochMilliToLocalTime(requestHeaders.getDate());
-
-        if (!isAvailableTime(now)) {
-            throw new NotAvailableTimeException();
-        }
-
+    public ResponseEntity updateMission(@LoginMember Member loginMember, @PathVariable Long missionId, @RequestBody @Valid MissionDTO missionDTO) {
         missionService.update(loginMember, missionId, missionDTO);
 
         HttpHeaders headers = new HttpHeaders();
@@ -106,10 +82,7 @@ public class MissionController {
     }
 
     @DeleteMapping("/missions/{missionId}")
-    public ResponseEntity deleteMission(@RequestHeader HttpHeaders requestHeaders, @PathVariable Long missionId) {
-        String token = requestHeaders.get(tokenKey).get(0);
-        Member loginMember = getTokenOwner(token);
-
+    public ResponseEntity deleteMission(@LoginMember Member loginMember, @PathVariable Long missionId) {
         missionService.delete(loginMember, missionId);
 
         HttpHeaders headers = new HttpHeaders();
@@ -118,16 +91,10 @@ public class MissionController {
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
+    @AvailableTime
     @PutMapping("/missions/{missionId}/seconds")
-    public ResponseEntity addProcessTime(@RequestHeader HttpHeaders requestHeaders, @PathVariable Long missionId, @RequestBody long processSeconds) {
-        String token = requestHeaders.get(tokenKey).get(0);
-        Member loginMember = getTokenOwner(token);
-
+    public ResponseEntity addProcessTime(@RequestHeader HttpHeaders requestHeaders, @LoginMember Member loginMember, @PathVariable Long missionId, @RequestBody long processSeconds) {
         LocalTime now = changeEpochMilliToLocalTime(requestHeaders.getDate());
-
-        if (!isAvailableTime(now)) {
-            throw new NotAvailableTimeException();
-        }
 
         missionService.passRunningTime(loginMember, missionId, processSeconds);
 
@@ -137,18 +104,12 @@ public class MissionController {
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
+    @AvailableTime
     @PutMapping("/missions/{missionId}/progress")
-    public ResponseEntity startMission(@RequestHeader HttpHeaders requestHeaders, @PathVariable Long missionId) {
-        String token = requestHeaders.get(tokenKey).get(0);
-        Member loginMember = getTokenOwner(token);
-
+    public ResponseEntity startMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember Member loginMember, @PathVariable Long missionId) {
         LocalTime now = changeEpochMilliToLocalTime(requestHeaders.getDate());
 
-        if (!isAvailableTime(now)) {
-            throw new NotAvailableTimeException();
-        }
-
-        missionService.startMission(loginMember, missionId, now);
+        missionService.changeStatus(loginMember, missionId, now, MissionStatus.IN_PROGRESS);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -157,17 +118,10 @@ public class MissionController {
     }
 
     @PutMapping("/missions/{missionId}/complete")
-    public ResponseEntity completeMission(@RequestHeader HttpHeaders requestHeaders, @PathVariable Long missionId) {
-        String token = requestHeaders.get(tokenKey).get(0);
-        Member loginMember = getTokenOwner(token);
-
+    public ResponseEntity completeMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember Member loginMember, @PathVariable Long missionId) {
         LocalTime now = changeEpochMilliToLocalTime(requestHeaders.getDate());
 
-        if (!isAvailableTime(now)) {
-            throw new NotAvailableTimeException();
-        }
-
-        missionService.completeMission(loginMember, missionId, now);
+        missionService.changeStatus(loginMember, missionId, now, MissionStatus.COMPLETE);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -179,14 +133,5 @@ public class MissionController {
         Instant requestInstant = Instant.ofEpochMilli(epochMilli);
 
         return requestInstant.atZone(ZoneId.of(ZONE_SEOUL)).toLocalTime();
-    }
-
-    private boolean isAvailableTime(LocalTime now) {
-        return now.isAfter(START_AVAILABLE_LOCAL_TIME) && now.isBefore(END_AVAILABLE_LOCAL_TIME);
-    }
-
-    private Member getTokenOwner(String token) {
-        JwtMemberDTO jwtMemberDTO = jwtHelper.decryptToken(secretKey, token);
-        return memberService.findTokenOwner(jwtMemberDTO);
     }
 }

@@ -1,7 +1,7 @@
 package com.sproutt.eussyaeussyaapi.domain.mission;
 
 public enum MissionStatus {
-    BEFORE_START,
+    PENDING,
     IN_PROGRESS,
     COMPLETE
 }

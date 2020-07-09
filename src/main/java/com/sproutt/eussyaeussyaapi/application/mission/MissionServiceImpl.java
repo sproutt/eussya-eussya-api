@@ -1,9 +1,11 @@
 package com.sproutt.eussyaeussyaapi.application.mission;
 
+import com.sproutt.eussyaeussyaapi.api.aspect.mission.AvailableTime;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionRepository;
+import com.sproutt.eussyaeussyaapi.domain.mission.MissionStatus;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoPermissionException;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoSuchMissionException;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotSatisfiedCondition;
@@ -85,22 +87,6 @@ public class MissionServiceImpl implements MissionService {
     }
 
     @Override
-    public void completeMission(Member loginMember, Long missionId, LocalTime now) {
-        Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
-
-        if (!mission.isWriter(loginMember)) {
-            throw new NoPermissionException();
-        }
-
-        if (!mission.isDeadlinePassed(now)) {
-            throw new NotSatisfiedCondition();
-        }
-
-        mission.complete();
-        missionRepository.save(mission);
-    }
-
-    @Override
     public void passRunningTime(Member loginMember, Long missionId, long runningSeconds) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
 
@@ -113,7 +99,7 @@ public class MissionServiceImpl implements MissionService {
     }
 
     @Override
-    public void startMission(Member loginMember, Long missionId, LocalTime now) {
+    public void changeStatus(Member loginMember, Long missionId, LocalTime now, MissionStatus status) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
 
         if (!mission.isWriter(loginMember)) {
@@ -124,7 +110,7 @@ public class MissionServiceImpl implements MissionService {
             throw new NotSatisfiedCondition();
         }
 
-        mission.start();
+        mission.changeStatus(status);
         missionRepository.save(mission);
     }
 }

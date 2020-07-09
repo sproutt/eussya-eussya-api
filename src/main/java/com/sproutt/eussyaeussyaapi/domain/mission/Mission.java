@@ -21,9 +21,10 @@ public class Mission {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 80)
     private String title;
 
+    @Lob
     @Column(nullable = false)
     private String contents;
 
@@ -44,7 +45,7 @@ public class Mission {
     private LocalTime runningTime = LocalTime.of(0, 0);
 
     @Column
-    private MissionStatus status = MissionStatus.BEFORE_START;
+    private MissionStatus status = MissionStatus.PENDING;
 
     @Builder
     public Mission(String title, String contents, Member writer, LocalTime deadlineTime) {
@@ -87,5 +88,9 @@ public class Mission {
 
     public void start() {
         this.status = MissionStatus.IN_PROGRESS;
+    }
+
+    public void changeStatus(MissionStatus status) {
+        this.status = status;
     }
 }
