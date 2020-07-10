@@ -20,15 +20,13 @@ public class MissionAspect {
     private static final LocalTime START_AVAILABLE_LOCAL_TIME = LocalTime.of(4, 0);
     private static final LocalTime END_AVAILABLE_LOCAL_TIME = LocalTime.of(9, 0);
 
-    @Before("@AvailableTime * (..)")
+    @Before("@annotation(AvailableTime)")
     public void checkAvailableTime() {
-        System.out.println("걸렸네");
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
         LocalTime now = changeEpochMilliToLocalTime(request.getDateHeader("date"));
 
         if (!isAvailableTime(now)) {
-            System.out.println("걸렸어");
             throw new NotAvailableTimeException();
         }
     }

@@ -2,6 +2,7 @@ package com.sproutt.eussyaeussyaapi.api.mission;
 
 import com.sproutt.eussyaeussyaapi.api.aspect.member.LoginMember;
 import com.sproutt.eussyaeussyaapi.api.aspect.mission.AvailableTime;
+import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionService;
@@ -34,7 +35,8 @@ public class MissionController {
 
     @AvailableTime
     @PostMapping("/missions")
-    public ResponseEntity createMission(@LoginMember Member loginMember, @RequestBody @Valid MissionDTO missionDTO) {
+    public ResponseEntity createMission(@LoginMember JwtMemberDTO jwtMemberDTO, @RequestBody @Valid MissionDTO missionDTO) {
+        Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
         missionService.create(loginMember, missionDTO);
 
         HttpHeaders headers = new HttpHeaders();
@@ -72,7 +74,8 @@ public class MissionController {
 
     @AvailableTime
     @PutMapping("/missions/{missionId}")
-    public ResponseEntity updateMission(@LoginMember Member loginMember, @PathVariable Long missionId, @RequestBody @Valid MissionDTO missionDTO) {
+    public ResponseEntity updateMission(@LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody @Valid MissionDTO missionDTO) {
+        Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
         missionService.update(loginMember, missionId, missionDTO);
 
         HttpHeaders headers = new HttpHeaders();
@@ -82,7 +85,8 @@ public class MissionController {
     }
 
     @DeleteMapping("/missions/{missionId}")
-    public ResponseEntity deleteMission(@LoginMember Member loginMember, @PathVariable Long missionId) {
+    public ResponseEntity deleteMission(@LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId) {
+        Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
         missionService.delete(loginMember, missionId);
 
         HttpHeaders headers = new HttpHeaders();
@@ -93,8 +97,8 @@ public class MissionController {
 
     @AvailableTime
     @PutMapping("/missions/{missionId}/seconds")
-    public ResponseEntity addProcessTime(@RequestHeader HttpHeaders requestHeaders, @LoginMember Member loginMember, @PathVariable Long missionId, @RequestBody long processSeconds) {
-        LocalTime now = changeEpochMilliToLocalTime(requestHeaders.getDate());
+    public ResponseEntity addProcessTime(@LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody long processSeconds) {
+        Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
 
         missionService.passRunningTime(loginMember, missionId, processSeconds);
 
@@ -106,7 +110,8 @@ public class MissionController {
 
     @AvailableTime
     @PutMapping("/missions/{missionId}/progress")
-    public ResponseEntity startMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember Member loginMember, @PathVariable Long missionId) {
+    public ResponseEntity startMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId) {
+        Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
         LocalTime now = changeEpochMilliToLocalTime(requestHeaders.getDate());
 
         missionService.changeStatus(loginMember, missionId, now, MissionStatus.IN_PROGRESS);
@@ -118,7 +123,8 @@ public class MissionController {
     }
 
     @PutMapping("/missions/{missionId}/complete")
-    public ResponseEntity completeMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember Member loginMember, @PathVariable Long missionId) {
+    public ResponseEntity completeMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId) {
+        Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
         LocalTime now = changeEpochMilliToLocalTime(requestHeaders.getDate());
 
         missionService.changeStatus(loginMember, missionId, now, MissionStatus.COMPLETE);

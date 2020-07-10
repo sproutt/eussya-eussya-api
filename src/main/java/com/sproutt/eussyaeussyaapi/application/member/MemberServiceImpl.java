@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
+
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
@@ -38,7 +40,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public Member joinWithLocalProvider(JoinDTO joinDTO) {
+    public Member joinWithLocalProvider(JoinDTO joinDTO) throws MessagingException {
 
         if (memberRepository.findByMemberId(joinDTO.getMemberId()).orElse(null) != null) {
             throw new DuplicationMemberException();

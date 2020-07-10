@@ -7,13 +7,14 @@ import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 
+import javax.mail.MessagingException;
 import java.util.List;
 
 public interface MemberService {
 
     Member login(LoginDTO loginDTO);
 
-    Member joinWithLocalProvider(JoinDTO joinDTO);
+    Member joinWithLocalProvider(JoinDTO joinDTO) throws MessagingException;
 
     Member joinWithOAuth2Provider();
 

@@ -2,8 +2,6 @@ package com.sproutt.eussyaeussyaapi.api.aspect.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
-import com.sproutt.eussyaeussyaapi.application.member.MemberService;
-import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -27,20 +25,13 @@ public class MemberAspect {
     private String secretKey;
 
     private final JwtHelper jwtHelper;
-    private final MemberService memberService;
 
     @Around("execution(* *(.., @LoginMember (*), ..))")
     public Object convertMember(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String token = request.getHeader(tokenKey);
-        Member loginMember = getTokenOwner(token);
+        JwtMemberDTO loginMemberDTO = jwtHelper.decryptToken(secretKey, token);
 
-        return joinPoint.proceed(new Object[] {loginMember});
-    }
-
-    private Member getTokenOwner(String token) {
-        JwtMemberDTO jwtMemberDTO = jwtHelper.decryptToken(secretKey, token);
-
-        return memberService.findTokenOwner(jwtMemberDTO);
+        return joinPoint.proceed(new Object[] {loginMemberDTO});
     }
 }
