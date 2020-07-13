@@ -2,6 +2,7 @@ package com.sproutt.eussyaeussyaapi.application.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
 import com.sproutt.eussyaeussyaapi.application.MailService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
@@ -15,6 +16,8 @@ import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.mail.MessagingException;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +40,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public Member joinWithLocalProvider(JoinDTO joinDTO) {
+    public Member joinWithLocalProvider(JoinDTO joinDTO) throws MessagingException {
 
         if (memberRepository.findByMemberId(joinDTO.getMemberId()).orElse(null) != null) {
             throw new DuplicationMemberException();
@@ -77,6 +80,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public Member findTokenOwner(JwtMemberDTO jwtMemberDTO) {
+        return memberRepository.findById(jwtMemberDTO.getId()).orElseThrow(NoSuchMemberException::new);
+    }
+
+    @Override
     public boolean isDuplicatedMemberId(String memberId) {
 
         return memberRepository.findByMemberId(memberId).isPresent();
@@ -86,6 +94,12 @@ public class MemberServiceImpl implements MemberService {
     public boolean isDuplicatedNickName(String nickName) {
 
         return memberRepository.findByNickName(nickName).isPresent();
+    }
+
+    @Override
+    public Member findByMemberId(String memberId) {
+
+        return memberRepository.findByMemberId(memberId).orElseThrow(NoSuchMemberException::new);
     }
 
     @Override

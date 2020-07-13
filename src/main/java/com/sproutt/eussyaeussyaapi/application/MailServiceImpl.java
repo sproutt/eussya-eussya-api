@@ -20,15 +20,16 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendAuthEmail(String email, String authCode) {
 
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        SimpleMailMessage message = new SimpleMailMessage();
 
-        simpleMailMessage.setTo(email);
-        simpleMailMessage.setSubject("으쌰으쌰 계정 인증");
-        simpleMailMessage.setText("인증 코드: " + authCode);
+        message.setTo(email);
+        message.setSubject("으쌰으쌰 계정 인증");
+        message.setText("인증 코드: " + authCode);
 
         try {
-            mailSender.send(simpleMailMessage);
+            mailSender.send(message);
         } catch (Exception e) {
+            System.out.println(e.toString());
             throw new MailSendException("메일 전송 에러");
         }
     }

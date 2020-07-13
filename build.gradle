@@ -35,6 +35,8 @@ dependencies {
 
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.2'
 
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {

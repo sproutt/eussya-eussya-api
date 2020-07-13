@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 
 @Slf4j
@@ -38,7 +39,7 @@ public class MemberController {
     }
 
     @PostMapping("/members")
-    public ResponseEntity createMemberWithLocalProvider(@Valid @RequestBody JoinDTO joinDTO) {
+    public ResponseEntity createMemberWithLocalProvider(@Valid @RequestBody JoinDTO joinDTO) throws MessagingException {
 
         memberService.joinWithLocalProvider(joinDTO);
 
@@ -62,7 +63,7 @@ public class MemberController {
     }
 
     @PostMapping("/members/{memberId}/authcode")
-    public ResponseEntity sendAuthCodeEmail(@PathVariable String memberId) {
+    public ResponseEntity sendAuthCodeEmail(@PathVariable String memberId) throws MessagingException {
 
         memberService.sendAuthCodeToEmail(memberId);
 
