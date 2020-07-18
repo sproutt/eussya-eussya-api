@@ -1,19 +1,15 @@
 package com.sproutt.eussyaeussyaapi.application.mission;
 
-import com.sproutt.eussyaeussyaapi.api.aspect.mission.AvailableTime;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionRepository;
-import com.sproutt.eussyaeussyaapi.domain.mission.MissionStatus;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoPermissionException;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoSuchMissionException;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotSatisfiedCondition;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -87,19 +83,45 @@ public class MissionServiceImpl implements MissionService {
     }
 
     @Override
-    public void passRunningTime(Member loginMember, Long missionId, long runningSeconds) {
+    @Transactional
+    public void pauseMission(Member loginMember, Long missionId, LocalDateTime stopPointTime) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
 
         if (!mission.isWriter(loginMember)) {
             throw new NoPermissionException();
         }
 
-        mission.passRunningTime(runningSeconds);
+        if (!mission.isToday(stopPointTime)) {
+            throw new ExpiredMissionException();
+        }
+
+        mission.recordPauseTime(stopPointTime);
+        mission.updateRunningTime();
+        mission.pause();
+        System.out.println(mission.toString());
         missionRepository.save(mission);
     }
 
     @Override
-    public void changeStatus(Member loginMember, Long missionId, LocalTime now, MissionStatus status) {
+    @Transactional
+    public void startMission(Member loginMember, Long missionId, LocalDateTime startPointTime) {
+        Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
+
+        if (!mission.isWriter(loginMember)) {
+            throw new NoPermissionException();
+        }
+
+        if (!mission.isToday(startPointTime)) {
+            throw new ExpiredMissionException();
+        }
+
+        mission.recordStartTime(startPointTime);
+        mission.start();
+        missionRepository.save(mission);
+    }
+
+    @Override
+    public void completeMission(Member loginMember, Long missionId, LocalDateTime now) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
 
         if (!mission.isWriter(loginMember)) {
@@ -110,7 +132,9 @@ public class MissionServiceImpl implements MissionService {
             throw new NotSatisfiedCondition();
         }
 
-        mission.changeStatus(status);
+        mission.recordPauseTime(now);
+        mission.updateRunningTime();
+        mission.complete();
         missionRepository.save(mission);
     }
 }

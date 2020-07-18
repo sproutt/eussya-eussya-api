@@ -14,4 +14,5 @@ public class ExceptionMessage {
     public static final String NO_SUCH_MISSION = "존재하지 않는 미션입니다.";
     public static final String NO_PERMISSION = "권한 없음";
     public static final String NOT_SATISFIED_CONDITION = "목표 시간을 채우지 못했습니다.";
+    public static final String EXPIRED_MISSION = "종료된 미션입니다.";
 }
