@@ -1,6 +1,7 @@
 package com.sproutt.eussyaeussyaapi.application.mission;
 
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
+import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionResponseDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 
@@ -21,6 +22,8 @@ public interface MissionService {
     List<Mission> findAll();
 
     List<Mission> filterDate(String afterDate, String beforeDate, List<Mission> missionList);
+
+    List<MissionResponseDTO> changeResponseDTOList(List<Mission> missionList);
 
     void pauseMission(Member loginMember, Long missionId, LocalDateTime now);
 

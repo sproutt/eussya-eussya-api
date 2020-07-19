@@ -1,6 +1,7 @@
 package com.sproutt.eussyaeussyaapi.application.mission;
 
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
+import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionResponseDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionRepository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,12 +57,16 @@ public class MissionServiceImpl implements MissionService {
 
     @Override
     public List<Mission> findByWriter(Member writer) {
-        return missionRepository.findAllByWriter(writer);
+        List<Mission> missionList = missionRepository.findAllByWriter(writer);
+
+        return missionList;
     }
 
     @Override
     public List<Mission> findAll() {
-        return missionRepository.findAll();
+        List<Mission> missionList = missionRepository.findAll();
+
+        return missionList;
     }
 
     @Override
@@ -98,7 +104,6 @@ public class MissionServiceImpl implements MissionService {
         mission.recordPauseTime(stopPointTime);
         mission.updateRunningTime();
         mission.pause();
-        System.out.println(mission.toString());
         missionRepository.save(mission);
     }
 
@@ -136,5 +141,12 @@ public class MissionServiceImpl implements MissionService {
         mission.updateRunningTime();
         mission.complete();
         missionRepository.save(mission);
+    }
+
+    public List<MissionResponseDTO> changeResponseDTOList(List<Mission> missionList) {
+        List<MissionResponseDTO> responseList = new ArrayList<>();
+        missionList.forEach(mission -> responseList.add(new MissionResponseDTO(mission)));
+
+        return responseList;
     }
 }

@@ -55,20 +55,22 @@ public class MissionController {
     }
 
     @GetMapping("/missions")
-    public ResponseEntity<List<Mission>> searchMissionList(@RequestParam(name = "writer", required = false) String memberId, @RequestParam(name = "after", required = false) String afterDate, @RequestParam(name = "before", required = false) String beforeDate) {
+    public ResponseEntity<List<MissionResponseDTO>> searchMissionList(@RequestParam(name = "writer", required = false) String memberId, @RequestParam(name = "after", required = false) String afterDate, @RequestParam(name = "before", required = false) String beforeDate) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
+        List<Mission> missions = missionService.findAll();
+
         if (memberId == null) {
-            return new ResponseEntity<>(missionService.findAll(), headers, HttpStatus.OK);
+            return new ResponseEntity<>(missionService.changeResponseDTOList(missions), headers, HttpStatus.OK);
         }
 
         var writer = memberService.findByMemberId(memberId);
-        var missions = missionService.findByWriter(writer);
+        missions = missionService.findByWriter(writer);
 
         var rangedMissions = missionService.filterDate(afterDate, beforeDate, missions);
 
-        return new ResponseEntity<>(rangedMissions, headers, HttpStatus.OK);
+        return new ResponseEntity<>(missionService.changeResponseDTOList(rangedMissions), headers, HttpStatus.OK);
     }
 
     @PutMapping("/missions/{missionId}")
