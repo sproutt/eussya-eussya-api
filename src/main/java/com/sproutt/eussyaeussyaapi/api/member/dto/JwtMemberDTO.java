@@ -10,13 +10,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class JwtMemberDTO {
 
-    Long id;
-
+    private Long id;
+    private String memberId;
     private String nickName;
 
     @Builder
-    public JwtMemberDTO(Long id, String nickName) {
+    public JwtMemberDTO(Long id, String memberId, String nickName) {
         this.id = id;
+        this.memberId = memberId;
         this.nickName = nickName;
     }
 }

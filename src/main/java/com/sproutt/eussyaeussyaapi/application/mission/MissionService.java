@@ -1,11 +1,11 @@
 package com.sproutt.eussyaeussyaapi.application.mission;
 
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
+import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionResponseDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
-import com.sproutt.eussyaeussyaapi.domain.mission.MissionStatus;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MissionService {
@@ -23,7 +23,11 @@ public interface MissionService {
 
     List<Mission> filterDate(String afterDate, String beforeDate, List<Mission> missionList);
 
-    void passRunningTime(Member loginMember, Long missionId, long processSeconds);
+    List<MissionResponseDTO> changeResponseDTOList(List<Mission> missionList);
 
-    void changeStatus(Member loginMember, Long missionId, LocalTime now, MissionStatus status);
+    void pauseMission(Member loginMember, Long missionId, LocalDateTime now);
+
+    void startMission(Member loginMember, Long missionId, LocalDateTime now);
+
+    void completeMission(Member loginMember, Long missionId, LocalDateTime now);
 }

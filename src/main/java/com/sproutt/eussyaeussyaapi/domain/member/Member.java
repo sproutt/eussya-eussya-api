@@ -10,7 +10,6 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -76,9 +75,10 @@ public class Member {
 
     public JwtMemberDTO toJwtInfo() {
         return JwtMemberDTO.builder()
-                .id(this.id)
-                .nickName(this.nickName)
-                .build();
+                           .id(this.id)
+                           .memberId(this.memberId)
+                           .nickName(this.nickName)
+                           .build();
     }
 
     public void addMission(Mission mission) {
@@ -87,5 +87,18 @@ public class Member {
 
     public boolean isSame(Member member) {
         return this == member;
+    }
+
+    @Override
+    public String toString() {
+        return "Member{" +
+                "id=" + id +
+                ", memberId='" + memberId + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", nickName='" + nickName + '\'' +
+                ", authentication='" + authentication + '\'' +
+                ", provider=" + provider +
+                '}';
     }
 }

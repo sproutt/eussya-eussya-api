@@ -9,10 +9,7 @@ import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationException
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.WrongPasswordException;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoPermissionException;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoSuchMissionException;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotAvailableTimeException;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotSatisfiedCondition;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.*;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -66,6 +63,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = NotSatisfiedCondition.class)
     public ResponseEntity NotSatisfiedCondition(NotSatisfiedCondition exception) {
         log.info("NotSatisfiedCondition : {}", exception);
+
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(value = ExpiredMissionException.class)
+    public ResponseEntity ExpiredMissionException(ExpiredMissionException exception) {
+        log.info("ExpiredMissionException : {}", exception);
 
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
     }

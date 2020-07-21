@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +48,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime("09:00:00")
+                .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
         Mission mission = new Mission(loginMember, missionDTO);
@@ -65,7 +65,7 @@ public class MissionServiceTest {
         Mission mission = Mission.builder()
                                  .title("test")
                                  .contents("test_contents")
-                                 .deadlineTime(LocalTime.of(9, 0))
+                                 .deadlineTime(LocalDateTime.of(2020, 7, 13, 9, 0))
                                  .writer(loginMember)
                                  .build();
 
@@ -106,7 +106,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime("09:00:00")
+                .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
         Mission mission = new Mission(loginMember, missionDTO);
@@ -115,7 +115,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title2")
                 .contents("test_contents2")
-                .deadlineTime("09:00:00")
+                .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
         when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
@@ -133,7 +133,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime("09:00:00")
+                .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
         Mission mission = new Mission(loginMember, missionDTO);
@@ -152,13 +152,13 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime("09:00:00")
+                .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
         Mission mission = new Mission(loginMember, missionDTO);
 
         when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
-        missionService.changeStatus(loginMember, 0l, LocalTime.of(9, 1), MissionStatus.IN_PROGRESS);
+        missionService.startMission(loginMember, 0l, LocalDateTime.of(2020, 7, 15, 5, 1));
 
         assertEquals(MissionStatus.IN_PROGRESS, missionService.findById(0l).getStatus());
     }
@@ -170,13 +170,14 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime("09:00:00")
+                .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
         Mission mission = new Mission(loginMember, missionDTO);
 
         when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
-        missionService.changeStatus(loginMember, 0l, LocalTime.of(9, 1), MissionStatus.COMPLETE);
+        missionService.startMission(loginMember, 0l, LocalDateTime.of(2020, 7, 15, 5, 1));
+        missionService.completeMission(loginMember, 0l, LocalDateTime.of(2020, 7, 15, 9, 1));
 
         assertEquals(MissionStatus.COMPLETE, missionService.findById(0l).getStatus());
     }
@@ -185,21 +186,21 @@ public class MissionServiceTest {
         Mission mission1 = Mission.builder()
                                   .title("test1")
                                   .contents("test_contents")
-                                  .deadlineTime(LocalTime.of(9, 0))
+                                  .deadlineTime(LocalDateTime.of(2020, 7, 13, 9, 0))
                                   .writer(loginMember)
                                   .build();
 
         Mission mission2 = Mission.builder()
                                   .title("test2")
                                   .contents("test_contents")
-                                  .deadlineTime(LocalTime.of(9, 0))
+                                  .deadlineTime(LocalDateTime.of(2020, 7, 13, 9, 0))
                                   .writer(loginMember)
                                   .build();
 
         Mission mission3 = Mission.builder()
                                   .title("test3")
                                   .contents("test_contents")
-                                  .deadlineTime(LocalTime.of(9, 0))
+                                  .deadlineTime(LocalDateTime.of(2020, 7, 13, 9, 0))
                                   .writer(new Member())
                                   .build();
 

@@ -9,6 +9,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 
@@ -17,27 +18,30 @@ import java.time.ZoneId;
 public class MissionAspect {
 
     private static final String ZONE_SEOUL = "Asia/Seoul";
-    private static final LocalTime START_AVAILABLE_LOCAL_TIME = LocalTime.of(4, 0);
-    private static final LocalTime END_AVAILABLE_LOCAL_TIME = LocalTime.of(9, 0);
+    private static final int START_AVAILABLE_HOUR = 4;
+    private static final int END_AVAILABLE_HOUR = 9;
 
     @Before("@annotation(AvailableTime)")
     public void checkAvailableTime() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
-        LocalTime now = changeEpochMilliToLocalTime(request.getDateHeader("date"));
+        LocalDateTime now = changeEpochMilliToLocalTime(request.getDateHeader("date"));
 
         if (!isAvailableTime(now)) {
             throw new NotAvailableTimeException();
         }
     }
 
-    private LocalTime changeEpochMilliToLocalTime(long epochMilli) {
+    private LocalDateTime changeEpochMilliToLocalTime(long epochMilli) {
         Instant requestInstant = Instant.ofEpochMilli(epochMilli);
 
-        return requestInstant.atZone(ZoneId.of(ZONE_SEOUL)).toLocalTime();
+        return requestInstant.atZone(ZoneId.of(ZONE_SEOUL)).toLocalDateTime();
     }
 
-    private boolean isAvailableTime(LocalTime now) {
-        return now.isAfter(START_AVAILABLE_LOCAL_TIME) && now.isBefore(END_AVAILABLE_LOCAL_TIME);
+    private boolean isAvailableTime(LocalDateTime now) {
+        LocalDateTime startLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(START_AVAILABLE_HOUR, 0));
+        LocalDateTime endLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(END_AVAILABLE_HOUR, 0));
+
+        return now.isAfter(startLocalDateTime) && now.isBefore(endLocalDateTime);
     }
 }
