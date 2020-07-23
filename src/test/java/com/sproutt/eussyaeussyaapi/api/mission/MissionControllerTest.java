@@ -2,6 +2,7 @@ package com.sproutt.eussyaeussyaapi.api.mission;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutt.eussyaeussyaapi.api.HeaderSetUpWithToken;
+import com.sproutt.eussyaeussyaapi.api.datetime.DateTimeController;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionService;
@@ -18,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -40,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(MissionController.class)
+@WebMvcTest(value = MissionController.class, includeFilters = @ComponentScan.Filter(classes = {Configuration.class}))
 @EnableAspectJAutoProxy
 public class MissionControllerTest extends HeaderSetUpWithToken {
 
