@@ -15,8 +15,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("#{'${api.cors.allow-origins}'.split(', ')}")
-    private String[] allowedOrigins;
+    @Value("{api.cors.allow-origins}")
+    private String allowedOrigins;
 
     private final JwtInterceptor jwtInterceptor;
 
@@ -38,6 +38,6 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowCredentials(true)
-                .allowedOrigins(allowedOrigins);
+                .allowedOrigins(allowedOrigins.split(", "));
     }
 }
