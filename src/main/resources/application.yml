@@ -40,8 +40,4 @@ jasypt:
 
 api:
   cors:
-    allow-origins:
-      -ENC(7Al74gfGXcAvd/D4S93NeuVCbIR8UHqwaGnaWbvkzc8=)
-      -ENC(jCH7aQtVVnhYmIhR4YQgnQbLMjjSZt7EGObYZbE4clY=)
-      -ENC(06n71p69CuJsZYnQ9wzRdYrvL3dCWKbLWYiLDfhl3Aydci5wWYx/gw==)
-      -ENC(f0BLwasumD9R4LjYJ+GDGwEPMDs6jduyeOa0ZzyUiNglBJUfBjuFJA==)
+    allow-origins: ENC(MUx6CLsdon60zBEAbQ+k0aHjrEkt5/6olFrgs11l7Wjo1VwjzoumVltRKR133vMsTPAp6vQlrCLHZOqniOrBUg==)
