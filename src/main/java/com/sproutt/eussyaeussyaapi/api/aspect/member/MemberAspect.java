@@ -42,6 +42,7 @@ public class MemberAspect {
         for (int i = 0; i < joinPointArgs.length; i++) {
             if (joinPointArgs[i].toString().contains("JwtMemberDTO")) {
                 joinPointArgs[i] = jwtMemberDTO;
+
                 break;
             }
         }
