@@ -18,6 +18,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${api.cors.allow-origins}")
     private String allowedOrigins;
 
+    @Value("${jwt.header}")
+    private String tokenKey;
+
     private final JwtInterceptor jwtInterceptor;
 
     @Override
@@ -36,6 +39,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
+                .exposedHeaders(tokenKey)
                 .allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowCredentials(true)
                 .allowedOrigins(allowedOrigins.split(", "));
