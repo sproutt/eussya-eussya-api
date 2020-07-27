@@ -1,6 +1,7 @@
 package com.sproutt.eussyaeussyaapi.domain.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
+import com.sproutt.eussyaeussyaapi.domain.chat.MemberChatRoom;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,6 +43,9 @@ public class Member {
 
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
     private List<Mission> missions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    private List<MemberChatRoom> chatRooms = new ArrayList<>();
 
 
     @Builder
