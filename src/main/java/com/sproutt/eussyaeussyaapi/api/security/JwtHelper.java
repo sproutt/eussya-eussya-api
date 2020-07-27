@@ -10,7 +10,7 @@ import java.util.Date;
 @Component
 public class JwtHelper {
 
-    private static final long VALID_MILLISECOND = 1000L * 60 * 60; // 1 hour
+    private static final long VALID_MILLISECOND = 1000L * 60 * 60 * 24; // 24 hour
 
     private static final String CLAIM_KEY = "member";
 
@@ -33,17 +33,7 @@ public class JwtHelper {
     }
 
     public JwtMemberDTO decryptToken(String secretKey, String token) {
-        Jws<Claims> claims = null;
-
-        try {
-
-            claims = getClaims(secretKey, token);
-
-        } catch (Exception e) {
-
-            throw new UnsupportedJwtException("token parser fail");
-        }
-
+        Jws<Claims> claims = getClaims(secretKey, token);
         ObjectMapper objectMapper = new ObjectMapper();
 
         return objectMapper.convertValue(claims.getBody().get(CLAIM_KEY), JwtMemberDTO.class);
@@ -54,7 +44,6 @@ public class JwtHelper {
             Jws<Claims> claims = getClaims(secretKey, token);
 
             return !isExpired(claims);
-
         } catch (Exception e) {
             return false;
         }
@@ -65,10 +54,14 @@ public class JwtHelper {
     }
 
     private Jws<Claims> getClaims(String secretKey, String token) {
-        Jws<Claims> claims = Jwts.parser()
-                                 .setSigningKey(secretKey)
-                                 .parseClaimsJws(token);
 
-        return claims;
+        try {
+            Jws<Claims> claims = Jwts.parser()
+                                     .setSigningKey(secretKey)
+                                     .parseClaimsJws(token);
+            return claims;
+        } catch (Exception e) {
+            throw new UnsupportedJwtException("token parser fail");
+        }
     }
 }
