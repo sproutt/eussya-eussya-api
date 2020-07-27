@@ -34,7 +34,7 @@ public class MissionController {
     private final MissionService missionService;
 
     @PostMapping("/missions")
-    public ResponseEntity createMission(@LoginMember JwtMemberDTO jwtMemberDTO, @RequestBody @Valid MissionDTO missionDTO) {
+    public ResponseEntity createMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @RequestBody @Valid MissionDTO missionDTO) {
         Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
         missionService.create(loginMember, missionDTO);
 
@@ -74,7 +74,7 @@ public class MissionController {
     }
 
     @PutMapping("/missions/{missionId}")
-    public ResponseEntity updateMission(@LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody @Valid MissionDTO missionDTO) {
+    public ResponseEntity updateMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody @Valid MissionDTO missionDTO) {
         Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
         missionService.update(loginMember, missionId, missionDTO);
 
@@ -85,7 +85,7 @@ public class MissionController {
     }
 
     @DeleteMapping("/missions/{missionId}")
-    public ResponseEntity deleteMission(@LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId) {
+    public ResponseEntity deleteMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId) {
         Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
         missionService.delete(loginMember, missionId);
 
