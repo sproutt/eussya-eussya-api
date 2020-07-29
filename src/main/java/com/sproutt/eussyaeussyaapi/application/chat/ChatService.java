@@ -12,4 +12,6 @@ public interface ChatService {
     ChatRoom getChatRoom(Member participant1, Member participant2);
 
     ChatRoom findChatRoom(Long roomId);
+
+    ChatRoom createChatRoom(Member participant1, Member participant2);
 }

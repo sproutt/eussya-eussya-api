@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.domain.chat;
 
+import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,9 +17,13 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToMany(mappedBy = "member")
-    private List<MemberChatRoom> members = new ArrayList<>();
+    @ManyToMany(mappedBy = "chatRooms")
+    private List<Member> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<ChatMessage> chatMessageList = new ArrayList<>();
+
+    public void addMember(Member member) {
+        members.add(member);
+    }
 }

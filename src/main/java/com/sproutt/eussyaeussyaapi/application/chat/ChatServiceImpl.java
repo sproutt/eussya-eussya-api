@@ -2,9 +2,12 @@ package com.sproutt.eussyaeussyaapi.application.chat;
 
 import com.sproutt.eussyaeussyaapi.domain.chat.*;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
+import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -12,8 +15,7 @@ import java.util.List;
 public class ChatServiceImpl implements ChatService {
 
     private final ChatRoomRepository chatRoomRepository;
-    private final MemberChatRoomRepository memberChatRoomRepository;
-    private final ChatMessageRepository chatMessageRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public List<ChatMessage> getChatHistory(Long roomId) {
@@ -23,24 +25,30 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    @Transactional
     public ChatRoom getChatRoom(Member participant1, Member participant2) {
-        List<MemberChatRoom> memberChatRoomsWithParticipant1 = memberChatRoomRepository.findByMember(participant1);
-        List<MemberChatRoom> memberChatRoomsWithParticipant2 = memberChatRoomRepository.findByMember(participant2);
+        Long chatRoomId = chatRoomRepository.findIdByMembers(participant1, participant2);
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElse(null);
 
-        for (MemberChatRoom memberChatRoomWith1 : memberChatRoomsWithParticipant1) {
-            for (MemberChatRoom memberChatRoomWith2 : memberChatRoomsWithParticipant2) {
-                if (memberChatRoomWith1.getChatRoom().equals(memberChatRoomWith2.getChatRoom())) {
-                    return memberChatRoomWith1.getChatRoom();
-                }
-            }
+        if (chatRoom == null) {
+            chatRoom = createChatRoom(participant1, participant2);
         }
+        System.out.println("roomId: " + chatRoomId);
+        System.out.println("room: " + chatRoom.getId());
 
-        ChatRoom chatRoom = chatRoomRepository.save(new ChatRoom());
-        MemberChatRoom memberChatRoom1 = new MemberChatRoom(participant1, chatRoom);
-        MemberChatRoom memberChatRoom2 = new MemberChatRoom(participant2, chatRoom);
+        return chatRoom;
+    }
 
-        memberChatRoomRepository.save(memberChatRoom1);
-        memberChatRoomRepository.save(memberChatRoom2);
+    @Transactional
+    public ChatRoom createChatRoom(Member participant1, Member participant2) {
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.addMember(participant1);
+        chatRoom.addMember(participant2);
+        chatRoomRepository.save(chatRoom);
+
+        participant1.addChatRoom(chatRoom);
+        participant2.addChatRoom(chatRoom);
+        memberRepository.saveAll(Arrays.asList(participant1, participant1));
 
         return chatRoom;
     }
