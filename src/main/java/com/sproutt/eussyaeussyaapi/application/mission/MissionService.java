@@ -30,4 +30,6 @@ public interface MissionService {
     void startMission(Member loginMember, Long missionId, LocalDateTime now);
 
     void completeMission(Member loginMember, Long missionId, LocalDateTime now);
+
+    List<Mission> filterStatus(String status, List<Mission> rangedMissions);
 }
