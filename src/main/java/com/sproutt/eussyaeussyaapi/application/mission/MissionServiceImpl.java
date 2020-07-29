@@ -5,12 +5,18 @@ import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionResponseDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionRepository;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.*;
+import com.sproutt.eussyaeussyaapi.domain.mission.MissionStatus;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.ExpiredMissionException;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoPermissionException;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoSuchMissionException;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotSatisfiedCondition;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,16 +78,16 @@ public class MissionServiceImpl implements MissionService {
     @Override
     public List<Mission> filterDate(String afterDate, String beforeDate, List<Mission> missionList) {
         if (afterDate != null) {
-            LocalDateTime afterLocalDateTime = LocalDateTime.parse(afterDate);
+            LocalDateTime afterLocalDateTime = LocalDateTime.ofInstant(Instant.parse(afterDate), ZoneId.of("Asia/Seoul"));
             missionList = missionList.stream()
-                                     .filter(mission -> mission.getCreatedTime().isAfter(afterLocalDateTime))
+                                     .filter(mission -> mission.getDeadlineTime().isAfter(afterLocalDateTime))
                                      .collect(Collectors.toList());
         }
 
         if (beforeDate != null) {
-            LocalDateTime beforeLocalDateTime = LocalDateTime.parse(beforeDate);
+            LocalDateTime beforeLocalDateTime = LocalDateTime.ofInstant(Instant.parse(beforeDate), ZoneId.of("Asia/Seoul"));
             missionList = missionList.stream()
-                                     .filter(mission -> mission.getCreatedTime().isBefore(beforeLocalDateTime))
+                                     .filter(mission -> mission.getDeadlineTime().isBefore(beforeLocalDateTime))
                                      .collect(Collectors.toList());
         }
 
@@ -141,6 +147,19 @@ public class MissionServiceImpl implements MissionService {
         mission.updateRunningTime();
         mission.complete();
         missionRepository.save(mission);
+    }
+
+    @Override
+    public List<Mission> filterStatus(String status, List<Mission> missions) {
+        if (status == null) {
+            return missions;
+        }
+
+        if (status.equals("UNCOMPLETE")) {
+            return missions.stream().filter(mission -> mission.getStatus() != MissionStatus.COMPLETE).collect(Collectors.toList());
+        }
+
+        return missions.stream().filter(mission -> mission.getStatus().name().equals(status)).collect(Collectors.toList());
     }
 
     public List<MissionResponseDTO> changeResponseDTOList(List<Mission> missionList) {
