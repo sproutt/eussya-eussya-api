@@ -9,7 +9,10 @@ import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionRepository;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -111,11 +114,17 @@ public class MissionAcceptanceTest {
         log.info("Response Body: {}", response.getBody().toString());
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().size() == 1);
+        assertThat(response.getBody().size()).isEqualTo(1);
 
-        response = template.getForEntity("/missions?after=2020.07.14&before=2020.07.17", List.class);
+        response = template.getForEntity("/missions?after=2020-07-14T00:00:00.00Z&before=2020-07-17T00:00:00.00Z", List.class);
+        log.info("Response Body: {}", response.getBody().toString());
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().size() == 1);
+        assertThat(response.getBody().size()).isEqualTo(1);
+
+        response = template.getForEntity("/missions?status=UNCOMPLETE", List.class);
+        log.info("Response Body: {}", response.getBody().toString());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().size()).isEqualTo(1);
     }
 
     @Test
