@@ -1,7 +1,7 @@
 package com.sproutt.eussyaeussyaapi.domain.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
-import com.sproutt.eussyaeussyaapi.domain.chat.MemberChatRoom;
+import com.sproutt.eussyaeussyaapi.domain.chat.ChatRoom;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,8 +44,13 @@ public class Member {
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
     private List<Mission> missions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
-    private List<MemberChatRoom> chatRooms = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(
+            name = "MEMBER_CHATROOM",                              // 연결테이블 이름
+            joinColumns = @JoinColumn(name = "MEMBER_ID"),        // 회원과 매핑할 조인 컬럼 정보를 지정
+            inverseJoinColumns = @JoinColumn(name = "CHATROOM_ID") // 상품과 매핑할 조인 컬럼 정보를 지정
+    )
+    private List<ChatRoom> chatRooms = new ArrayList<>();
 
 
     @Builder
@@ -87,6 +92,10 @@ public class Member {
 
     public void addMission(Mission mission) {
         missions.add(mission);
+    }
+
+    public void addChatRoom(ChatRoom chatRoom) {
+        chatRooms.add(chatRoom);
     }
 
     public boolean isSame(Member member) {
