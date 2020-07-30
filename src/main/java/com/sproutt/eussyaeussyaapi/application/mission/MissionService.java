@@ -5,7 +5,6 @@ import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionResponseDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MissionService {
@@ -25,11 +24,11 @@ public interface MissionService {
 
     List<MissionResponseDTO> changeResponseDTOList(List<Mission> missionList);
 
-    void pauseMission(Member loginMember, Long missionId, LocalDateTime now);
+    void pauseMission(Member loginMember, Long missionId, String timeFormattedISO);
 
-    void startMission(Member loginMember, Long missionId, LocalDateTime now);
+    void startMission(Member loginMember, Long missionId, String timeFormattedISO);
 
-    void completeMission(Member loginMember, Long missionId, LocalDateTime now);
+    void completeMission(Member loginMember, Long missionId, String timeFormattedISO);
 
     List<Mission> filterStatus(String status, List<Mission> rangedMissions);
 }

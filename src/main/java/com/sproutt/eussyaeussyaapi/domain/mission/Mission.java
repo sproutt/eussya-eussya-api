@@ -6,7 +6,6 @@ import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.h2.util.json.JSONObject;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -14,7 +13,6 @@ import javax.persistence.*;
 import java.time.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -33,7 +31,7 @@ public class Mission {
     @Column(nullable = false)
     private String contents;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, foreignKey = @ForeignKey(name = "fk_mission_writer"))
     private Member writer;
 
@@ -107,9 +105,16 @@ public class Mission {
         RunningTimePoint runningTimePoint = new RunningTimePoint();
         runningTimePoint.setStartPoint(startPointTime);
 
-        this.runningTimePointList.add(runningTimePoint);
-
         Gson gson = new Gson();
+
+        try {
+            runningTimePointList = new ArrayList<>(Arrays.asList(gson.fromJson(this.runningTimePoint, RunningTimePoint[].class)));
+        } catch (Exception e) {
+            runningTimePointList = new ArrayList<>();
+        }
+
+        runningTimePointList.add(runningTimePoint);
+
         this.runningTimePoint = gson.toJson(this.runningTimePointList);
     }
 
@@ -160,6 +165,7 @@ public class Mission {
     }
 
     public boolean isToday(LocalDateTime stopPointTime) {
+        System.out.println(stopPointTime.toLocalDate());
         return this.deadlineTime.toLocalDate().equals(stopPointTime.toLocalDate());
     }
 }

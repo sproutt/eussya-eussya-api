@@ -96,18 +96,20 @@ public class MissionServiceImpl implements MissionService {
 
     @Override
     @Transactional
-    public void pauseMission(Member loginMember, Long missionId, LocalDateTime stopPointTime) {
+    public void pauseMission(Member loginMember, Long missionId, String timeFormattedISO) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
+        LocalDateTime now = LocalDateTime.ofInstant(Instant.parse(timeFormattedISO), ZoneId.of("Asia/Seoul"));
+
 
         if (!mission.isWriter(loginMember)) {
             throw new NoPermissionException();
         }
 
-        if (!mission.isToday(stopPointTime)) {
+        if (!mission.isToday(now)) {
             throw new ExpiredMissionException();
         }
 
-        mission.recordPauseTime(stopPointTime);
+        mission.recordPauseTime(now);
         mission.updateRunningTime();
         mission.pause();
         missionRepository.save(mission);
@@ -115,25 +117,28 @@ public class MissionServiceImpl implements MissionService {
 
     @Override
     @Transactional
-    public void startMission(Member loginMember, Long missionId, LocalDateTime startPointTime) {
+    public void startMission(Member loginMember, Long missionId, String timeFormattedISO) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
+        LocalDateTime now = LocalDateTime.ofInstant(Instant.parse(timeFormattedISO), ZoneId.of("Asia/Seoul"));
+
 
         if (!mission.isWriter(loginMember)) {
             throw new NoPermissionException();
         }
 
-        if (!mission.isToday(startPointTime)) {
+        if (!mission.isToday(now)) {
             throw new ExpiredMissionException();
         }
 
-        mission.recordStartTime(startPointTime);
+        mission.recordStartTime(now);
         mission.start();
         missionRepository.save(mission);
     }
 
     @Override
-    public void completeMission(Member loginMember, Long missionId, LocalDateTime now) {
+    public void completeMission(Member loginMember, Long missionId, String timeFormattedISO) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
+        LocalDateTime now = LocalDateTime.ofInstant(Instant.parse(timeFormattedISO), ZoneId.of("Asia/Seoul"));
 
         if (!mission.isWriter(loginMember)) {
             throw new NoPermissionException();
