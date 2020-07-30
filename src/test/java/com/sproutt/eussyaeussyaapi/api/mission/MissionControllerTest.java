@@ -32,7 +32,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -231,14 +233,17 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     @Test
     @DisplayName("미션 시작 요청")
     void startMissionTest() throws Exception {
-        headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
+        String time = "2020-07-15T05:00:00.00Z";
+        Map<String, String > mapForJson = new HashMap<>();
+        mapForJson.put("time", time);
 
         doNothing().when(missionService).completeMission(any(), any(), any());
 
         ResultActions actions = mvc.perform(put("/missions/0/progress")
                 .headers(headers)
                 .characterEncoding("utf-8")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(mapForJson)))
                                    .andDo(print());
 
         actions.andExpect(status().isOk());
@@ -247,14 +252,17 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     @Test
     @DisplayName("미션 달성 요청 - 정상적인 경우")
     void completeMissionTest() throws Exception {
-        headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
+        String time = "2020-07-15T05:00:00.00Z";
+        Map<String, String > mapForJson = new HashMap<>();
+        mapForJson.put("time", time);
 
         doNothing().when(missionService).completeMission(any(), any(), any());
 
         ResultActions actions = mvc.perform(put("/missions/0/complete")
                 .headers(headers)
                 .characterEncoding("utf-8")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(mapForJson)))
                                    .andDo(print());
 
         actions.andExpect(status().isOk());

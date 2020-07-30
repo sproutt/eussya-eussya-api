@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -100,6 +102,16 @@ public class MemberServiceImpl implements MemberService {
     public Member findByMemberId(String memberId) {
 
         return memberRepository.findByMemberId(memberId).orElseThrow(NoSuchMemberException::new);
+    }
+
+    @Override
+    public List<Member> findAllExclude(String memberId) {
+
+        if (memberId == null) {
+            return memberRepository.findAll();
+        }
+
+        return memberRepository.findAll().stream().filter(member -> !member.getMemberId().equals(memberId)).collect(Collectors.toList());
     }
 
     @Override

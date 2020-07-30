@@ -158,7 +158,7 @@ public class MissionServiceTest {
         Mission mission = new Mission(loginMember, missionDTO);
 
         when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
-        missionService.startMission(loginMember, 0l, LocalDateTime.of(2020, 7, 15, 5, 1));
+        missionService.startMission(loginMember, 0l, "2020-07-15T05:01:00.00Z");
 
         assertEquals(MissionStatus.IN_PROGRESS, missionService.findById(0l).getStatus());
     }
@@ -176,8 +176,8 @@ public class MissionServiceTest {
         Mission mission = new Mission(loginMember, missionDTO);
 
         when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
-        missionService.startMission(loginMember, 0l, LocalDateTime.of(2020, 7, 15, 5, 1));
-        missionService.completeMission(loginMember, 0l, LocalDateTime.of(2020, 7, 15, 9, 1));
+        missionService.startMission(loginMember, 0l,"2020-07-15T05:01:00.00Z");
+        missionService.completeMission(loginMember, 0l, "2020-07-15T09:01:00.00Z");
 
         assertEquals(MissionStatus.COMPLETE, missionService.findById(0l).getStatus());
     }

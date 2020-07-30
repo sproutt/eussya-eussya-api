@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.acceptance;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
@@ -18,16 +19,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -131,7 +132,14 @@ public class MissionAcceptanceTest {
     void 정상적인_일시정지_테스트_러닝타임카운팅포함() {
         Mission mission = missionRepository.findAll().get(0);
 
-        ResponseEntity response = template.exchange("/missions/" + mission.getId() + "/progress", HttpMethod.PUT, null, String.class);
+        String time = "2020-07-15T05:00:00.00Z";
+        Map<String, String > mapForJson = new HashMap<>();
+        mapForJson.put("time", time);
+
+        HttpEntity<String> httpEntity = new HttpEntity<>(asJsonString(mapForJson));
+
+
+        ResponseEntity response = template.exchange("/missions/" + mission.getId() + "/progress", HttpMethod.PUT, httpEntity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         response = template.getForEntity("/missions/" + mission.getId(), String.class);
@@ -146,12 +154,26 @@ public class MissionAcceptanceTest {
                     return execution.execute(request, body);
                 }));
 
-        response = template.exchange("/missions/" + mission.getId() + "/pause", HttpMethod.PUT, null, String.class);
+        time = "2020-07-15T05:01:00.00Z";
+        mapForJson = new HashMap<>();
+        mapForJson.put("time", time);
+
+        httpEntity = new HttpEntity<>(asJsonString(mapForJson));
+
+        response = template.exchange("/missions/" + mission.getId() + "/pause", HttpMethod.PUT, httpEntity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         response = template.getForEntity("/missions/" + mission.getId(), String.class);
         log.info("Response Body: {}", response.getBody().toString());
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().toString().contains(LocalTime.of(0, 1, 0).toString()));
+    }
+
+    private static String asJsonString(final Object object) {
+        try {
+            return new ObjectMapper().writeValueAsString(object);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

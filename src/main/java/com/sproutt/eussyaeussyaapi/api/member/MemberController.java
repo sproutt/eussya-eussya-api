@@ -2,6 +2,7 @@ package com.sproutt.eussyaeussyaapi.api.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
+import com.sproutt.eussyaeussyaapi.api.mission.dto.MemberDTO;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -36,6 +39,19 @@ public class MemberController {
     public MemberController(MemberService memberService, JwtHelper jwtHelper) {
         this.memberService = memberService;
         this.jwtHelper = jwtHelper;
+    }
+
+    @GetMapping("/members")
+    public ResponseEntity<List<MemberDTO>> getMembers(@RequestParam(name = "exclude", required = false) String memberId) throws MessagingException {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        List<Member> memberList = memberService.findAllExclude(memberId);
+        List<MemberDTO> memberDTOList = new ArrayList<>();
+        memberList.forEach(member -> memberDTOList.add(member.toDTO()));
+
+        return new ResponseEntity<>(memberDTOList, headers, HttpStatus.OK);
     }
 
     @PostMapping("/members")
