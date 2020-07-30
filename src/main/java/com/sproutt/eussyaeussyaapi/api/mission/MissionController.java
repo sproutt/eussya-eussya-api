@@ -1,5 +1,7 @@
 package com.sproutt.eussyaeussyaapi.api.mission;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.sproutt.eussyaeussyaapi.api.aspect.member.LoginMember;
 import com.sproutt.eussyaeussyaapi.api.aspect.mission.AvailableTime;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
@@ -11,6 +13,9 @@ import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.json.JSONParser;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -97,11 +102,12 @@ public class MissionController {
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @AvailableTime
     @PutMapping("/missions/{missionId}/pause")
-    public ResponseEntity pauseMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId) {
+    public ResponseEntity pauseMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody String time) throws JSONException {
         Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
-        LocalDateTime now = changeEpochMilliToLocalTime(requestHeaders.getDate());
+
+        JSONObject jsonObject = new JSONObject(time);
+        String now = jsonObject.getString("time");
 
         missionService.pauseMission(loginMember, missionId, now);
 
@@ -113,9 +119,11 @@ public class MissionController {
 
     @AvailableTime
     @PutMapping("/missions/{missionId}/progress")
-    public ResponseEntity startMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId) {
+    public ResponseEntity startMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody String time) throws JSONException {
         Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
-        LocalDateTime now = changeEpochMilliToLocalTime(requestHeaders.getDate());
+
+        JSONObject jsonObject = new JSONObject(time);
+        String now = jsonObject.getString("time");
 
         missionService.startMission(loginMember, missionId, now);
 
@@ -126,9 +134,11 @@ public class MissionController {
     }
 
     @PutMapping("/missions/{missionId}/complete")
-    public ResponseEntity completeMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId) {
+    public ResponseEntity completeMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody String time) throws JSONException {
         Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
-        LocalDateTime now = changeEpochMilliToLocalTime(requestHeaders.getDate());
+
+        JSONObject jsonObject = new JSONObject(time);
+        String now = jsonObject.getString("time");
 
         missionService.completeMission(loginMember, missionId, now);
 
