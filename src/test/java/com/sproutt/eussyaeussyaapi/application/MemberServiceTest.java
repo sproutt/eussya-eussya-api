@@ -20,6 +20,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
@@ -31,10 +33,11 @@ public class MemberServiceTest {
     private MemberRepository memberRepository = mock(MemberRepository.class);
     private MailService mailService = mock(MailService.class);
     private MemberService memberService;
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @BeforeEach
     void setUp() {
-        memberService = new MemberServiceImpl(memberRepository, mailService);
+        memberService = new MemberServiceImpl(memberRepository, mailService, passwordEncoder);
     }
 
     @Test
