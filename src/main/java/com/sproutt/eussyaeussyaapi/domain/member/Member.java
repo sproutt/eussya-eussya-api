@@ -54,10 +54,6 @@ public class Member {
         this.provider = provider;
     }
 
-    public boolean isEqualPassword(String password) {
-        return this.password.equals(password);
-    }
-
     public boolean verifyEmail(String authCode) {
 
         if (this.authentication.equals(authCode)) {
