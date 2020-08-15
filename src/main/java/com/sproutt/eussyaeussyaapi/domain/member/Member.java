@@ -54,17 +54,6 @@ public class Member {
         this.provider = provider;
     }
 
-    public boolean verifyEmail(String authCode) {
-
-        if (this.authentication.equals(authCode)) {
-            this.authentication = "Y";
-
-            return true;
-        }
-
-        return false;
-    }
-
     public void changeAuthCode(String authCode) {
         this.authentication = authCode;
     }
@@ -104,5 +93,9 @@ public class Member {
                         .memberId(this.memberId)
                         .nickName(this.nickName)
                         .build();
+    }
+
+    public void verifyEmail() {
+        this.authentication = "Y";
     }
 }

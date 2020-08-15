@@ -1,4 +1,4 @@
-INSERT INTO member (id, email, password, nick_name, member_id, authentication, provider) values (99, 'kiki@gmail.com', '1111', 'kiki','kiki@gmail.com', 'Y', 'LOCAL');
+INSERT INTO member (id, email, password, nick_name, member_id, authentication, provider) values (99, 'kiki@gmail.com', '$2a$10$u05HYzfziIorHmGQ9psOf.coB/cMl8cjhI0olx8YRVet4o.7khhVC', 'kiki','kiki@gmail.com', 'Y', 'LOCAL');
 
 INSERT INTO mission (id, title, contents, writer_id, deadline_time, running_time, status) values ( 50, 'mission1', 'mission1 contents', 99, '2020-07-10T03:00', '01:00:01', 2);
 INSERT INTO mission (id, title, contents, writer_id, deadline_time, running_time, status) values ( 51, 'mission2', 'mission2 contents', 99, '2020-07-11T03:00', '01:00:02', 2);
