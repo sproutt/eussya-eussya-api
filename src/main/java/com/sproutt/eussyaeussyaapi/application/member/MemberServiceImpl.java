@@ -18,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,7 +55,7 @@ public class MemberServiceImpl implements MemberService {
                               .password(passwordEncoder.encode(joinDTO.getPassword()))
                               .email(joinDTO.getMemberId())
                               .nickName(joinDTO.getNickName())
-                              .authentication(authCode)
+                              .authentication(passwordEncoder.encode(authCode))
                               .provider(Provider.LOCAL)
                               .build();
 
@@ -69,7 +68,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findByMemberId(email).orElseThrow(NoSuchMemberException::new);
         String authCode = RandomGenerator.createAuthenticationCode();
 
-        member.changeAuthCode(authCode);
+        member.changeAuthCode(passwordEncoder.encode(authCode));
         mailService.sendAuthEmail(email, authCode);
 
         return memberRepository.save(member);
@@ -109,9 +108,11 @@ public class MemberServiceImpl implements MemberService {
     public Member authenticateEmail(EmailAuthDTO emailAuthDTO) {
         Member member = memberRepository.findByMemberId(emailAuthDTO.getMemberId()).orElseThrow(NoSuchMemberException::new);
 
-        if (!member.verifyEmail(emailAuthDTO.getAuthCode())) {
+        if (!passwordEncoder.matches(emailAuthDTO.getAuthCode(), member.getAuthentication())) {
             throw new VerificationException();
         }
+
+        member.verifyEmail();
 
         return memberRepository.save(member);
     }
