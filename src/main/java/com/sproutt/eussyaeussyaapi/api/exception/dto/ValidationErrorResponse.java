@@ -1,18 +1,12 @@
-package com.sproutt.eussyaeussyaapi.api.dto;
-
-import lombok.Getter;
-import lombok.Setter;
+package com.sproutt.eussyaeussyaapi.api.exception.dto;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Setter
-public class ErrorResponse {
-
+public class ValidationErrorResponse extends ErrorResponse {
     private List<ValidateError> errors;
 
-    public ErrorResponse() {
+    public ValidationErrorResponse() {
         this.errors = new ArrayList<>();
     }
 

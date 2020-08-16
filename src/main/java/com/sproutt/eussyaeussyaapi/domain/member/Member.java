@@ -98,4 +98,8 @@ public class Member {
     public void verifyEmail() {
         this.authentication = "Y";
     }
+
+    public boolean isVerified() {
+        return this.authentication.equals("Y");
+    }
 }
