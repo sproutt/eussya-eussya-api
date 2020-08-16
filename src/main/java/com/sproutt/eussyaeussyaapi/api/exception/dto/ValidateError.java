@@ -1,4 +1,4 @@
-package com.sproutt.eussyaeussyaapi.api.dto;
+package com.sproutt.eussyaeussyaapi.api.exception.dto;
 
 import lombok.Getter;
 import lombok.Setter;

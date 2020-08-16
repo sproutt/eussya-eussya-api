@@ -8,12 +8,10 @@ import com.sproutt.eussyaeussyaapi.application.MailService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.domain.member.Provider;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationException;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.WrongPasswordException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.*;
 import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
 import lombok.RequiredArgsConstructor;
+import org.h2.security.auth.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +33,10 @@ public class MemberServiceImpl implements MemberService {
 
         if (!passwordEncoder.matches(loginDTO.getPassword(), member.getPassword())) {
             throw new WrongPasswordException();
+        }
+
+        if (!member.isVerified()) {
+            throw new UnauthenticatedEmailException();
         }
 
         return member;
