@@ -11,7 +11,6 @@ import com.sproutt.eussyaeussyaapi.domain.member.Provider;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.*;
 import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
 import lombok.RequiredArgsConstructor;
-import org.h2.security.auth.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
