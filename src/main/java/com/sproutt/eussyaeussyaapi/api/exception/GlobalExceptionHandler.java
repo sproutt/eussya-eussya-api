@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleMethodArgumentNotValidException(
-        MethodArgumentNotValidException exception) {
+            MethodArgumentNotValidException exception) {
         log.info("handleMethodArgumentNotValidException : {}", exception);
 
         ValidationErrorResponse response = new ValidationErrorResponse();
@@ -149,6 +149,15 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(exception.getMessage());
     }
+
+
+    @ExceptionHandler(value = NotCompletedMissionException.class)
+    public ResponseEntity handleNotCompletedMissionException(NotCompletedMissionException exception) {
+        log.info("NotCompletedMissionException : {}", exception);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(exception.getMessage());
+    }
+
 
     @ExceptionHandler(value = OAuth2CommunicationException.class)
     public ResponseEntity handleOAuth2CommunicationException(OAuth2CommunicationException exception) {

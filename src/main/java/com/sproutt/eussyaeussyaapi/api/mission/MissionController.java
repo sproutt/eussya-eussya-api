@@ -1,11 +1,10 @@
 package com.sproutt.eussyaeussyaapi.api.mission;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.sproutt.eussyaeussyaapi.api.aspect.member.LoginMember;
 import com.sproutt.eussyaeussyaapi.api.aspect.mission.AvailableTime;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
-import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
+import com.sproutt.eussyaeussyaapi.api.mission.dto.CompleteMissionResponseDTO;
+import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionResponseDTO;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionService;
@@ -13,7 +12,6 @@ import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpHeaders;
@@ -23,9 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -39,9 +35,9 @@ public class MissionController {
     private final MissionService missionService;
 
     @PostMapping("/missions")
-    public ResponseEntity createMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @RequestBody @Valid MissionDTO missionDTO) {
+    public ResponseEntity createMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @RequestBody @Valid MissionRequestDTO missionRequestDTO) {
         Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
-        missionService.create(loginMember, missionDTO);
+        missionService.create(loginMember, missionRequestDTO);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -55,8 +51,18 @@ public class MissionController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        
+        MissionResponseDTO missionResponseDTO = determineMissionResponseDTO(mission);
 
-        return new ResponseEntity<>(new MissionResponseDTO(mission), headers, HttpStatus.OK);
+        return new ResponseEntity<>(missionResponseDTO, headers, HttpStatus.OK);
+    }
+
+    private MissionResponseDTO determineMissionResponseDTO(Mission mission) {
+        if (mission.isComplete()) {
+            return new CompleteMissionResponseDTO(mission);
+        }
+        
+        return new MissionResponseDTO(mission);
     }
 
     @GetMapping("/missions")
@@ -77,13 +83,20 @@ public class MissionController {
         var rangedMissions = missionService.filterDate(afterDate, beforeDate, missions);
         rangedMissions = missionService.filterStatus(status, rangedMissions);
 
-        return new ResponseEntity<>(missionService.changeResponseDTOList(rangedMissions), headers, HttpStatus.OK);
+        return new ResponseEntity<>(changeResponseDTOList(rangedMissions), headers, HttpStatus.OK);
+    }
+
+    public List<MissionResponseDTO> changeResponseDTOList(List<Mission> missionList) {
+        List<MissionResponseDTO> responseList = new ArrayList<>();
+        missionList.forEach(mission -> responseList.add(determineMissionResponseDTO(mission)));
+
+        return responseList;
     }
 
     @PutMapping("/missions/{missionId}")
-    public ResponseEntity updateMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody @Valid MissionDTO missionDTO) {
+    public ResponseEntity updateMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody @Valid MissionRequestDTO missionRequestDTO) {
         Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
-        missionService.update(loginMember, missionId, missionDTO);
+        missionService.update(loginMember, missionId, missionRequestDTO);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -148,9 +161,15 @@ public class MissionController {
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    private LocalDateTime changeEpochMilliToLocalTime(long epochMilli) {
-        Instant requestInstant = Instant.ofEpochMilli(epochMilli);
+    @PutMapping("/missions/{missionId}/result")
+    public ResponseEntity writeMissionResult(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody String result) {
+        Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
 
-        return requestInstant.atZone(ZoneId.of(ZONE_SEOUL)).toLocalDateTime();
+        missionService.addMissionResult(loginMember, missionId, result);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 }

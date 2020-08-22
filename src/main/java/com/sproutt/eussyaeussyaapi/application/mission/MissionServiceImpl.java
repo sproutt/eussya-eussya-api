@@ -1,15 +1,11 @@
 package com.sproutt.eussyaeussyaapi.application.mission;
 
-import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
-import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionResponseDTO;
+import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionRepository;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionStatus;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.ExpiredMissionException;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoPermissionException;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoSuchMissionException;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotSatisfiedCondition;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,21 +23,21 @@ public class MissionServiceImpl implements MissionService {
     private final MissionRepository missionRepository;
 
     @Override
-    public Mission create(Member loginMember, MissionDTO missionDTO) {
-        Mission mission = new Mission(loginMember, missionDTO);
+    public Mission create(Member loginMember, MissionRequestDTO missionRequestDTO) {
+        Mission mission = new Mission(loginMember, missionRequestDTO);
 
         return missionRepository.save(mission);
     }
 
     @Override
-    public Mission update(Member loginMember, Long missionId, MissionDTO missionDTO) {
+    public Mission update(Member loginMember, Long missionId, MissionRequestDTO missionRequestDTO) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
 
         if (!mission.isWriter(loginMember)) {
             throw new RuntimeException();
         }
 
-        return missionRepository.save(mission.update(missionDTO));
+        return missionRepository.save(mission.update(missionRequestDTO));
     }
 
     @Override
@@ -167,10 +162,18 @@ public class MissionServiceImpl implements MissionService {
         return missions.stream().filter(mission -> mission.getStatus().name().equals(status)).collect(Collectors.toList());
     }
 
-    public List<MissionResponseDTO> changeResponseDTOList(List<Mission> missionList) {
-        List<MissionResponseDTO> responseList = new ArrayList<>();
-        missionList.forEach(mission -> responseList.add(new MissionResponseDTO(mission)));
+    @Override
+    public Mission addMissionResult(Member loginMember, Long missionId, String result) {
+        Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
 
-        return responseList;
+        if (!mission.isWriter(loginMember)) {
+            throw new NoPermissionException();
+        }
+
+        if (!mission.isComplete()) {
+            throw new NotCompletedMissionException();
+        }
+
+        return missionRepository.save(mission.addResult(result));
     }
 }

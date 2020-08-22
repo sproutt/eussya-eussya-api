@@ -2,7 +2,7 @@ package com.sproutt.eussyaeussyaapi.acceptance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
-import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
+import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
@@ -63,14 +63,14 @@ public class MissionAcceptanceTest {
     void setUp() {
         Member member = MemberFactory.getDefaultMember();
 
-        MissionDTO missionDTO = MissionDTO
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
                 .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
-        Mission mission = new Mission(member, missionDTO);
+        Mission mission = new Mission(member, missionRequestDTO);
         member.addMission(mission);
         log.info("test: {}");
         memberRepository.saveAndFlush(member);
@@ -167,6 +167,28 @@ public class MissionAcceptanceTest {
         log.info("Response Body: {}", response.getBody().toString());
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().toString().contains(LocalTime.of(0, 1, 0).toString()));
+    }
+
+    @Test
+    void 정상적인_미션_결과물_등록_테스트() {
+        Mission mission = missionRepository.findAll().get(0);
+        mission.complete();
+        missionRepository.saveAndFlush(mission);
+
+        HttpEntity<String> httpEntity = new HttpEntity<>("test result");
+
+        ResponseEntity response = template.exchange("/missions/" + mission.getId() + "/result", HttpMethod.PUT, httpEntity, String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void 비정상적인_미션_결과물_등록_테스트() {
+        Mission mission = missionRepository.findAll().get(0);
+
+        HttpEntity<String> httpEntity = new HttpEntity<>("test result");
+
+        ResponseEntity response = template.exchange("/missions/" + mission.getId() + "/result", HttpMethod.PUT, httpEntity, String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     private static String asJsonString(final Object object) {
