@@ -1,7 +1,7 @@
 package com.sproutt.eussyaeussyaapi.domain.mission;
 
 import com.google.gson.Gson;
-import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
+import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,6 +35,10 @@ public class Mission {
     @JoinColumn(nullable = false, foreignKey = @ForeignKey(name = "fk_mission_writer"))
     private Member writer;
 
+    @Lob
+    @Column
+    private String result;
+
     @CreatedDate
     private LocalDateTime createdTime;
 
@@ -64,10 +68,10 @@ public class Mission {
         this.deadlineTime = deadlineTime;
     }
 
-    public Mission(Member writer, MissionDTO missionDTO) {
-        this.title = missionDTO.getTitle();
-        this.contents = missionDTO.getContents();
-        this.deadlineTime = LocalDateTime.ofInstant(Instant.parse(missionDTO.getDeadlineTime()), ZoneId.of("Asia/Seoul"));
+    public Mission(Member writer, MissionRequestDTO missionRequestDTO) {
+        this.title = missionRequestDTO.getTitle();
+        this.contents = missionRequestDTO.getContents();
+        this.deadlineTime = LocalDateTime.ofInstant(Instant.parse(missionRequestDTO.getDeadlineTime()), ZoneId.of("Asia/Seoul"));
         this.writer = writer;
     }
 
@@ -75,10 +79,10 @@ public class Mission {
         return this.writer.isSame(member);
     }
 
-    public Mission update(MissionDTO missionDTO) {
-        this.title = missionDTO.getTitle();
-        this.contents = missionDTO.getContents();
-        this.deadlineTime = LocalDateTime.ofInstant(Instant.parse(missionDTO.getDeadlineTime()), ZoneId.of("Asia/Seoul"));
+    public Mission update(MissionRequestDTO missionRequestDTO) {
+        this.title = missionRequestDTO.getTitle();
+        this.contents = missionRequestDTO.getContents();
+        this.deadlineTime = LocalDateTime.ofInstant(Instant.parse(missionRequestDTO.getDeadlineTime()), ZoneId.of("Asia/Seoul"));
 
         return this;
     }
@@ -167,5 +171,14 @@ public class Mission {
     public boolean isToday(LocalDateTime stopPointTime) {
         System.out.println(stopPointTime.toLocalDate());
         return this.deadlineTime.toLocalDate().equals(stopPointTime.toLocalDate());
+    }
+
+    public boolean isComplete() {
+        return this.status == MissionStatus.COMPLETE;
+    }
+
+    public Mission addResult(String result) {
+        this.result = result;
+        return this;
     }
 }
