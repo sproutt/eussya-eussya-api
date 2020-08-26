@@ -1,14 +1,13 @@
 package com.sproutt.eussyaeussyaapi.api.exception;
 
-import com.sproutt.eussyaeussyaapi.api.dto.ErrorResponse;
-import com.sproutt.eussyaeussyaapi.api.dto.ValidateError;
+import com.sproutt.eussyaeussyaapi.api.exception.dto.ErrorCode;
+import com.sproutt.eussyaeussyaapi.api.exception.dto.ErrorResponse;
+import com.sproutt.eussyaeussyaapi.api.exception.dto.ValidateError;
+import com.sproutt.eussyaeussyaapi.api.exception.dto.ValidationErrorResponse;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportedOAuth2Exception;
 import com.sproutt.eussyaeussyaapi.api.security.exception.InvalidTokenException;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationException;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationException;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.WrongPasswordException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.*;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.*;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -36,11 +35,12 @@ public class GlobalExceptionHandler {
     private final MessageSourceAccessor messageSourceAccessor;
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
-        MethodArgumentNotValidException exception) {
+    public ResponseEntity<ValidationErrorResponse> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException exception) {
         log.info("handleMethodArgumentNotValidException : {}", exception);
 
-        ErrorResponse response = new ErrorResponse();
+        ValidationErrorResponse response = new ValidationErrorResponse();
+        response.of(ErrorCode.INVALID_INPUT_VALUE);
 
         List<ObjectError> errors = exception.getBindingResult().getAllErrors();
 
@@ -96,10 +96,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = InvalidTokenException.class)
-    public ResponseEntity handleInvalidTokenException(InvalidTokenException exception) {
+    public ResponseEntity<ErrorResponse> handleInvalidTokenException(InvalidTokenException exception) {
         log.info("handleInvalidTokenException : {}", exception);
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
+        ErrorResponse response = new ErrorResponse();
+        response.of(ErrorCode.INVALID_TOKEN);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
     @ExceptionHandler(value = DuplicationException.class)
@@ -107,6 +110,16 @@ public class GlobalExceptionHandler {
         log.info("handleDuplicationException : {}", exception);
 
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(value = UnauthenticatedEmailException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthenticatedEmailException(UnauthenticatedEmailException exception) {
+        log.info("UnauthenticatedEmailException : {}", exception);
+
+        ErrorResponse response = new ErrorResponse();
+        response.of(ErrorCode.UN_AUTHENTICATED_EMAIL);
+
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
     @ExceptionHandler(value = WrongPasswordException.class)
@@ -136,6 +149,15 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(exception.getMessage());
     }
+
+
+    @ExceptionHandler(value = NotCompletedMissionException.class)
+    public ResponseEntity handleNotCompletedMissionException(NotCompletedMissionException exception) {
+        log.info("NotCompletedMissionException : {}", exception);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(exception.getMessage());
+    }
+
 
     @ExceptionHandler(value = OAuth2CommunicationException.class)
     public ResponseEntity handleOAuth2CommunicationException(OAuth2CommunicationException exception) {

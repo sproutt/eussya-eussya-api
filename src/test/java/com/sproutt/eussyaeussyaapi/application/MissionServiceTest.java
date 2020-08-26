@@ -1,6 +1,6 @@
 package com.sproutt.eussyaeussyaapi.application;
 
-import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
+import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionService;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionServiceImpl;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
@@ -8,6 +8,7 @@ import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionRepository;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionStatus;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoSuchMissionException;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotCompletedMissionException;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,17 +45,17 @@ public class MissionServiceTest {
     @Test
     @DisplayName("미션 생성 테스트")
     void createMission() {
-        MissionDTO missionDTO = MissionDTO
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
                 .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
-        Mission mission = new Mission(loginMember, missionDTO);
+        Mission mission = new Mission(loginMember, missionRequestDTO);
 
         when(missionRepository.save(any(Mission.class))).thenReturn(mission);
-        Mission savedMission = missionService.create(loginMember, missionDTO);
+        Mission savedMission = missionService.create(loginMember, missionRequestDTO);
 
         assertEquals(mission.getTitle(), savedMission.getTitle());
     }
@@ -102,16 +103,16 @@ public class MissionServiceTest {
     @Test
     @DisplayName("미션 수정 테스트")
     void updateMission() {
-        MissionDTO missionDTO = MissionDTO
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
                 .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
-        Mission mission = new Mission(loginMember, missionDTO);
+        Mission mission = new Mission(loginMember, missionRequestDTO);
 
-        MissionDTO updatedMissionDTO = MissionDTO
+        MissionRequestDTO updatedMissionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title2")
                 .contents("test_contents2")
@@ -119,24 +120,24 @@ public class MissionServiceTest {
                 .build();
 
         when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
-        when(missionRepository.save(any())).thenReturn(new Mission(loginMember, updatedMissionDTO));
+        when(missionRepository.save(any())).thenReturn(new Mission(loginMember, updatedMissionRequestDTO));
 
-        Mission updatedMission = missionService.update(loginMember, 0l, missionDTO);
+        Mission updatedMission = missionService.update(loginMember, 0l, missionRequestDTO);
 
-        assertEquals(updatedMissionDTO.getTitle(), updatedMission.getTitle());
+        assertEquals(updatedMissionRequestDTO.getTitle(), updatedMission.getTitle());
     }
 
     @Test
     @DisplayName("미션 삭제 테스트")
     void deleteMission() {
-        MissionDTO missionDTO = MissionDTO
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
                 .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
-        Mission mission = new Mission(loginMember, missionDTO);
+        Mission mission = new Mission(loginMember, missionRequestDTO);
 
         when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
         missionService.delete(loginMember, 0l);
@@ -148,14 +149,14 @@ public class MissionServiceTest {
     @Test
     @DisplayName("미션 시작 테스트")
     void startMission() {
-        MissionDTO missionDTO = MissionDTO
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
                 .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
-        Mission mission = new Mission(loginMember, missionDTO);
+        Mission mission = new Mission(loginMember, missionRequestDTO);
 
         when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
         missionService.startMission(loginMember, 0l, "2020-07-15T05:01:00.00Z");
@@ -166,20 +167,57 @@ public class MissionServiceTest {
     @Test
     @DisplayName("미션 완료 테스트")
     void completeMission() {
-        MissionDTO missionDTO = MissionDTO
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
                 .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
-        Mission mission = new Mission(loginMember, missionDTO);
+        Mission mission = new Mission(loginMember, missionRequestDTO);
 
         when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
-        missionService.startMission(loginMember, 0l,"2020-07-15T05:01:00.00Z");
+        missionService.startMission(loginMember, 0l, "2020-07-15T05:01:00.00Z");
         missionService.completeMission(loginMember, 0l, "2020-07-15T09:01:00.00Z");
 
         assertEquals(MissionStatus.COMPLETE, missionService.findById(0l).getStatus());
+    }
+
+    @Test
+    @DisplayName("미션 결과 추가 테스트 - 미션의 상태가 complete 인 경우 ")
+    void addMissionResult() {
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
+                .builder()
+                .title("test_title")
+                .contents("test_contents")
+                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .build();
+
+        Mission mission = new Mission(loginMember, missionRequestDTO);
+        mission.complete();
+
+        when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
+        when(missionRepository.save(any())).thenReturn(mission);
+
+        assertEquals(mission, missionService.addMissionResult(loginMember, 0l, "test"));
+    }
+
+    @Test
+    @DisplayName("미션 결과 추가 테스트 - 미션 상태가 complete가 아닌 경우")
+    void addMissionResult_with_not_complete() {
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
+                .builder()
+                .title("test_title")
+                .contents("test_contents")
+                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .build();
+
+        Mission mission = new Mission(loginMember, missionRequestDTO);
+
+        when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
+        when(missionRepository.save(any())).thenReturn(mission);
+
+        assertThrows(NotCompletedMissionException.class, () -> missionService.addMissionResult(loginMember, 0l, "test"));
     }
 
     private List<Mission> setMockMissionList() {

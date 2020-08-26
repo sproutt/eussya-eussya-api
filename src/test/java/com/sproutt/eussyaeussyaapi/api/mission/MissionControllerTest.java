@@ -2,13 +2,13 @@ package com.sproutt.eussyaeussyaapi.api.mission;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutt.eussyaeussyaapi.api.HeaderSetUpWithToken;
-import com.sproutt.eussyaeussyaapi.api.datetime.DateTimeController;
-import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionDTO;
+import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoPermissionException;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotCompletedMissionException;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotSatisfiedCondition;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,14 +81,14 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     void createMissionTest() throws Exception {
         headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
 
-        MissionDTO missionDTO = MissionDTO
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
                 .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
-        Mission mission = new Mission(loginMember, missionDTO);
+        Mission mission = new Mission(loginMember, missionRequestDTO);
 
         given(memberService.findTokenOwner(any())).willReturn(loginMember);
         given(missionService.create(any(), any())).willReturn(mission);
@@ -97,7 +97,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(missionDTO)))
+                .content(asJsonString(missionRequestDTO)))
                                    .andDo(print());
 
         actions.andExpect(status().isCreated());
@@ -106,22 +106,22 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     @Test
     @DisplayName("미션 등록 요청 - 입력이 잘못된 경우")
     void createMissionTest_withWrongInput() throws Exception {
-        MissionDTO wrongMissionDTO = MissionDTO
+        MissionRequestDTO wrongMissionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("")
                 .contents(" ")
                 .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
-        Mission mission = new Mission(loginMember, wrongMissionDTO);
+        Mission mission = new Mission(loginMember, wrongMissionRequestDTO);
 
-        given(missionService.create(loginMember, wrongMissionDTO)).willReturn(mission);
+        given(missionService.create(loginMember, wrongMissionRequestDTO)).willReturn(mission);
 
         ResultActions actions = mvc.perform(post("/missions")
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(wrongMissionDTO)))
+                .content(asJsonString(wrongMissionRequestDTO)))
                                    .andDo(print());
 
         actions.andExpect(status().isBadRequest());
@@ -146,7 +146,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     void updateMissionTest() throws Exception {
         headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
 
-        MissionDTO updatedMissionDTO = MissionDTO
+        MissionRequestDTO updatedMissionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("update")
                 .contents("update_contents")
@@ -154,16 +154,16 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
                 .build();
 
 
-        Mission updatedMission = new Mission(loginMember, updatedMissionDTO);
+        Mission updatedMission = new Mission(loginMember, updatedMissionRequestDTO);
 
         given(memberService.findTokenOwner(any())).willReturn(loginMember);
-        given(missionService.update(loginMember, 0l, updatedMissionDTO)).willReturn(updatedMission);
+        given(missionService.update(loginMember, 0l, updatedMissionRequestDTO)).willReturn(updatedMission);
 
         ResultActions actions = mvc.perform(put("/missions/0")
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(updatedMissionDTO)))
+                .content(asJsonString(updatedMissionRequestDTO)))
                                    .andDo(print());
 
         actions.andExpect(status().isOk());
@@ -174,31 +174,31 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     void updateMissionTest_withWrongInput() throws Exception {
         headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
 
-        MissionDTO missionDTO = MissionDTO
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
                 .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
-        MissionDTO wrongUpdatedMissionDTO = MissionDTO
+        MissionRequestDTO wrongUpdatedMissionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("")
                 .contents(" ")
                 .deadlineTime("2020-07-15T00:00:00.00Z")
                 .build();
 
-        Mission mission = new Mission(loginMember, missionDTO);
-        Mission updatedMission = new Mission(loginMember, wrongUpdatedMissionDTO);
+        Mission mission = new Mission(loginMember, missionRequestDTO);
+        Mission updatedMission = new Mission(loginMember, wrongUpdatedMissionRequestDTO);
 
         given(missionService.findById(0l)).willReturn(mission);
-        given(missionService.update(loginMember, 0l, wrongUpdatedMissionDTO)).willReturn(updatedMission);
+        given(missionService.update(loginMember, 0l, wrongUpdatedMissionRequestDTO)).willReturn(updatedMission);
 
         ResultActions actions = mvc.perform(put("/missions/0")
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(wrongUpdatedMissionDTO)))
+                .content(asJsonString(wrongUpdatedMissionRequestDTO)))
                                    .andDo(print());
 
         actions.andExpect(status().isBadRequest());
@@ -234,7 +234,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     @DisplayName("미션 시작 요청")
     void startMissionTest() throws Exception {
         String time = "2020-07-15T05:00:00.00Z";
-        Map<String, String > mapForJson = new HashMap<>();
+        Map<String, String> mapForJson = new HashMap<>();
         mapForJson.put("time", time);
 
         doNothing().when(missionService).completeMission(any(), any(), any());
@@ -253,7 +253,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     @DisplayName("미션 달성 요청 - 정상적인 경우")
     void completeMissionTest() throws Exception {
         String time = "2020-07-15T05:00:00.00Z";
-        Map<String, String > mapForJson = new HashMap<>();
+        Map<String, String> mapForJson = new HashMap<>();
         mapForJson.put("time", time);
 
         doNothing().when(missionService).completeMission(any(), any(), any());
@@ -279,6 +279,48 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON))
+                                   .andDo(print());
+
+        actions.andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("미션 결과 추가 요청 - 정상적인 경우")
+    void writeMissionResultTest() throws Exception {
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
+                .builder()
+                .title("test_title")
+                .contents("test_contents")
+                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .build();
+
+        Mission mission = new Mission(loginMember, missionRequestDTO);
+        mission.complete();
+
+        given(memberService.findTokenOwner(any())).willReturn(loginMember);
+        given(missionService.addMissionResult(loginMember, 0l, "test result")).willReturn(mission);
+
+        ResultActions actions = mvc.perform(put("/missions/0/result")
+                .headers(headers)
+                .characterEncoding("utf-8")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString("test result")))
+                                   .andDo(print());
+
+        actions.andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("미션 결과 추가 요청 - 비정상적인 경우")
+    void writeMissionResultTest_with_wrong_request() throws Exception {
+        given(memberService.findTokenOwner(any())).willReturn(loginMember);
+        doThrow(NotCompletedMissionException.class).when(missionService).addMissionResult(any(), any(), any());
+
+        ResultActions actions = mvc.perform(put("/missions/0/result")
+                .headers(headers)
+                .characterEncoding("utf-8")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString("test result")))
                                    .andDo(print());
 
         actions.andExpect(status().isBadRequest());

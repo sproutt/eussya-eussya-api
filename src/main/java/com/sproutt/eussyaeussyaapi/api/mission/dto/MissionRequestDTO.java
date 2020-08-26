@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MissionDTO {
+public class MissionRequestDTO {
 
     @NotBlank
     @Size(max = 80)
@@ -24,7 +24,7 @@ public class MissionDTO {
     private String deadlineTime;
 
     @Builder
-    public MissionDTO(String title, String contents, String deadlineTime) {
+    public MissionRequestDTO(String title, String contents, String deadlineTime) {
         this.title = title;
         this.contents = contents;
         this.deadlineTime = deadlineTime;
