@@ -2,6 +2,7 @@ package com.sproutt.eussyaeussyaapi.acceptance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
+import com.sproutt.eussyaeussyaapi.api.mission.dto.CompleteMissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
@@ -129,6 +130,29 @@ public class MissionAcceptanceTest {
     }
 
     @Test
+    void 정상적인_미션완료_테스트() {
+        Mission mission = missionRepository.findAll().get(0);
+
+        String time = "2020-07-15T05:00:00.00Z";
+        Map<String, String > mapForJson = new HashMap<>();
+        mapForJson.put("time", time);
+
+        HttpEntity<String> httpEntityForProgress = new HttpEntity<>(asJsonString(mapForJson));
+        ResponseEntity response = template.exchange("/missions/" + mission.getId() + "/progress", HttpMethod.PUT, httpEntityForProgress, String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        log.info("Response Body: {}", response.getBody().toString());
+
+        CompleteMissionRequestDTO completeMissionRequestDTO = new CompleteMissionRequestDTO("2020-07-15T05:01:00.00Z", "result contents..");
+        HttpEntity<CompleteMissionRequestDTO> httpEntityForComplete = new HttpEntity<>(completeMissionRequestDTO);
+
+        response = template.exchange("/missions/" + mission.getId() + "/complete", HttpMethod.PUT, httpEntityForComplete, String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        response = template.getForEntity("/missions/" + mission.getId(), String.class);
+        log.info("Response Body: {}", response.getBody().toString());
+    }
+
+    @Test
     void 정상적인_일시정지_테스트_러닝타임카운팅포함() {
         Mission mission = missionRepository.findAll().get(0);
 
@@ -137,7 +161,6 @@ public class MissionAcceptanceTest {
         mapForJson.put("time", time);
 
         HttpEntity<String> httpEntity = new HttpEntity<>(asJsonString(mapForJson));
-
 
         ResponseEntity response = template.exchange("/missions/" + mission.getId() + "/progress", HttpMethod.PUT, httpEntity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -170,7 +193,7 @@ public class MissionAcceptanceTest {
     }
 
     @Test
-    void 정상적인_미션_결과물_등록_테스트() {
+    void 정상적인_미션_결과물_수정_테스트() {
         Mission mission = missionRepository.findAll().get(0);
         mission.complete();
         missionRepository.saveAndFlush(mission);
@@ -182,7 +205,7 @@ public class MissionAcceptanceTest {
     }
 
     @Test
-    void 비정상적인_미션_결과물_등록_테스트() {
+    void 비정상적인_미션_결과물_수정_테스트() {
         Mission mission = missionRepository.findAll().get(0);
 
         HttpEntity<String> httpEntity = new HttpEntity<>("test result");
