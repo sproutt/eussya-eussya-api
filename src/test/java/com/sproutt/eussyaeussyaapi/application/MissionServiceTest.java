@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.application;
 
+import com.sproutt.eussyaeussyaapi.api.mission.dto.CompleteMissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionService;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionServiceImpl;
@@ -178,7 +179,7 @@ public class MissionServiceTest {
 
         when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
         missionService.startMission(loginMember, 0l, "2020-07-15T05:01:00.00Z");
-        missionService.completeMission(loginMember, 0l, "2020-07-15T09:01:00.00Z");
+        missionService.completeMission(loginMember, 0l, new CompleteMissionRequestDTO("2020-07-15T09:01:00.00Z", "result contents.."));
 
         assertEquals(MissionStatus.COMPLETE, missionService.findById(0l).getStatus());
     }
@@ -199,7 +200,7 @@ public class MissionServiceTest {
         when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
         when(missionRepository.save(any())).thenReturn(mission);
 
-        assertEquals(mission, missionService.addMissionResult(loginMember, 0l, "test"));
+        assertEquals(mission, missionService.updateMissionResult(loginMember, 0l, "test"));
     }
 
     @Test
@@ -217,7 +218,7 @@ public class MissionServiceTest {
         when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
         when(missionRepository.save(any())).thenReturn(mission);
 
-        assertThrows(NotCompletedMissionException.class, () -> missionService.addMissionResult(loginMember, 0l, "test"));
+        assertThrows(NotCompletedMissionException.class, () -> missionService.updateMissionResult(loginMember, 0l, "test"));
     }
 
     private List<Mission> setMockMissionList() {

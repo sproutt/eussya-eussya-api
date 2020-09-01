@@ -2,6 +2,7 @@ package com.sproutt.eussyaeussyaapi.api.mission;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutt.eussyaeussyaapi.api.HeaderSetUpWithToken;
+import com.sproutt.eussyaeussyaapi.api.mission.dto.CompleteMissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionService;
@@ -253,8 +254,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     @DisplayName("미션 달성 요청 - 정상적인 경우")
     void completeMissionTest() throws Exception {
         String time = "2020-07-15T05:00:00.00Z";
-        Map<String, String> mapForJson = new HashMap<>();
-        mapForJson.put("time", time);
+        CompleteMissionRequestDTO completeMissionRequestDTO = new CompleteMissionRequestDTO(time, "result contents...");
 
         doNothing().when(missionService).completeMission(any(), any(), any());
 
@@ -262,7 +262,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(mapForJson)))
+                .content(asJsonString(completeMissionRequestDTO)))
                                    .andDo(print());
 
         actions.andExpect(status().isOk());
@@ -285,7 +285,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     }
 
     @Test
-    @DisplayName("미션 결과 추가 요청 - 정상적인 경우")
+    @DisplayName("미션 결과 수정 요청 - 정상적인 경우")
     void writeMissionResultTest() throws Exception {
         MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
@@ -298,7 +298,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
         mission.complete();
 
         given(memberService.findTokenOwner(any())).willReturn(loginMember);
-        given(missionService.addMissionResult(loginMember, 0l, "test result")).willReturn(mission);
+        given(missionService.updateMissionResult(loginMember, 0l, "test result")).willReturn(mission);
 
         ResultActions actions = mvc.perform(put("/missions/0/result")
                 .headers(headers)
@@ -311,10 +311,10 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     }
 
     @Test
-    @DisplayName("미션 결과 추가 요청 - 비정상적인 경우")
+    @DisplayName("미션 결과 수정 요청 - 비정상적인 경우")
     void writeMissionResultTest_with_wrong_request() throws Exception {
         given(memberService.findTokenOwner(any())).willReturn(loginMember);
-        doThrow(NotCompletedMissionException.class).when(missionService).addMissionResult(any(), any(), any());
+        doThrow(NotCompletedMissionException.class).when(missionService).updateMissionResult(any(), any(), any());
 
         ResultActions actions = mvc.perform(put("/missions/0/result")
                 .headers(headers)
