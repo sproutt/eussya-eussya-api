@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.application.mission;
 
+import com.sproutt.eussyaeussyaapi.api.mission.dto.CompleteMissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
@@ -25,10 +26,10 @@ public interface MissionService {
 
     void startMission(Member loginMember, Long missionId, String timeFormattedISO);
 
-    void completeMission(Member loginMember, Long missionId, String timeFormattedISO);
+    void completeMission(Member loginMember, Long missionId, CompleteMissionRequestDTO completeMissionRequestDTO);
 
     List<Mission> filterStatus(String status, List<Mission> rangedMissions);
 
-    Mission addMissionResult(Member loginMember, Long missionId, String result);
+    Mission updateMissionResult(Member loginMember, Long missionId, String result);
 
 }

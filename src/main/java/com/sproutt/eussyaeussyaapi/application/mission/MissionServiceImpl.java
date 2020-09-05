@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.application.mission;
 
+import com.sproutt.eussyaeussyaapi.api.mission.dto.CompleteMissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
@@ -131,9 +132,10 @@ public class MissionServiceImpl implements MissionService {
     }
 
     @Override
-    public void completeMission(Member loginMember, Long missionId, String timeFormattedISO) {
+    @Transactional
+    public void completeMission(Member loginMember, Long missionId, CompleteMissionRequestDTO completeMissionRequestDTO) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
-        LocalDateTime now = LocalDateTime.ofInstant(Instant.parse(timeFormattedISO), ZoneId.of("Asia/Seoul"));
+        LocalDateTime now = LocalDateTime.ofInstant(Instant.parse(completeMissionRequestDTO.getTimeFormattedAsISO()), ZoneId.of("Asia/Seoul"));
 
         if (!mission.isWriter(loginMember)) {
             throw new NoPermissionException();
@@ -144,8 +146,9 @@ public class MissionServiceImpl implements MissionService {
         }
 
         mission.recordPauseTime(now);
-        mission.updateRunningTime();
         mission.complete();
+        mission.updateRunningTime();
+        mission.addResult(completeMissionRequestDTO.getResult());
         missionRepository.save(mission);
     }
 
@@ -163,7 +166,7 @@ public class MissionServiceImpl implements MissionService {
     }
 
     @Override
-    public Mission addMissionResult(Member loginMember, Long missionId, String result) {
+    public Mission updateMissionResult(Member loginMember, Long missionId, String result) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
 
         if (!mission.isWriter(loginMember)) {
