@@ -1,9 +1,8 @@
 package com.sproutt.eussyaeussyaapi.api.aspect.member;
 
-import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoPermissionException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -37,11 +36,11 @@ public class MemberAspect {
                                       .orElseThrow(NoPermissionException::new);
 
         String token = headers.getFirst(tokenKey);
-        JwtMemberDTO jwtMemberDTO = jwtHelper.decryptToken(secretKey, token);
+        MemberTokenCommand memberTokenCommand = jwtHelper.decryptToken(secretKey, token);
 
         for (int i = 0; i < joinPointArgs.length; i++) {
-            if (joinPointArgs[i].toString().contains("JwtMemberDTO")) {
-                joinPointArgs[i] = jwtMemberDTO;
+            if (joinPointArgs[i].toString().contains("MemberTokenCommand")) {
+                joinPointArgs[i] = memberTokenCommand;
 
                 break;
             }

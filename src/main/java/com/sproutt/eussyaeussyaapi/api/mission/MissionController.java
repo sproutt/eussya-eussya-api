@@ -2,7 +2,7 @@ package com.sproutt.eussyaeussyaapi.api.mission;
 
 import com.sproutt.eussyaeussyaapi.api.aspect.member.LoginMember;
 import com.sproutt.eussyaeussyaapi.api.aspect.mission.AvailableTime;
-import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.CompleteMissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.CompleteMissionResponseDTO;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
@@ -36,8 +36,9 @@ public class MissionController {
     private final MissionService missionService;
 
     @PostMapping("/missions")
-    public ResponseEntity createMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @RequestBody @Valid MissionRequestDTO missionRequestDTO) {
-        Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
+    public ResponseEntity createMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember
+            MemberTokenCommand memberTokenCommand, @RequestBody @Valid MissionRequestDTO missionRequestDTO) {
+        Member loginMember = memberService.findTokenOwner(memberTokenCommand);
         missionService.create(loginMember, missionRequestDTO);
 
         HttpHeaders headers = new HttpHeaders();
@@ -95,8 +96,9 @@ public class MissionController {
     }
 
     @PutMapping("/missions/{missionId}")
-    public ResponseEntity updateMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody @Valid MissionRequestDTO missionRequestDTO) {
-        Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
+    public ResponseEntity updateMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember
+            MemberTokenCommand memberTokenCommand, @PathVariable Long missionId, @RequestBody @Valid MissionRequestDTO missionRequestDTO) {
+        Member loginMember = memberService.findTokenOwner(memberTokenCommand);
         missionService.update(loginMember, missionId, missionRequestDTO);
 
         HttpHeaders headers = new HttpHeaders();
@@ -106,8 +108,9 @@ public class MissionController {
     }
 
     @DeleteMapping("/missions/{missionId}")
-    public ResponseEntity deleteMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId) {
-        Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
+    public ResponseEntity deleteMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember
+            MemberTokenCommand memberTokenCommand, @PathVariable Long missionId) {
+        Member loginMember = memberService.findTokenOwner(memberTokenCommand);
         missionService.delete(loginMember, missionId);
 
         HttpHeaders headers = new HttpHeaders();
@@ -117,8 +120,9 @@ public class MissionController {
     }
 
     @PutMapping("/missions/{missionId}/pause")
-    public ResponseEntity pauseMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody String time) throws JSONException {
-        Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
+    public ResponseEntity pauseMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember
+            MemberTokenCommand memberTokenCommand, @PathVariable Long missionId, @RequestBody String time) throws JSONException {
+        Member loginMember = memberService.findTokenOwner(memberTokenCommand);
 
         JSONObject jsonObject = new JSONObject(time);
         String now = jsonObject.getString("time");
@@ -133,8 +137,9 @@ public class MissionController {
 
     @AvailableTime
     @PutMapping("/missions/{missionId}/progress")
-    public ResponseEntity startMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody String time) throws JSONException {
-        Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
+    public ResponseEntity startMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember
+            MemberTokenCommand memberTokenCommand, @PathVariable Long missionId, @RequestBody String time) throws JSONException {
+        Member loginMember = memberService.findTokenOwner(memberTokenCommand);
 
         JSONObject jsonObject = new JSONObject(time);
         String now = jsonObject.getString("time");
@@ -148,8 +153,9 @@ public class MissionController {
     }
 
     @PutMapping("/missions/{missionId}/complete")
-    public ResponseEntity completeMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody @Valid CompleteMissionRequestDTO completeMissionRequestDTO) {
-        Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
+    public ResponseEntity completeMission(@RequestHeader HttpHeaders requestHeaders, @LoginMember
+            MemberTokenCommand memberTokenCommand, @PathVariable Long missionId, @RequestBody @Valid CompleteMissionRequestDTO completeMissionRequestDTO) {
+        Member loginMember = memberService.findTokenOwner(memberTokenCommand);
 
         missionService.completeMission(loginMember, missionId, completeMissionRequestDTO);
 
@@ -160,8 +166,9 @@ public class MissionController {
     }
 
     @PutMapping("/missions/{missionId}/result")
-    public ResponseEntity updateMissionResult(@RequestHeader HttpHeaders requestHeaders, @LoginMember JwtMemberDTO jwtMemberDTO, @PathVariable Long missionId, @RequestBody String result) {
-        Member loginMember = memberService.findTokenOwner(jwtMemberDTO);
+    public ResponseEntity updateMissionResult(@RequestHeader HttpHeaders requestHeaders, @LoginMember
+            MemberTokenCommand memberTokenCommand, @PathVariable Long missionId, @RequestBody String result) {
+        Member loginMember = memberService.findTokenOwner(memberTokenCommand);
 
         missionService.updateMissionResult(loginMember, missionId, result);
 

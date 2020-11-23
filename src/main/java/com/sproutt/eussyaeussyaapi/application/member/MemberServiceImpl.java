@@ -1,9 +1,9 @@
 package com.sproutt.eussyaeussyaapi.application.member;
 
-import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
-import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
-import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
-import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
+import com.sproutt.eussyaeussyaapi.api.member.EmailAuthCommand;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberJoinCommand;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberLoginCommand;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
 import com.sproutt.eussyaeussyaapi.api.oauth2.dto.OAuth2UserInfoDTO;
 import com.sproutt.eussyaeussyaapi.application.MailService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
@@ -28,10 +28,10 @@ public class MemberServiceImpl implements MemberService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Member login(LoginDTO loginDTO) {
-        Member member = memberRepository.findByMemberId(loginDTO.getMemberId()).orElseThrow(NoSuchMemberException::new);
+    public Member login(MemberLoginCommand memberLoginCommand) {
+        Member member = memberRepository.findByMemberId(memberLoginCommand.getMemberId()).orElseThrow(NoSuchMemberException::new);
 
-        if (!passwordEncoder.matches(loginDTO.getPassword(), member.getPassword())) {
+        if (!passwordEncoder.matches(memberLoginCommand.getPassword(), member.getPassword())) {
             throw new WrongPasswordException();
         }
 
@@ -44,19 +44,19 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public Member joinWithLocalProvider(JoinDTO joinDTO) {
-        if (memberRepository.findByMemberId(joinDTO.getMemberId()).orElse(null) != null) {
+    public Member joinWithLocalProvider(MemberJoinCommand memberJoinCommand) {
+        if (memberRepository.findByMemberId(memberJoinCommand.getMemberId()).orElse(null) != null) {
             throw new DuplicationMemberException();
         }
 
         String authCode = RandomGenerator.createAuthenticationCode();
-        mailService.sendAuthEmail(joinDTO.getMemberId(), authCode);
+        mailService.sendAuthEmail(memberJoinCommand.getMemberId(), authCode);
 
         Member member = Member.builder()
-                              .memberId(joinDTO.getMemberId())
-                              .password(passwordEncoder.encode(joinDTO.getPassword()))
-                              .email(joinDTO.getMemberId())
-                              .nickName(joinDTO.getNickName())
+                              .memberId(memberJoinCommand.getMemberId())
+                              .password(passwordEncoder.encode(memberJoinCommand.getPassword()))
+                              .email(memberJoinCommand.getMemberId())
+                              .nickName(memberJoinCommand.getNickName())
                               .authentication(passwordEncoder.encode(authCode))
                               .provider(Provider.LOCAL)
                               .build();
@@ -77,8 +77,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member findTokenOwner(JwtMemberDTO jwtMemberDTO) {
-        return memberRepository.findById(jwtMemberDTO.getId()).orElseThrow(NoSuchMemberException::new);
+    public Member findTokenOwner(MemberTokenCommand memberTokenCommand) {
+        return memberRepository.findById(memberTokenCommand.getId()).orElseThrow(NoSuchMemberException::new);
     }
 
     @Override
@@ -120,10 +120,10 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public Member authenticateEmail(EmailAuthDTO emailAuthDTO) {
-        Member member = memberRepository.findByMemberId(emailAuthDTO.getMemberId()).orElseThrow(NoSuchMemberException::new);
+    public Member authenticateEmail(EmailAuthCommand emailAuthCommand) {
+        Member member = memberRepository.findByMemberId(emailAuthCommand.getMemberId()).orElseThrow(NoSuchMemberException::new);
 
-        if (!passwordEncoder.matches(emailAuthDTO.getAuthCode(), member.getAuthentication())) {
+        if (!passwordEncoder.matches(emailAuthCommand.getAuthCode(), member.getAuthentication())) {
             throw new VerificationException();
         }
 

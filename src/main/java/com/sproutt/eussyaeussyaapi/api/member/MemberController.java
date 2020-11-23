@@ -1,7 +1,7 @@
 package com.sproutt.eussyaeussyaapi.api.member;
 
-import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
-import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberJoinCommand;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberLoginCommand;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MemberDTO;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
@@ -55,9 +55,9 @@ public class MemberController {
     }
 
     @PostMapping("/members")
-    public ResponseEntity createMemberWithLocalProvider(@Valid @RequestBody JoinDTO joinDTO) throws MessagingException {
+    public ResponseEntity createMemberWithLocalProvider(@Valid @RequestBody MemberJoinCommand memberJoinCommand) throws MessagingException {
 
-        memberService.joinWithLocalProvider(joinDTO);
+        memberService.joinWithLocalProvider(memberJoinCommand);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -66,8 +66,8 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity loginMember(@Valid @RequestBody LoginDTO loginDTO) {
-        Member loginMember = memberService.login(loginDTO);
+    public ResponseEntity loginMember(@Valid @RequestBody MemberLoginCommand memberLoginCommand) {
+        Member loginMember = memberService.login(memberLoginCommand);
 
         String token = jwtHelper.createToken(secretKey, loginMember.toJwtInfo());
 
@@ -90,11 +90,11 @@ public class MemberController {
     }
 
     @PostMapping("/email-auth")
-    public ResponseEntity<String> authenticateEmail(@Valid @RequestBody EmailAuthDTO emailAuthDTO) {
+    public ResponseEntity<String> authenticateEmail(@Valid @RequestBody EmailAuthCommand emailAuthCommand) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        memberService.authenticateEmail(emailAuthDTO);
+        memberService.authenticateEmail(emailAuthCommand);
 
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }

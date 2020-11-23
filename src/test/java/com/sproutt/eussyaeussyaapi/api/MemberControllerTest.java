@@ -2,9 +2,9 @@ package com.sproutt.eussyaeussyaapi.api;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
+import com.sproutt.eussyaeussyaapi.api.member.EmailAuthCommand;
 import com.sproutt.eussyaeussyaapi.api.member.MemberController;
-import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberJoinCommand;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
@@ -50,13 +50,13 @@ public class MemberControllerTest {
     @Test
     @DisplayName("회원가입 테스트(올바른 요청일 경우)")
     public void createMemberWithLocalProvider() throws Exception {
-        JoinDTO joinDTO = defaultSignUpDTO();
+        MemberJoinCommand memberJoinCommand = defaultSignUpDTO();
         Member member = MemberFactory.getDefaultMember();
 
-        given(memberService.joinWithLocalProvider(joinDTO)).willReturn(member);
+        given(memberService.joinWithLocalProvider(memberJoinCommand)).willReturn(member);
 
         ResultActions actions = mvc.perform(post("/members")
-                .content(asJsonString(joinDTO))
+                .content(asJsonString(memberJoinCommand))
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -67,9 +67,9 @@ public class MemberControllerTest {
     @Test
     @DisplayName("회원가입 테스트(중복된 memberId를 입력한 경우)")
     public void createMember_with_exist_memberId() throws Exception {
-        JoinDTO joinDTO = defaultSignUpDTO();
+        MemberJoinCommand memberJoinCommand = defaultSignUpDTO();
 
-        given(memberService.joinWithLocalProvider(joinDTO)).willThrow(new DuplicationMemberException());
+        given(memberService.joinWithLocalProvider(memberJoinCommand)).willThrow(new DuplicationMemberException());
 
         ResultActions actions = mvc.perform(post("/members")
                 .contentType(MediaType.APPLICATION_JSON)).andDo(print());
@@ -99,15 +99,15 @@ public class MemberControllerTest {
     public void authenticateEmail() throws Exception {
         Member member = MemberFactory.getDefaultMember();
 
-        EmailAuthDTO emailAuthDTO = EmailAuthDTO.builder()
-                                                .memberId(member.getMemberId())
-                                                .authCode(member.getAuthentication())
-                                                .build();
+        EmailAuthCommand emailAuthCommand = EmailAuthCommand.builder()
+                                                            .memberId(member.getMemberId())
+                                                            .authCode(member.getAuthentication())
+                                                            .build();
 
-        when(memberService.authenticateEmail(emailAuthDTO)).thenReturn(member);
+        when(memberService.authenticateEmail(emailAuthCommand)).thenReturn(member);
 
         ResultActions actions = mvc.perform(post("/email-auth")
-                .content(asJsonString(emailAuthDTO))
+                .content(asJsonString(emailAuthCommand))
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -183,11 +183,11 @@ public class MemberControllerTest {
         }
     }
 
-    private JoinDTO defaultSignUpDTO() {
-        return JoinDTO.builder()
-                      .memberId(DEFAULT_MEMBER_ID)
-                      .password(DEFAULT_PASSWORD)
-                      .nickName(DEFAULT_NAME)
-                      .build();
+    private MemberJoinCommand defaultSignUpDTO() {
+        return MemberJoinCommand.builder()
+                                .memberId(DEFAULT_MEMBER_ID)
+                                .password(DEFAULT_PASSWORD)
+                                .nickName(DEFAULT_NAME)
+                                .build();
     }
 }

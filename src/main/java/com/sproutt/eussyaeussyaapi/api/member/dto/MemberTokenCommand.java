@@ -8,14 +8,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class JwtMemberDTO {
+public class MemberTokenCommand {
 
     private Long id;
     private String memberId;
     private String nickName;
 
     @Builder
-    public JwtMemberDTO(Long id, String memberId, String nickName) {
+    public MemberTokenCommand(Long id, String memberId, String nickName) {
         this.id = id;
         this.memberId = memberId;
         this.nickName = nickName;

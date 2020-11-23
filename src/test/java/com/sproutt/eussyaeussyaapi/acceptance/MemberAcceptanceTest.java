@@ -1,6 +1,6 @@
 package com.sproutt.eussyaeussyaapi.acceptance;
 
-import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberJoinCommand;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.domain.member.Provider;
@@ -41,8 +41,8 @@ public class MemberAcceptanceTest {
 
     @Test
     public void createMember() {
-        JoinDTO joinDTO = defaultSignUpDTO();
-        ResponseEntity response = template.postForEntity("/members", joinDTO, Void.class);
+        MemberJoinCommand memberJoinCommand = defaultSignUpDTO();
+        ResponseEntity response = template.postForEntity("/members", memberJoinCommand, Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
@@ -51,24 +51,24 @@ public class MemberAcceptanceTest {
     public void createMember_with_already_exist_memberId() {
         memberRepository.save(defaultMember());
 
-        JoinDTO wrongJoinDTO = JoinDTO.builder()
-                                      .memberId(DEFAULT_MEMBER_ID)
-                                      .nickName("test2")
-                                      .password(DEFAULT_PASSWORD)
-                                      .build();
+        MemberJoinCommand wrongMemberJoinCommand = MemberJoinCommand.builder()
+                                                                    .memberId(DEFAULT_MEMBER_ID)
+                                                                    .nickName("test2")
+                                                                    .password(DEFAULT_PASSWORD)
+                                                                    .build();
 
-        ResponseEntity response = template.postForEntity("/members", wrongJoinDTO, String.class);
+        ResponseEntity response = template.postForEntity("/members", wrongMemberJoinCommand, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody().toString()).contains(ExceptionMessage.DUPLICATED_MEMBER_ID);
     }
 
-    private JoinDTO defaultSignUpDTO() {
-        return JoinDTO.builder()
-                      .memberId(DEFAULT_MEMBER_ID)
-                      .password(DEFAULT_PASSWORD)
-                      .nickName(DEFAULT_NAME)
-                      .build();
+    private MemberJoinCommand defaultSignUpDTO() {
+        return MemberJoinCommand.builder()
+                                .memberId(DEFAULT_MEMBER_ID)
+                                .password(DEFAULT_PASSWORD)
+                                .nickName(DEFAULT_NAME)
+                                .build();
     }
 
     private Member defaultMember() {

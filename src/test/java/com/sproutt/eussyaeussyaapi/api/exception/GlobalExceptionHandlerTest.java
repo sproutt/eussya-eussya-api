@@ -1,6 +1,6 @@
 package com.sproutt.eussyaeussyaapi.api.exception;
 
-import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberJoinCommand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,13 +24,13 @@ public class GlobalExceptionHandlerTest {
     @Test
     @DisplayName("예외 메세지 핸들러 테스트")
     void validationMessageTest() {
-        JoinDTO joinDTO = JoinDTO.builder()
-                                 .memberId("")
-                                 .password("")
-                                 .nickName("")
-                                 .build();
+        MemberJoinCommand memberJoinCommand = MemberJoinCommand.builder()
+                                                               .memberId("")
+                                                               .password("")
+                                                               .nickName("")
+                                                               .build();
 
-        ResponseEntity<String> response = template.postForEntity("/members", joinDTO, String.class);
+        ResponseEntity<String> response = template.postForEntity("/members", memberJoinCommand, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.toString()).contains("비밀번호");

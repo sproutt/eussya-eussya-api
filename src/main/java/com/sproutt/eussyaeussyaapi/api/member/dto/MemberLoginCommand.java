@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 @NoArgsConstructor
-public class LoginDTO {
+public class MemberLoginCommand {
 
     @Email
     @NotBlank
@@ -21,7 +21,7 @@ public class LoginDTO {
     private String password;
 
     @Builder
-    public LoginDTO(String memberId, String password) {
+    public MemberLoginCommand(String memberId, String password) {
         this.memberId = memberId;
         this.password = password;
     }

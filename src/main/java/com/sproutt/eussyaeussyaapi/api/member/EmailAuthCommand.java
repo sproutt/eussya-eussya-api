@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 @NoArgsConstructor
-public class EmailAuthDTO {
+public class EmailAuthCommand {
 
     @Email
     @NotBlank
@@ -21,14 +21,14 @@ public class EmailAuthDTO {
     private String authCode;
 
     @Builder
-    public EmailAuthDTO(@Email @NotBlank String memberId, @NotBlank String authCode) {
+    public EmailAuthCommand(@Email @NotBlank String memberId, @NotBlank String authCode) {
         this.memberId = memberId;
         this.authCode = authCode;
     }
 
     @Override
     public String toString() {
-        return "EmailAuthDTO{" +
+        return "EmailAuthCommand{" +
                 "memberId='" + memberId + '\'' +
                 ", authCode='" + authCode + '\'' +
                 '}';
