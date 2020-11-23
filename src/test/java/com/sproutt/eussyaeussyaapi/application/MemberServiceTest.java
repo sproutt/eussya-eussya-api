@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
-import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
+import com.sproutt.eussyaeussyaapi.api.member.EmailAuthCommand;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberJoinCommand;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.application.member.MemberServiceImpl;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
@@ -43,16 +43,16 @@ public class MemberServiceTest {
     @Test
     @DisplayName("멤버 생성 테스트(중복되지 않은 id인 경우)")
     public void createMember_with_exist_memberId() {
-        JoinDTO joinDTO = JoinDTO.builder()
-                                 .memberId(MEMBER_ID)
-                                 .nickName(NICKNAME)
-                                 .password(PASSWORD)
-                                 .build();
+        MemberJoinCommand memberJoinCommand = MemberJoinCommand.builder()
+                                                               .memberId(MEMBER_ID)
+                                                               .nickName(NICKNAME)
+                                                               .password(PASSWORD)
+                                                               .build();
 
         Member member = MemberFactory.getDefaultMember();
         when(memberRepository.findByMemberId(MEMBER_ID)).thenReturn(Optional.of(member));
 
-        assertThrows(DuplicationMemberException.class, () -> memberService.joinWithLocalProvider(joinDTO));
+        assertThrows(DuplicationMemberException.class, () -> memberService.joinWithLocalProvider(memberJoinCommand));
     }
 
     @Test
@@ -60,14 +60,14 @@ public class MemberServiceTest {
     public void authenticateEmail_with_unMatched_authCode() {
         Member member = MemberFactory.getDefaultMember();
 
-        EmailAuthDTO emailAuthDTO = EmailAuthDTO.builder()
-                                                .memberId(MEMBER_ID)
-                                                .authCode("1111")
-                                                .build();
+        EmailAuthCommand emailAuthCommand = EmailAuthCommand.builder()
+                                                            .memberId(MEMBER_ID)
+                                                            .authCode("1111")
+                                                            .build();
 
         when(memberRepository.findByMemberId(MEMBER_ID)).thenReturn(Optional.of(member));
 
-        assertThrows(VerificationException.class, () -> memberService.authenticateEmail(emailAuthDTO));
+        assertThrows(VerificationException.class, () -> memberService.authenticateEmail(emailAuthCommand));
     }
 
     @Test

@@ -1,7 +1,7 @@
 package com.sproutt.eussyaeussyaapi.acceptance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.CompleteMissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
@@ -77,10 +77,10 @@ public class MissionAcceptanceTest {
         memberRepository.saveAndFlush(member);
         missionRepository.saveAndFlush(mission);
 
-        token = jwtHelper.createToken(secretKey, JwtMemberDTO.builder()
-                                                             .id(member.getId())
-                                                             .memberId(member.getMemberId())
-                                                             .nickName(member.getNickName()).build());
+        token = jwtHelper.createToken(secretKey, MemberTokenCommand.builder()
+                                                                   .id(member.getId())
+                                                                   .memberId(member.getMemberId())
+                                                                   .nickName(member.getNickName()).build());
 
         template.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {

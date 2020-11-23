@@ -1,6 +1,6 @@
 package com.sproutt.eussyaeussyaapi.domain.member;
 
-import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MemberDTO;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import lombok.Builder;
@@ -58,12 +58,12 @@ public class Member {
         this.authentication = authCode;
     }
 
-    public JwtMemberDTO toJwtInfo() {
-        return JwtMemberDTO.builder()
-                           .id(this.id)
-                           .memberId(this.memberId)
-                           .nickName(this.nickName)
-                           .build();
+    public MemberTokenCommand toJwtInfo() {
+        return MemberTokenCommand.builder()
+                                 .id(this.id)
+                                 .memberId(this.memberId)
+                                 .nickName(this.nickName)
+                                 .build();
     }
 
     public void addMission(Mission mission) {

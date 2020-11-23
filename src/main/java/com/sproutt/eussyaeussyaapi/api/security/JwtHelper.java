@@ -1,7 +1,7 @@
 package com.sproutt.eussyaeussyaapi.api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +14,10 @@ public class JwtHelper {
 
     private static final String CLAIM_KEY = "member";
 
-    public String createToken(String secretKey, JwtMemberDTO jwtMemberDTO) {
+    public String createToken(String secretKey, MemberTokenCommand memberTokenCommand) {
 
         Claims claims = Jwts.claims().setSubject(CLAIM_KEY);
-        claims.put(CLAIM_KEY, jwtMemberDTO);
+        claims.put(CLAIM_KEY, memberTokenCommand);
 
         Date now = new Date();
 
@@ -32,11 +32,11 @@ public class JwtHelper {
         return token;
     }
 
-    public JwtMemberDTO decryptToken(String secretKey, String token) {
+    public MemberTokenCommand decryptToken(String secretKey, String token) {
         Jws<Claims> claims = getClaims(secretKey, token);
         ObjectMapper objectMapper = new ObjectMapper();
 
-        return objectMapper.convertValue(claims.getBody().get(CLAIM_KEY), JwtMemberDTO.class);
+        return objectMapper.convertValue(claims.getBody().get(CLAIM_KEY), MemberTokenCommand.class);
     }
 
     public boolean isUsable(String secretKey, String token) {

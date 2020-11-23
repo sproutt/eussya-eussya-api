@@ -1,9 +1,9 @@
 package com.sproutt.eussyaeussyaapi.application.member;
 
-import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
-import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
-import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
-import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
+import com.sproutt.eussyaeussyaapi.api.member.EmailAuthCommand;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberJoinCommand;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberLoginCommand;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 
 import javax.mail.MessagingException;
@@ -11,15 +11,15 @@ import java.util.List;
 
 public interface MemberService {
 
-    Member login(LoginDTO loginDTO);
+    Member login(MemberLoginCommand memberLoginCommand);
 
-    Member joinWithLocalProvider(JoinDTO joinDTO) throws MessagingException;
+    Member joinWithLocalProvider(MemberJoinCommand memberJoinCommand) throws MessagingException;
 
-    Member authenticateEmail(EmailAuthDTO emailAuthDTO);
+    Member authenticateEmail(EmailAuthCommand emailAuthCommand);
 
     Member sendAuthCodeToEmail(String email);
 
-    Member findTokenOwner(JwtMemberDTO jwtMemberDTO);
+    Member findTokenOwner(MemberTokenCommand memberTokenCommand);
 
     boolean isDuplicatedMemberId(String memberId);
 

@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @NoArgsConstructor
-public class JoinDTO {
+public class MemberJoinCommand {
 
     @NotBlank
     @ApiParam(value = "회원 ID", required = true)
@@ -31,7 +31,7 @@ public class JoinDTO {
     private String password;
 
     @Builder
-    public JoinDTO(String memberId, String nickName, String password) {
+    public MemberJoinCommand(String memberId, String nickName, String password) {
         this.memberId = memberId;
         this.nickName = nickName;
         this.password = password;
