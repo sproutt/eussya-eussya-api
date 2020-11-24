@@ -4,6 +4,7 @@ import com.sproutt.eussyaeussyaapi.api.member.EmailAuthDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JoinDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.JwtMemberDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.LoginDTO;
+import com.sproutt.eussyaeussyaapi.api.oauth2.dto.OAuth2UserInfoDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 
 import javax.mail.MessagingException;
@@ -28,4 +29,6 @@ public interface MemberService {
     Member findByMemberId(String memberId);
 
     List<Member> findAllExclude(String memberId);
+
+    Member loginWithSocialProvider(OAuth2UserInfoDTO userInfoDTO);
 }

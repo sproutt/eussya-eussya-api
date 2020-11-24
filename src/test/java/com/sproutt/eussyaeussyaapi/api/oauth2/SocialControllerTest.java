@@ -1,15 +1,19 @@
 package com.sproutt.eussyaeussyaapi.api.oauth2;
 
-import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportedOAuth2Exception;
+import com.sproutt.eussyaeussyaapi.api.oauth2.dto.FacebookOAuth2UserDTO;
+import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GithubOAuth2UserDTO;
+import com.sproutt.eussyaeussyaapi.api.oauth2.dto.GoogleOAuth2UserDTO;
+import com.sproutt.eussyaeussyaapi.api.oauth2.dto.OAuth2UserInfoDTO;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2RequestService;
-import com.sproutt.eussyaeussyaapi.api.oauth2.service.SocialService;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
+import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -34,10 +38,19 @@ class SocialControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private SocialService socialService;
+    private MemberService memberService;
 
     @MockBean
-    private OAuth2RequestService oAuth2RequestService;
+    @Qualifier("google")
+    private OAuth2RequestService googleOAuth2RequestService;
+
+    @MockBean
+    @Qualifier("facebook")
+    private OAuth2RequestService facebookOAuth2RequestService;
+
+    @MockBean
+    @Qualifier("github")
+    private OAuth2RequestService githubOAuth2RequestService;
 
     @MockBean
     private JwtHelper jwtHelper;
@@ -46,10 +59,11 @@ class SocialControllerTest {
     @Test
     public void login_by_github() throws Exception {
         Member githubMember = MemberFactory.getGithubMember();
+        OAuth2UserInfoDTO userInfoDTO = new GithubOAuth2UserDTO();
 
-        when(oAuth2RequestService.getUserInfoByProvider(eq("token"), eq("github"), any()))
-                .thenReturn(githubMember);
-        when(socialService.login(githubMember)).thenReturn(githubMember);
+        when(githubOAuth2RequestService.getUserInfo(eq("token")))
+                .thenReturn(userInfoDTO);
+        when(memberService.loginWithSocialProvider(userInfoDTO)).thenReturn(githubMember);
         when(jwtHelper.createToken(any(), any())).thenReturn("token");
 
         ResultActions actions = mockMvc.perform(post("/social/login/github")
@@ -63,11 +77,12 @@ class SocialControllerTest {
     @DisplayName("facebook으로 로그인")
     @Test
     public void login_by_facebook() throws Exception {
-        Member githubMember = MemberFactory.getGithubMember();
+        Member facebookMember = MemberFactory.getFacebookMember();
+        OAuth2UserInfoDTO userInfoDTO = new FacebookOAuth2UserDTO();
 
-        when(oAuth2RequestService.getUserInfoByProvider(eq("token"), eq("facebook"), any()))
-                .thenReturn(githubMember);
-        when(socialService.login(githubMember)).thenReturn(githubMember);
+        when(facebookOAuth2RequestService.getUserInfo(eq("token")))
+                .thenReturn(userInfoDTO);
+        when(memberService.loginWithSocialProvider(userInfoDTO)).thenReturn(facebookMember);
         when(jwtHelper.createToken(any(), any())).thenReturn("token");
 
         ResultActions actions = mockMvc.perform(post("/social/login/facebook")
@@ -81,11 +96,12 @@ class SocialControllerTest {
     @DisplayName("google으로 로그인")
     @Test
     public void login_by_google() throws Exception {
-        Member githubMember = MemberFactory.getGithubMember();
+        Member googleMember = MemberFactory.getGoogleMember();
+        OAuth2UserInfoDTO userInfoDTO = new GoogleOAuth2UserDTO();
 
-        when(oAuth2RequestService.getUserInfoByProvider(eq("token"), eq("google"), any()))
-                .thenReturn(githubMember);
-        when(socialService.login(githubMember)).thenReturn(githubMember);
+        when(googleOAuth2RequestService.getUserInfo(eq("token")))
+                .thenReturn(userInfoDTO);
+        when(memberService.loginWithSocialProvider(userInfoDTO)).thenReturn(googleMember);
         when(jwtHelper.createToken(any(), any())).thenReturn("token");
 
         ResultActions actions = mockMvc.perform(post("/social/login/google")
@@ -99,9 +115,6 @@ class SocialControllerTest {
     @DisplayName("지원하지 않는 oauth2 로그인 시 UnSupportedException 발생")
     @Test
     public void login_by_no_provider() throws Exception {
-        when(oAuth2RequestService.getUserInfoByProvider(eq("token"), eq("wrong"), any()))
-                .thenThrow(UnSupportedOAuth2Exception.class);
-
         ResultActions actions = mockMvc.perform(post("/social/login/wrong")
                 .param("accessToken", "token")
                 .contentType(MediaType.APPLICATION_JSON)).andDo(print());
