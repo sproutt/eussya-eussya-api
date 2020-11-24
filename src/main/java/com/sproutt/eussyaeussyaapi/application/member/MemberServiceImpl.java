@@ -101,8 +101,6 @@ public class MemberServiceImpl implements MemberService {
             return memberRepository.findAll();
         }
 
-
-
         return memberRepository.findAll().stream().filter(member -> !member.getMemberId().equals(memberId)).collect(Collectors.toList());
     }
 
