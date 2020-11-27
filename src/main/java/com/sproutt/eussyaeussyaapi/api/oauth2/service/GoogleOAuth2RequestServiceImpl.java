@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-@Service
-@Qualifier("google")
+@Service("google")
 public class GoogleOAuth2RequestServiceImpl implements OAuth2RequestService {
 
     private final RestTemplate restTemplate;

@@ -10,8 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-@Service
-@Qualifier("facebook")
+@Service("facebook")
 public class FacebookOAuth2RequestServiceImpl implements OAuth2RequestService {
 
     private final RestTemplate restTemplate;
