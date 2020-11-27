@@ -9,17 +9,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-public class FacebookOAuth2RequestServiceTest extends OAuth2RequestServiceTest{
+public class FacebookOAuth2RequestServiceTest {
+
+    private final String MOCK_TOKEN = "mock";
+    private final String WRONG_TOKEN = "WRONG";
+
+    private RestTemplate restTemplate = mock(RestTemplate.class);
 
     private final String FACEBOOK_REQUEST_URL = "https://graph.facebook.com/v6.0/me";
-
     private OAuth2RequestService facebookOAuth2RequestService;
 
     @BeforeEach
@@ -31,11 +39,11 @@ public class FacebookOAuth2RequestServiceTest extends OAuth2RequestServiceTest{
     @Test
     public void getUserInfo_by_Facebook() {
 
-        FacebookOAuth2UserDTO defaultFacebookDto = DtoFactory.getFacebookOAuth2UserDto();
+        FacebookOAuth2UserDTO defaultFacebookDTO = DtoFactory.getFacebookOAuth2UserDTO();
         Member defaultFacebookMember = MemberFactory.getFacebookMember();
 
         when(restTemplate.getForEntity(getFacebookRequest(MOCK_TOKEN), FacebookOAuth2UserDTO.class))
-                .thenReturn(getResponseEntity(defaultFacebookDto));
+                .thenReturn(getResponseEntity(defaultFacebookDTO));
 
         Member facebookMember = facebookOAuth2RequestService
                 .getUserInfo(MOCK_TOKEN).toEntity();
@@ -65,5 +73,9 @@ public class FacebookOAuth2RequestServiceTest extends OAuth2RequestServiceTest{
                .append(token);
 
         return request.toString();
+    }
+
+    <T> ResponseEntity<T> getResponseEntity(T userDTO) {
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 }

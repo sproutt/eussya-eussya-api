@@ -9,17 +9,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.*;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-public class GithubOAuth2RequestServiceTest extends OAuth2RequestServiceTest {
+public class GithubOAuth2RequestServiceTest {
+
+    private final String MOCK_TOKEN = "mock";
+    private final String WRONG_TOKEN = "WRONG";
+
+    private RestTemplate restTemplate = mock(RestTemplate.class);
 
     private final String GITHUB_REQUEST_URL = "https://api.github.com/user";
 
@@ -34,12 +39,12 @@ public class GithubOAuth2RequestServiceTest extends OAuth2RequestServiceTest {
     @Test
     public void getUserInfo_by_github() {
 
-        GithubOAuth2UserDTO defaultGithubDto = DtoFactory.getGithubOAuth2UserDto();
+        GithubOAuth2UserDTO defaultGithubDTO = DtoFactory.getGithubOAuth2UserDTO();
         Member defaultGitHubMember = MemberFactory.getGithubMember();
 
         when(restTemplate
                 .exchange(GITHUB_REQUEST_URL, HttpMethod.GET, getGithubRequest(MOCK_TOKEN), GithubOAuth2UserDTO.class))
-                .thenReturn(getResponseEntity(defaultGithubDto));
+                .thenReturn(getResponseEntity(defaultGithubDTO));
 
         Member githubMember = githubOAuth2RequestService
                 .getUserInfo(MOCK_TOKEN).toEntity();
@@ -67,4 +72,7 @@ public class GithubOAuth2RequestServiceTest extends OAuth2RequestServiceTest {
         return new HttpEntity(headers);
     }
 
+    <T> ResponseEntity<T> getResponseEntity(T userDTO) {
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    }
 }

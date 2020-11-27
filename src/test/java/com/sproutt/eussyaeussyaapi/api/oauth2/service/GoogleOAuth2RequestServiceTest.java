@@ -9,20 +9,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.*;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-public class GoogleOAuth2RequestServiceTest extends OAuth2RequestServiceTest{
+public class GoogleOAuth2RequestServiceTest{
+
+    final String MOCK_TOKEN = "mock";
+    final String WRONG_TOKEN = "WRONG";
+
+    private RestTemplate restTemplate = mock(RestTemplate.class);
 
     private final String GOOGLE_REQUEST_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
-
     private OAuth2RequestService googleOAuth2RequestService;
 
     @BeforeEach
@@ -34,12 +38,12 @@ public class GoogleOAuth2RequestServiceTest extends OAuth2RequestServiceTest{
     @Test
     public void getUserInfo_by_Google() {
 
-        GoogleOAuth2UserDTO defaultGoogleDto = DtoFactory.getGoogleOAuth2UserDto();
+        GoogleOAuth2UserDTO defaultGoogleDTO = DtoFactory.getGoogleOAuth2UserDTO();
         Member defaultGoogleMember = MemberFactory.getGoogleMember();
 
         when(restTemplate
                 .exchange(GOOGLE_REQUEST_URL, HttpMethod.GET, getGoogleRequest(MOCK_TOKEN), GoogleOAuth2UserDTO.class))
-                .thenReturn(getResponseEntity(defaultGoogleDto));
+                .thenReturn(getResponseEntity(defaultGoogleDTO));
 
         Member googleMember = googleOAuth2RequestService
                 .getUserInfo(MOCK_TOKEN).toEntity();
@@ -66,5 +70,9 @@ public class GoogleOAuth2RequestServiceTest extends OAuth2RequestServiceTest{
         headers.set("Authorization", "Bearer " + token);
 
         return new HttpEntity(headers);
+    }
+
+    <T> ResponseEntity<T> getResponseEntity(T userDTO) {
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 }
