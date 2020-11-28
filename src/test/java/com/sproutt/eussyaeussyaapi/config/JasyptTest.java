@@ -42,4 +42,5 @@ class JasyptTest {
 
         assertThat(encryptor.decrypt(encryptedText)).isEqualTo(defualtRawText);
     }
+    
 }
