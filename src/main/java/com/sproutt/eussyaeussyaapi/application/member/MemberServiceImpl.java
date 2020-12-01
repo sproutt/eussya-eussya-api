@@ -117,7 +117,7 @@ public class MemberServiceImpl implements MemberService {
 
         return memberRepository.findByMemberId(userInfoDTO.getId()).orElseThrow(NoSuchMemberException::new);
     }
-
+  
     @Override
     @Transactional
     public Member authenticateEmail(EmailAuthCommand emailAuthCommand) {
