@@ -7,20 +7,20 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class FacebookOAuth2UserDto {
-
-    private String id;
-
-    private String name;
+public class FacebookOAuth2UserDTO extends OAuth2UserInfoDTO {
 
     private String email;
 
+    public FacebookOAuth2UserDTO() {
+        this.setProvider(Provider.FACEBOOK);
+    }
+
     public Member toEntity() {
         return Member.builder()
-                     .memberId(id)
-                     .nickName(name)
+                     .memberId(this.getId())
+                     .nickName(this.getName())
                      .email(email)
-                     .provider(Provider.FACEBOOK)
+                     .provider(this.getProvider())
                      .build();
     }
 }

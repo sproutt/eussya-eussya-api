@@ -7,18 +7,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class GithubOAuth2UserDto {
+public abstract class OAuth2UserInfoDTO {
 
     private String id;
-
     private String name;
+    private Provider provider;
 
-    public Member toEntity() {
-        return Member.builder()
-                     .memberId(id)
-                     .nickName(name)
-                     .provider(Provider.GITHUB)
-                     .build();
-    }
-
+    public abstract Member toEntity();
 }

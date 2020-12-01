@@ -2,8 +2,9 @@ package com.sproutt.eussyaeussyaapi.application.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.EmailAuthCommand;
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberJoinCommand;
-import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberLoginCommand;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
+import com.sproutt.eussyaeussyaapi.api.oauth2.dto.OAuth2UserInfoDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 
 import javax.mail.MessagingException;
@@ -28,4 +29,6 @@ public interface MemberService {
     Member findByMemberId(String memberId);
 
     List<Member> findAllExclude(String memberId);
+
+    Member loginWithSocialProvider(OAuth2UserInfoDTO userInfoDTO);
 }

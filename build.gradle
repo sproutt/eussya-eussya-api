@@ -55,6 +55,10 @@ test {
     useJUnitPlatform{
         excludeTags 'integration'
     }
+
+    def JASYPT_PASSWORD = project.getProperties()["JASYPT_PASSWORD"]
+    environment 'JASYPT_PASSWORD', JASYPT_PASSWORD
+    failFast = true
 }
 
 jacocoTestReport {

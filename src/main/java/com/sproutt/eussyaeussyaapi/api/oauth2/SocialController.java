@@ -1,11 +1,11 @@
 package com.sproutt.eussyaeussyaapi.api.oauth2;
 
-import com.sproutt.eussyaeussyaapi.api.oauth2.dto.RequestUrlDto;
+import com.sproutt.eussyaeussyaapi.api.oauth2.dto.OAuth2UserInfoDTO;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2RequestService;
-import com.sproutt.eussyaeussyaapi.api.oauth2.service.SocialService;
+import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2RequestServiceFactory;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
+import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,23 +13,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
 @RequestMapping("/social")
 @RestController
 public class SocialController {
 
     private final JwtHelper jwtHelper;
-    private final SocialService socialService;
-    private final OAuth2RequestService oAuth2RequestService;
-
-    @Value("${social.github.url}")
-    private String githubRequestUrl;
-
-    @Value("${social.google.url}")
-    private String googleRequestUrl;
-
-    @Value("${social.facebook.url}")
-    private String facebookRequestUrl;
+    private final MemberService memberService;
+    private final OAuth2RequestServiceFactory oAuth2RequestServiceFactory;
 
     @Value("${jwt.header}")
     private String tokenKey;
@@ -37,18 +27,26 @@ public class SocialController {
     @Value("${jwt.secret}")
     private String secretKey;
 
+    public SocialController(JwtHelper jwtHelper, MemberService memberService, OAuth2RequestServiceFactory oAuth2RequestServiceFactory) {
+        this.jwtHelper = jwtHelper;
+        this.memberService = memberService;
+        this.oAuth2RequestServiceFactory = oAuth2RequestServiceFactory;
+    }
+
     @PostMapping("/login/{provider}")
     public ResponseEntity loginByProvider(@PathVariable String provider, @RequestParam String accessToken) {
-        RequestUrlDto requestUrlDto = new RequestUrlDto(googleRequestUrl, githubRequestUrl, facebookRequestUrl);
+        OAuth2RequestService oAuth2RequestService = oAuth2RequestServiceFactory.getOAuth2RequestService(provider);
 
-        Member loginMember = oAuth2RequestService.getUserInfoByProvider(accessToken, provider, requestUrlDto);
-        socialService.login(loginMember);
+        OAuth2UserInfoDTO userInfoDTO = oAuth2RequestService.getUserInfo(accessToken);
+        Member loginMember = userInfoDTO.toEntity();
+
+        memberService.loginWithSocialProvider(userInfoDTO);
         String token = jwtHelper.createToken(secretKey, loginMember.toJwtInfo());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(tokenKey, token);
+
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
-
 }
