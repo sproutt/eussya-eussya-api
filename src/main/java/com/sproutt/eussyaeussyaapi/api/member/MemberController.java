@@ -27,8 +27,8 @@ import java.util.List;
 @Api(description = "으쌰으쌰 회원 관련 API", tags = {"Member - 담당자 : 김종근"})
 public class MemberController {
 
-    @Value("${jwt.header}")
-    private String tokenKey;
+    @Value("${jwt.accessTokenKey}")
+    private String accessTokenKey;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -69,11 +69,11 @@ public class MemberController {
     public ResponseEntity loginMember(@Valid @RequestBody MemberLoginCommand memberLoginCommand) {
         Member loginMember = memberService.login(memberLoginCommand);
 
-        String token = jwtHelper.createToken(secretKey, loginMember.toJwtInfo());
+        String token = jwtHelper.createAccessToken(secretKey, loginMember.toJwtInfo());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(tokenKey, token);
+        headers.set(accessTokenKey, token);
 
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }

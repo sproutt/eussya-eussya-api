@@ -61,7 +61,7 @@ class SocialControllerTest {
         when(oAuth2RequestService.getUserInfo(eq("token")))
                 .thenReturn(userInfoDTO);
         when(memberService.loginWithSocialProvider(userInfoDTO)).thenReturn(githubMember);
-        when(jwtHelper.createToken(any(), any())).thenReturn("token");
+        when(jwtHelper.createAccessToken(any(), any())).thenReturn("token");
 
         ResultActions actions = mockMvc.perform(post("/social/login/github")
                 .param("accessToken", "token")
@@ -82,7 +82,7 @@ class SocialControllerTest {
         when(oAuth2RequestService.getUserInfo(eq("token")))
                 .thenReturn(userInfoDTO);
         when(memberService.loginWithSocialProvider(userInfoDTO)).thenReturn(facebookMember);
-        when(jwtHelper.createToken(any(), any())).thenReturn("token");
+        when(jwtHelper.createAccessToken(any(), any())).thenReturn("token");
 
         ResultActions actions = mockMvc.perform(post("/social/login/facebook")
                 .param("accessToken", "token")
@@ -103,7 +103,7 @@ class SocialControllerTest {
         when(oAuth2RequestService.getUserInfo(eq("token")))
                 .thenReturn(userInfoDTO);
         when(memberService.loginWithSocialProvider(userInfoDTO)).thenReturn(googleMember);
-        when(jwtHelper.createToken(any(), any())).thenReturn("token");
+        when(jwtHelper.createAccessToken(any(), any())).thenReturn("token");
 
         ResultActions actions = mockMvc.perform(post("/social/login/google")
                 .param("accessToken", "token")

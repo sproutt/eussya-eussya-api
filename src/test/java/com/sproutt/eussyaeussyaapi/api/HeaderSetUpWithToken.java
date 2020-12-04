@@ -19,8 +19,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 public class HeaderSetUpWithToken {
 
-    @Value("${jwt.header}")
-    private String tokenKey;
+    @Value("${jwt.accessTokenKey}")
+    private String accessTokenKey;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -33,12 +33,12 @@ public class HeaderSetUpWithToken {
 
     public HttpHeaders setUpHeader() throws Exception {
         Member loginMember = MemberFactory.getDefaultMember();
-        when(jwtHelper.createToken(any(), any())).thenReturn("token");
-        String token = jwtHelper.createToken(secretKey, loginMember.toJwtInfo());
+        when(jwtHelper.createAccessToken(any(), any())).thenReturn("token");
+        String token = jwtHelper.createAccessToken(secretKey, loginMember.toJwtInfo());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(tokenKey, token);
+        headers.set(accessTokenKey, token);
         headers.setZonedDateTime("date", ZonedDateTime.now());
 
         when(jwtInterceptor.preHandle(any(), any(), any())).thenReturn(true);

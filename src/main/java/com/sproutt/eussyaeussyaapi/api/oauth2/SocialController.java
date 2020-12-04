@@ -21,8 +21,8 @@ public class SocialController {
     private final MemberService memberService;
     private final OAuth2RequestServiceFactory oAuth2RequestServiceFactory;
 
-    @Value("${jwt.header}")
-    private String tokenKey;
+    @Value("${jwt.accessTokenKey}")
+    private String accessTokenKey;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -41,11 +41,11 @@ public class SocialController {
         Member loginMember = userInfoDTO.toEntity();
 
         memberService.loginWithSocialProvider(userInfoDTO);
-        String token = jwtHelper.createToken(secretKey, loginMember.toJwtInfo());
+        String token = jwtHelper.createAccessToken(secretKey, loginMember.toJwtInfo());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(tokenKey, token);
+        headers.set(accessTokenKey, token);
 
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }

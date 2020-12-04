@@ -18,8 +18,8 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class MemberAspect {
 
-    @Value("${jwt.header}")
-    private String tokenKey;
+    @Value("${jwt.accessTokenKey}")
+    private String accessTokenKey;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -35,7 +35,7 @@ public class MemberAspect {
                                       .findFirst()
                                       .orElseThrow(NoPermissionException::new);
 
-        String token = headers.getFirst(tokenKey);
+        String token = headers.getFirst(accessTokenKey);
         MemberTokenCommand memberTokenCommand = jwtHelper.decryptToken(secretKey, token);
 
         for (int i = 0; i < joinPointArgs.length; i++) {
