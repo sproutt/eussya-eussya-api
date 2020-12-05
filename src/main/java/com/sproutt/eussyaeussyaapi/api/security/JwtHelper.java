@@ -20,8 +20,9 @@ public class JwtHelper {
     }
 
     public String createRefreshToken(String secretKey, MemberTokenCommand memberTokenCommand) {
+        String token = createToken(secretKey, memberTokenCommand, REFRESH_TOKEN_VALID_MILLISECOND);
         // TODO: 20. 12. 4. Redis 연동하기
-        return createToken(secretKey, memberTokenCommand, REFRESH_TOKEN_VALID_MILLISECOND);
+        return token;
     }
 
     private String createToken(String secretKey, MemberTokenCommand memberTokenCommand, long validMilisecond) {

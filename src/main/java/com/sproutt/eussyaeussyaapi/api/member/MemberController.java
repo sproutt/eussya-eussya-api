@@ -30,6 +30,9 @@ public class MemberController {
     @Value("${jwt.accessTokenKey}")
     private String accessTokenKey;
 
+    @Value("${jwt.refreshTokenKey}")
+    private String refreshTokenKey;
+
     @Value("${jwt.secret}")
     private String secretKey;
 
@@ -69,11 +72,13 @@ public class MemberController {
     public ResponseEntity loginMember(@Valid @RequestBody MemberLoginCommand memberLoginCommand) {
         Member loginMember = memberService.login(memberLoginCommand);
 
-        String token = jwtHelper.createAccessToken(secretKey, loginMember.toJwtInfo());
+        String accessToken = jwtHelper.createAccessToken(secretKey, loginMember.toJwtInfo());
+        String refreshToken = jwtHelper.createRefreshToken(secretKey, loginMember.toJwtInfo());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(accessTokenKey, token);
+        headers.set(accessTokenKey, accessToken);
+        headers.set(refreshTokenKey, refreshToken);
 
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }

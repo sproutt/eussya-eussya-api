@@ -24,6 +24,9 @@ public class SocialController {
     @Value("${jwt.accessTokenKey}")
     private String accessTokenKey;
 
+    @Value("${jwt.refreshTokenKey}")
+    private String refreshTokenKey;
+
     @Value("${jwt.secret}")
     private String secretKey;
 
@@ -34,18 +37,20 @@ public class SocialController {
     }
 
     @PostMapping("/login/{provider}")
-    public ResponseEntity loginByProvider(@PathVariable String provider, @RequestParam String accessToken) {
+    public ResponseEntity loginByProvider(@PathVariable String provider, @RequestParam String token) {
         OAuth2RequestService oAuth2RequestService = oAuth2RequestServiceFactory.getOAuth2RequestService(provider);
 
-        OAuth2UserInfoDTO userInfoDTO = oAuth2RequestService.getUserInfo(accessToken);
+        OAuth2UserInfoDTO userInfoDTO = oAuth2RequestService.getUserInfo(token);
         Member loginMember = userInfoDTO.toEntity();
 
         memberService.loginWithSocialProvider(userInfoDTO);
-        String token = jwtHelper.createAccessToken(secretKey, loginMember.toJwtInfo());
+        String accessToken = jwtHelper.createAccessToken(secretKey, loginMember.toJwtInfo());
+        String refreshToken = jwtHelper.createRefreshToken(secretKey, loginMember.toJwtInfo());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(accessTokenKey, token);
+        headers.set(accessTokenKey, accessToken);
+        headers.set(refreshTokenKey, refreshToken);
 
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
