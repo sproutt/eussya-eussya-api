@@ -106,7 +106,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
-    @ExceptionHandler(value = InvalidAccessTokenException.class)
+    @ExceptionHandler(value = InvalidRefreshTokenException.class)
     public ResponseEntity<ErrorResponse> handleInvalidRefreshTokenException(InvalidRefreshTokenException exception) {
         log.info("handleInvalidRefreshTokenException : {}", exception);
 
