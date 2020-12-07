@@ -4,6 +4,7 @@ import com.sproutt.eussyaeussyaapi.api.oauth2.dto.OAuth2UserInfoDTO;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2RequestService;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2RequestServiceFactory;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
+import com.sproutt.eussyaeussyaapi.api.security.dto.JwtDTO;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +38,7 @@ public class SocialController {
     }
 
     @PostMapping("/login/{provider}")
-    public ResponseEntity loginByProvider(@PathVariable String provider, @RequestParam String token) {
+    public ResponseEntity<JwtDTO> loginByProvider(@PathVariable String provider, @RequestParam String token) {
         OAuth2RequestService oAuth2RequestService = oAuth2RequestServiceFactory.getOAuth2RequestService(provider);
 
         OAuth2UserInfoDTO userInfoDTO = oAuth2RequestService.getUserInfo(token);
@@ -49,9 +50,7 @@ public class SocialController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(accessTokenKey, accessToken);
-        headers.set(refreshTokenKey, refreshToken);
 
-        return new ResponseEntity<>(headers, HttpStatus.OK);
+        return new ResponseEntity<>(new JwtDTO(accessToken, refreshToken), headers, HttpStatus.OK);
     }
 }
