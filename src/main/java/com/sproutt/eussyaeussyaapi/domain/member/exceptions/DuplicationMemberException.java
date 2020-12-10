@@ -1,10 +1,10 @@
 package com.sproutt.eussyaeussyaapi.domain.member.exceptions;
 
-import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
+import com.sproutt.eussyaeussyaapi.api.exception.message.MemberExceptionMessage;
 
 public class DuplicationMemberException extends DuplicationException {
     public DuplicationMemberException() {
-        super(ExceptionMessage.DUPLICATED_MEMBER_ID);
+        super(MemberExceptionMessage.DUPLICATED_MEMBER_ID);
     }
 
     public DuplicationMemberException(String message) {

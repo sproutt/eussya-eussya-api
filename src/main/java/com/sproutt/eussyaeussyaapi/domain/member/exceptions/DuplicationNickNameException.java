@@ -1,10 +1,10 @@
 package com.sproutt.eussyaeussyaapi.domain.member.exceptions;
 
-import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
+import com.sproutt.eussyaeussyaapi.api.exception.message.MemberExceptionMessage;
 
 public class DuplicationNickNameException extends DuplicationException {
     public DuplicationNickNameException() {
-        super(ExceptionMessage.DUPLICATED_NICKNAME);
+        super(MemberExceptionMessage.DUPLICATED_NICKNAME);
     }
 
     public DuplicationNickNameException(String message) {

@@ -1,15 +1,14 @@
 package com.sproutt.eussyaeussyaapi.application;
 
-import com.sproutt.eussyaeussyaapi.api.mission.dto.CompleteMissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionService;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionServiceImpl;
+import com.sproutt.eussyaeussyaapi.application.mission.ServiceTimeProvider;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionRepository;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionStatus;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NoSuchMissionException;
-import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotCompletedMissionException;
+import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.*;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +17,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,15 +34,26 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class MissionServiceTest {
     private MissionRepository missionRepository = mock(MissionRepository.class);
+    private ServiceTimeProvider serviceTimeProvider = mock(ServiceTimeProvider.class);
+
     private MissionService missionService;
     private Member loginMember;
     private List<Mission> mockedMissionList;
+    private String setUpDeadLineTime;
 
     @BeforeEach
     void setUp() {
-        missionService = new MissionServiceImpl(missionRepository);
+        missionService = new MissionServiceImpl(missionRepository, serviceTimeProvider);
         loginMember = MemberFactory.getDefaultMember();
         mockedMissionList = setMockMissionList();
+
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
+        if (now.getHour() >= 21) {
+            now = now.minusHours(3);
+        }
+
+        setUpDeadLineTime = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), now.plusHours(1).getHour(), 0, 0).toInstant(ZoneOffset.of("+09:00")).toString();
     }
 
     @Test
@@ -50,7 +63,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .deadlineTime(setUpDeadLineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
@@ -108,7 +121,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .deadlineTime(setUpDeadLineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
@@ -117,7 +130,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title2")
                 .contents("test_contents2")
-                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .deadlineTime(setUpDeadLineTime)
                 .build();
 
         when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
@@ -129,13 +142,39 @@ public class MissionServiceTest {
     }
 
     @Test
+    @DisplayName("미션 수정 테스트 - 이미 완료된 테스트인 경우 수정 금지")
+    void updateMission_already_completed() {
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
+                .builder()
+                .title("test_title")
+                .contents("test_contents")
+                .deadlineTime(setUpDeadLineTime)
+                .build();
+
+        Mission mission = new Mission(loginMember, missionRequestDTO);
+        mission.complete();
+
+        MissionRequestDTO updatedMissionRequestDTO = MissionRequestDTO
+                .builder()
+                .title("test_title2")
+                .contents("test_contents2")
+                .deadlineTime(setUpDeadLineTime)
+                .build();
+
+        when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
+        when(missionRepository.save(any())).thenReturn(new Mission(loginMember, updatedMissionRequestDTO));
+
+        assertThrows(CompletedMissionException.class, () -> missionService.update(loginMember, 0l, missionRequestDTO));
+    }
+
+    @Test
     @DisplayName("미션 삭제 테스트")
     void deleteMission() {
         MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .deadlineTime(setUpDeadLineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
@@ -148,50 +187,131 @@ public class MissionServiceTest {
     }
 
     @Test
-    @DisplayName("미션 시작 테스트")
-    void startMission() {
-        MissionRequestDTO missionRequestDTO = MissionRequestDTO
-                .builder()
-                .title("test_title")
-                .contents("test_contents")
-                .deadlineTime("2020-07-15T00:00:00.00Z")
-                .build();
-
-        Mission mission = new Mission(loginMember, missionRequestDTO);
-
-        when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
-        missionService.startMission(loginMember, 0l, "2020-07-15T05:01:00.00Z");
-
-        assertEquals(MissionStatus.IN_PROGRESS, missionService.findById(0l).getStatus());
-    }
-
-    @Test
     @DisplayName("미션 완료 테스트")
     void completeMission() {
         MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .deadlineTime(setUpDeadLineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
+        mission.startAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
 
-        when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
-        missionService.startMission(loginMember, 0l, "2020-07-15T05:01:00.00Z");
-        missionService.completeMission(loginMember, 0l, new CompleteMissionRequestDTO("2020-07-15T09:01:00.00Z", "result contents.."));
+        when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
+
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
+        if (now.getHour() >= 21) {
+            now = now.minusHours(3);
+        }
+
+        LocalDateTime mockingNow = now.plusHours(1);
+
+        when(serviceTimeProvider.now()).thenReturn(mockingNow);
+        when(serviceTimeProvider.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).plusHours(3).getHour());
+
+        missionService.completeMission(loginMember, 0l);
 
         assertEquals(MissionStatus.COMPLETE, missionService.findById(0l).getStatus());
     }
 
     @Test
-    @DisplayName("미션 결과 추가 테스트 - 미션의 상태가 complete 인 경우 ")
+    @DisplayName("미션 완료 테스트 - 미션 완료 제한 시간을 초과한 경우 실패")
+    void completeMission_limit_time_over() {
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
+                .builder()
+                .title("test_title")
+                .contents("test_contents")
+                .deadlineTime(setUpDeadLineTime)
+                .build();
+
+        Mission mission = new Mission(loginMember, missionRequestDTO);
+        mission.startAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+
+        when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
+
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
+        if (now.getHour() >= 21) {
+            now = now.minusHours(3);
+        }
+
+        LocalDateTime mockingNow = now.plusHours(1);
+
+        when(serviceTimeProvider.now()).thenReturn(mockingNow);
+        when(serviceTimeProvider.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).getHour());
+
+        assertThrows(LimitedTimeExceedException.class, () -> missionService.completeMission(loginMember, 0l));
+    }
+
+    @Test
+    @DisplayName("미션 완료 테스트 - 목표 시간을 채우지 못한 경우 실패")
+    void completeMission_before_deadline_time() {
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
+                .builder()
+                .title("test_title")
+                .contents("test_contents")
+                .deadlineTime(setUpDeadLineTime)
+                .build();
+
+        Mission mission = new Mission(loginMember, missionRequestDTO);
+        mission.startAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+
+        when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
+
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
+        if (now.getHour() >= 21) {
+            now = now.minusHours(3);
+        }
+
+        when(serviceTimeProvider.now()).thenReturn(now);
+        when(serviceTimeProvider.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).plusHours(3).getHour());
+
+        assertThrows(NotSatisfiedCondition.class, () -> missionService.completeMission(loginMember, 0l));
+    }
+
+    @Test
+    @DisplayName("미션 완료 테스트 - 이미 완료된 미션인 경우 실패")
+    void completeMission_already_completed() {
+        MissionRequestDTO missionRequestDTO = MissionRequestDTO
+                .builder()
+                .title("test_title")
+                .contents("test_contents")
+                .deadlineTime(setUpDeadLineTime)
+                .build();
+
+        Mission mission = new Mission(loginMember, missionRequestDTO);
+        mission.startAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+
+        when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
+
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
+        if (now.getHour() >= 21) {
+            now = now.minusHours(3);
+        }
+
+        LocalDateTime mockingNow = now.plusHours(1);
+
+        mission.complete();
+
+        when(serviceTimeProvider.now()).thenReturn(mockingNow);
+        when(serviceTimeProvider.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).plusHours(3).getHour());
+
+        assertThrows(ExpiredMissionException.class, () -> missionService.completeMission(loginMember, 0l));
+    }
+
+    @Test
+    @DisplayName("미션 결과 추가 테스트 - 미션의 상태가 complete 인 경우에만 성공")
     void addMissionResult() {
         MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .deadlineTime(setUpDeadLineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
@@ -204,13 +324,13 @@ public class MissionServiceTest {
     }
 
     @Test
-    @DisplayName("미션 결과 추가 테스트 - 미션 상태가 complete가 아닌 경우")
+    @DisplayName("미션 결과 추가 테스트 - 미션 상태가 complete가 아닌 경우 실패")
     void addMissionResult_with_not_complete() {
         MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .deadlineTime(setUpDeadLineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);

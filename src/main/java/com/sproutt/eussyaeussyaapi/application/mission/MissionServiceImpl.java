@@ -1,6 +1,5 @@
 package com.sproutt.eussyaeussyaapi.application.mission;
 
-import com.sproutt.eussyaeussyaapi.api.mission.dto.CompleteMissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
@@ -21,11 +20,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MissionServiceImpl implements MissionService {
 
+    private static final String ZONE_SEOUL = "Asia/Seoul";
+
     private final MissionRepository missionRepository;
+    private final ServiceTimeProvider serviceTimeProvider;
+
 
     @Override
     public Mission create(Member loginMember, MissionRequestDTO missionRequestDTO) {
         Mission mission = new Mission(loginMember, missionRequestDTO);
+        mission.startAt(serviceTimeProvider.now());
 
         return missionRepository.save(mission);
     }
@@ -35,7 +39,11 @@ public class MissionServiceImpl implements MissionService {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
 
         if (!mission.isWriter(loginMember)) {
-            throw new RuntimeException();
+            throw new NoPermissionException();
+        }
+
+        if (mission.isComplete()) {
+            throw new CompletedMissionException();
         }
 
         return missionRepository.save(mission.update(missionRequestDTO));
@@ -74,14 +82,14 @@ public class MissionServiceImpl implements MissionService {
     @Override
     public List<Mission> filterDate(String afterDate, String beforeDate, List<Mission> missionList) {
         if (afterDate != null) {
-            LocalDateTime afterLocalDateTime = LocalDateTime.ofInstant(Instant.parse(afterDate), ZoneId.of("Asia/Seoul"));
+            LocalDateTime afterLocalDateTime = LocalDateTime.ofInstant(Instant.parse(afterDate), ZoneId.of(ZONE_SEOUL));
             missionList = missionList.stream()
                                      .filter(mission -> mission.getDeadlineTime().isAfter(afterLocalDateTime))
                                      .collect(Collectors.toList());
         }
 
         if (beforeDate != null) {
-            LocalDateTime beforeLocalDateTime = LocalDateTime.ofInstant(Instant.parse(beforeDate), ZoneId.of("Asia/Seoul"));
+            LocalDateTime beforeLocalDateTime = LocalDateTime.ofInstant(Instant.parse(beforeDate), ZoneId.of(ZONE_SEOUL));
             missionList = missionList.stream()
                                      .filter(mission -> mission.getDeadlineTime().isBefore(beforeLocalDateTime))
                                      .collect(Collectors.toList());
@@ -92,64 +100,45 @@ public class MissionServiceImpl implements MissionService {
 
     @Override
     @Transactional
-    public void pauseMission(Member loginMember, Long missionId, String timeFormattedISO) {
+    public void completeMission(Member loginMember, Long missionId) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
-        LocalDateTime now = LocalDateTime.ofInstant(Instant.parse(timeFormattedISO), ZoneId.of("Asia/Seoul"));
-
+        LocalDateTime now = serviceTimeProvider.now();
 
         if (!mission.isWriter(loginMember)) {
             throw new NoPermissionException();
         }
 
-        if (!mission.isToday(now)) {
+        if (mission.isComplete()) {
             throw new ExpiredMissionException();
-        }
-
-        mission.recordPauseTime(now);
-        mission.updateRunningTime();
-        mission.pause();
-        missionRepository.save(mission);
-    }
-
-    @Override
-    @Transactional
-    public void startMission(Member loginMember, Long missionId, String timeFormattedISO) {
-        Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
-        LocalDateTime now = LocalDateTime.ofInstant(Instant.parse(timeFormattedISO), ZoneId.of("Asia/Seoul"));
-
-
-        if (!mission.isWriter(loginMember)) {
-            throw new NoPermissionException();
-        }
-
-        if (!mission.isToday(now)) {
-            throw new ExpiredMissionException();
-        }
-
-        mission.recordStartTime(now);
-        mission.start();
-        missionRepository.save(mission);
-    }
-
-    @Override
-    @Transactional
-    public void completeMission(Member loginMember, Long missionId, CompleteMissionRequestDTO completeMissionRequestDTO) {
-        Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
-        LocalDateTime now = LocalDateTime.ofInstant(Instant.parse(completeMissionRequestDTO.getTimeFormattedAsISO()), ZoneId.of("Asia/Seoul"));
-
-        if (!mission.isWriter(loginMember)) {
-            throw new NoPermissionException();
         }
 
         if (!mission.isDeadlinePassed(now)) {
             throw new NotSatisfiedCondition();
         }
 
-        mission.recordPauseTime(now);
+        if (isAfterLimitedTime(now)) {
+            mission.fail();
+            missionRepository.save(mission);
+
+            throw new LimitedTimeExceedException();
+        }
+
         mission.complete();
-        mission.updateRunningTime();
-        mission.addResult(completeMissionRequestDTO.getResult());
+        mission.recordRunningTime();
+
         missionRepository.save(mission);
+    }
+
+    private boolean isAfterLimitedTime(LocalDateTime now) {
+        LocalDateTime limitedDateTime = LocalDateTime.of(
+                now.getYear(),
+                now.getMonth(),
+                now.getDayOfMonth(),
+                serviceTimeProvider.getLimitHour(),
+                0,
+                0);
+
+        return now.isAfter(limitedDateTime);
     }
 
     @Override

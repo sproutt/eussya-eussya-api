@@ -1,7 +1,7 @@
 package com.sproutt.eussyaeussyaapi.domain.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
-import com.sproutt.eussyaeussyaapi.api.mission.dto.MemberDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberDTO;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import lombok.Builder;
 import lombok.Getter;

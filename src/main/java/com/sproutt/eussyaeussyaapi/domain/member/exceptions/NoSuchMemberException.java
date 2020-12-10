@@ -1,9 +1,9 @@
 package com.sproutt.eussyaeussyaapi.domain.member.exceptions;
 
-import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
+import com.sproutt.eussyaeussyaapi.api.exception.message.MemberExceptionMessage;
 
 public class NoSuchMemberException extends RuntimeException {
     public NoSuchMemberException() {
-        super(ExceptionMessage.NO_SUCH_MEMBER);
+        super(MemberExceptionMessage.NO_SUCH_MEMBER);
     }
 }

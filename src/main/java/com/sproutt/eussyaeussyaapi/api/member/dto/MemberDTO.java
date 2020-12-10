@@ -1,4 +1,4 @@
-package com.sproutt.eussyaeussyaapi.api.mission.dto;
+package com.sproutt.eussyaeussyaapi.api.member.dto;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,9 +1,9 @@
 package com.sproutt.eussyaeussyaapi.domain.mission.exceptions;
 
-import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
+import com.sproutt.eussyaeussyaapi.api.exception.message.MissionExceptionMessage;
 
 public class NotCompletedMissionException extends RuntimeException {
     public NotCompletedMissionException() {
-        super(ExceptionMessage.NOT_COMPLETED_MISSION);
+        super(MissionExceptionMessage.NOT_COMPLETED_MISSION);
     }
 }

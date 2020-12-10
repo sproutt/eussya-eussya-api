@@ -1,9 +1,9 @@
 package com.sproutt.eussyaeussyaapi.domain.mission.exceptions;
 
-import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
+import com.sproutt.eussyaeussyaapi.api.exception.message.MissionExceptionMessage;
 
 public class NoPermissionException extends RuntimeException {
     public NoPermissionException() {
-        super(ExceptionMessage.NO_PERMISSION);
+        super(MissionExceptionMessage.NO_PERMISSION);
     }
 }

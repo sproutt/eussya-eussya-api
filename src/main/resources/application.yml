@@ -55,5 +55,7 @@ api:
   cors:
     allow-origins: ENC(MUx6CLsdon60zBEAbQ+k0aHjrEkt5/6olFrgs11l7Wjo1VwjzoumVltRKR133vMsTPAp6vQlrCLHZOqniOrBUg==)
 
-kafka:
-  bootstrap-server: localhost:9092
+time:
+  start: 4
+  end: 9
+  limit: 12

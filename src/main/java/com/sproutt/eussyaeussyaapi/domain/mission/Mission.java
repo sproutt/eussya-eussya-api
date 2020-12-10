@@ -1,24 +1,22 @@
 package com.sproutt.eussyaeussyaapi.domain.mission;
 
-import com.google.gson.Gson;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor
 public class Mission {
+
+    private static final String ZONE_SEOUL = "Asia/Seoul";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -39,26 +37,21 @@ public class Mission {
     @Column
     private String result;
 
-    @CreatedDate
-    private LocalDateTime createdTime;
+    @Column
+    private LocalDateTime startTime;
 
     @LastModifiedDate
     private LocalDateTime updatedTime;
 
     @Column
+    @NotNull
     private LocalDateTime deadlineTime;
-
-    @Column
-    private String runningTimePoint;
 
     @Column
     private LocalTime runningTime;
 
     @Column
-    private MissionStatus status = MissionStatus.PENDING;
-
-    @Transient
-    private List<RunningTimePoint> runningTimePointList = new ArrayList<>();
+    private MissionStatus status = MissionStatus.IN_PROGRESS;
 
     @Builder
     public Mission(String title, String contents, Member writer, LocalDateTime deadlineTime) {
@@ -71,7 +64,7 @@ public class Mission {
     public Mission(Member writer, MissionRequestDTO missionRequestDTO) {
         this.title = missionRequestDTO.getTitle();
         this.contents = missionRequestDTO.getContents();
-        this.deadlineTime = LocalDateTime.ofInstant(Instant.parse(missionRequestDTO.getDeadlineTime()), ZoneId.of("Asia/Seoul"));
+        this.deadlineTime = LocalDateTime.ofInstant(Instant.parse(missionRequestDTO.getDeadlineTime()), ZoneId.of(ZONE_SEOUL));
         this.writer = writer;
     }
 
@@ -82,7 +75,7 @@ public class Mission {
     public Mission update(MissionRequestDTO missionRequestDTO) {
         this.title = missionRequestDTO.getTitle();
         this.contents = missionRequestDTO.getContents();
-        this.deadlineTime = LocalDateTime.ofInstant(Instant.parse(missionRequestDTO.getDeadlineTime()), ZoneId.of("Asia/Seoul"));
+        this.deadlineTime = LocalDateTime.ofInstant(Instant.parse(missionRequestDTO.getDeadlineTime()), ZoneId.of(ZONE_SEOUL));
 
         return this;
     }
@@ -91,86 +84,8 @@ public class Mission {
         return deadlineTime.isBefore(now);
     }
 
-    public void recordPauseTime(LocalDateTime stopPointTime) {
-        if (stopPointTime.getHour() >= 9) {
-            stopPointTime = LocalDateTime.of(stopPointTime.toLocalDate(), LocalTime.of(9, 0));
-        }
-
-        Gson gson = new Gson();
-        runningTimePointList = Arrays.asList(gson.fromJson(this.runningTimePoint, RunningTimePoint[].class));
-
-        RunningTimePoint runningTimePoint = this.runningTimePointList.get(runningTimePointList.size() - 1);
-        runningTimePoint.setStopPoint(stopPointTime);
-
-        this.runningTimePoint = gson.toJson(this.runningTimePointList);
-    }
-
-    public void recordStartTime(LocalDateTime startPointTime) {
-        RunningTimePoint runningTimePoint = new RunningTimePoint();
-        runningTimePoint.setStartPoint(startPointTime);
-
-        Gson gson = new Gson();
-
-        try {
-            runningTimePointList = new ArrayList<>(Arrays.asList(gson.fromJson(this.runningTimePoint, RunningTimePoint[].class)));
-        } catch (Exception e) {
-            runningTimePointList = new ArrayList<>();
-        }
-
-        runningTimePointList.add(runningTimePoint);
-
-        this.runningTimePoint = gson.toJson(this.runningTimePointList);
-    }
-
-    public void pause() {
-        this.status = MissionStatus.PENDING;
-    }
-
-    public void start() {
-        this.status = MissionStatus.IN_PROGRESS;
-    }
-
     public void complete() {
         this.status = MissionStatus.COMPLETE;
-    }
-
-    public void updateRunningTime() {
-        LocalTime term = LocalTime.of(0, 0);
-
-        Gson gson = new Gson();
-        runningTimePointList = Arrays.asList(gson.fromJson(this.runningTimePoint, RunningTimePoint[].class));
-
-        if (runningTimePointList.isEmpty()) {
-            this.runningTime = term;
-            return;
-        }
-
-        for (RunningTimePoint runningTimePoint : this.runningTimePointList) {
-            term = term.plusSeconds(Duration.between(runningTimePoint.getStartPoint(), runningTimePoint.getStopPoint()).getSeconds());
-        }
-
-        this.runningTime = term;
-    }
-
-    @Override
-    public String toString() {
-        return "Mission{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", contents='" + contents + '\'' +
-                ", writer=" + writer.getId() +
-                ", createdTime=" + createdTime +
-                ", updatedTime=" + updatedTime +
-                ", deadlineTime=" + deadlineTime +
-                ", runningTimePoint='" + runningTimePoint + '\'' +
-                ", runningTime=" + runningTime +
-                ", status=" + status +
-                '}';
-    }
-
-    public boolean isToday(LocalDateTime stopPointTime) {
-        System.out.println(stopPointTime.toLocalDate());
-        return this.deadlineTime.toLocalDate().equals(stopPointTime.toLocalDate());
     }
 
     public boolean isComplete() {
@@ -180,5 +95,19 @@ public class Mission {
     public Mission addResult(String result) {
         this.result = result;
         return this;
+    }
+
+    public void recordRunningTime() {
+        Duration duration = Duration.between(this.startTime, this.deadlineTime);
+        this.runningTime = LocalTime.ofSecondOfDay(duration.getSeconds());
+    }
+
+    public void startAt(LocalDateTime now) {
+        this.startTime = now;
+    }
+
+    public void fail() {
+        this.status = MissionStatus.FAIL;
+        this.runningTime = LocalTime.ofSecondOfDay(0l);
     }
 }

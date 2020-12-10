@@ -1,10 +1,10 @@
 package com.sproutt.eussyaeussyaapi.acceptance;
 
+import com.sproutt.eussyaeussyaapi.api.exception.message.MemberExceptionMessage;
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberJoinCommand;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.domain.member.Provider;
-import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
 import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -60,7 +60,7 @@ public class MemberAcceptanceTest {
         ResponseEntity response = template.postForEntity("/members", wrongMemberJoinCommand, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody().toString()).contains(ExceptionMessage.DUPLICATED_MEMBER_ID);
+        assertThat(response.getBody().toString()).contains(MemberExceptionMessage.DUPLICATED_MEMBER_ID);
     }
 
     private MemberJoinCommand defaultSignUpDTO() {
