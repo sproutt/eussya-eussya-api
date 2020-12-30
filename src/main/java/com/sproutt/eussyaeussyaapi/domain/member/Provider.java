@@ -11,4 +11,8 @@ public enum Provider {
     Provider(String name) {
         this.name = name;
     }
+
+    public boolean equals(String provider) {
+        return provider.equals(this.name);
+    }
 }

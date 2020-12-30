@@ -7,20 +7,21 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class GoogleOAuth2UserDto {
-
-    private String id;
-
-    private String name;
+public class GoogleOAuth2UserDTO extends OAuth2UserInfoDTO {
 
     private String email;
 
+    public GoogleOAuth2UserDTO() {
+        this.setProvider(Provider.GOOGLE);
+    }
+
+    @Override
     public Member toEntity() {
         return Member.builder()
-                     .memberId(id)
-                     .nickName(name)
+                     .memberId(this.getId())
+                     .nickName(this.getName())
                      .email(email)
-                     .provider(Provider.GOOGLE)
+                     .provider(this.getProvider())
                      .build();
     }
 }

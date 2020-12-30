@@ -2,8 +2,9 @@ package com.sproutt.eussyaeussyaapi.application.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.EmailAuthCommand;
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberJoinCommand;
-import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberLoginCommand;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
+import com.sproutt.eussyaeussyaapi.api.oauth2.dto.OAuth2UserInfoDTO;
 import com.sproutt.eussyaeussyaapi.application.MailService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
@@ -104,6 +105,19 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.findAll().stream().filter(member -> !member.getMemberId().equals(memberId)).collect(Collectors.toList());
     }
 
+    @Override
+    public Member loginWithSocialProvider(OAuth2UserInfoDTO userInfoDTO) {
+        if (!memberRepository.existsByMemberId(userInfoDTO.getId())) {
+
+            Member member = userInfoDTO.toEntity();
+            member.verifyEmail();
+
+            return memberRepository.save(member);
+        }
+
+        return memberRepository.findByMemberId(userInfoDTO.getId()).orElseThrow(NoSuchMemberException::new);
+    }
+  
     @Override
     @Transactional
     public Member authenticateEmail(EmailAuthCommand emailAuthCommand) {
