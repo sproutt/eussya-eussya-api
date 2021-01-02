@@ -22,12 +22,6 @@ public class SocialController {
     private final MemberService memberService;
     private final OAuth2RequestServiceFactory oAuth2RequestServiceFactory;
 
-    @Value("${jwt.accessTokenKey}")
-    private String accessTokenKey;
-
-    @Value("${jwt.refreshTokenKey}")
-    private String refreshTokenKey;
-
     @Value("${jwt.secret}")
     private String secretKey;
 

@@ -28,12 +28,6 @@ import java.util.List;
 @Api(description = "으쌰으쌰 회원 관련 API", tags = {"Member - 담당자 : 김종근"})
 public class MemberController {
 
-    @Value("${jwt.accessTokenKey}")
-    private String accessTokenKey;
-
-    @Value("${jwt.refreshTokenKey}")
-    private String refreshTokenKey;
-
     @Value("${jwt.secret}")
     private String secretKey;
 
