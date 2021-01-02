@@ -4,6 +4,7 @@ import com.sproutt.eussyaeussyaapi.api.oauth2.dto.OAuth2UserInfoDTO;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2RequestService;
 import com.sproutt.eussyaeussyaapi.api.oauth2.service.OAuth2RequestServiceFactory;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
+import com.sproutt.eussyaeussyaapi.api.security.dto.JwtDTO;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,9 +22,6 @@ public class SocialController {
     private final MemberService memberService;
     private final OAuth2RequestServiceFactory oAuth2RequestServiceFactory;
 
-    @Value("${jwt.header}")
-    private String tokenKey;
-
     @Value("${jwt.secret}")
     private String secretKey;
 
@@ -34,19 +32,19 @@ public class SocialController {
     }
 
     @PostMapping("/login/{provider}")
-    public ResponseEntity loginByProvider(@PathVariable String provider, @RequestParam String accessToken) {
+    public ResponseEntity<JwtDTO> loginByProvider(@PathVariable String provider, @RequestParam String token) {
         OAuth2RequestService oAuth2RequestService = oAuth2RequestServiceFactory.getOAuth2RequestService(provider);
 
-        OAuth2UserInfoDTO userInfoDTO = oAuth2RequestService.getUserInfo(accessToken);
+        OAuth2UserInfoDTO userInfoDTO = oAuth2RequestService.getUserInfo(token);
         Member loginMember = userInfoDTO.toEntity();
 
         memberService.loginWithSocialProvider(userInfoDTO);
-        String token = jwtHelper.createToken(secretKey, loginMember.toJwtInfo());
+        String accessToken = jwtHelper.createAccessToken(secretKey, loginMember.toJwtInfo());
+        String refreshToken = jwtHelper.createRefreshToken(secretKey, loginMember.toJwtInfo());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(tokenKey, token);
 
-        return new ResponseEntity<>(headers, HttpStatus.OK);
+        return new ResponseEntity<>(new JwtDTO(accessToken, refreshToken), headers, HttpStatus.OK);
     }
 }

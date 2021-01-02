@@ -6,7 +6,8 @@ import com.sproutt.eussyaeussyaapi.api.exception.dto.ValidateError;
 import com.sproutt.eussyaeussyaapi.api.exception.dto.ValidationErrorResponse;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
 import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportedOAuth2Exception;
-import com.sproutt.eussyaeussyaapi.api.security.exception.InvalidTokenException;
+import com.sproutt.eussyaeussyaapi.api.security.exception.InvalidAccessTokenException;
+import com.sproutt.eussyaeussyaapi.api.security.exception.InvalidRefreshTokenException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.*;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.*;
 import javassist.NotFoundException;
@@ -95,9 +96,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
     }
 
-    @ExceptionHandler(value = InvalidTokenException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidTokenException(InvalidTokenException exception) {
-        log.info("handleInvalidTokenException : {}", exception);
+    @ExceptionHandler(value = InvalidAccessTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidAccessTokenException(InvalidAccessTokenException exception) {
+        log.info("handleInvalidAccessTokenException : {}", exception);
+
+        ErrorResponse response = new ErrorResponse();
+        response.of(ErrorCode.INVALID_TOKEN);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(response);
+    }
+
+    @ExceptionHandler(value = InvalidRefreshTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRefreshTokenException(InvalidRefreshTokenException exception) {
+        log.info("handleInvalidRefreshTokenException : {}", exception);
 
         ErrorResponse response = new ErrorResponse();
         response.of(ErrorCode.INVALID_TOKEN);

@@ -10,12 +10,22 @@ import java.util.Date;
 @Component
 public class JwtHelper {
 
-    private static final long VALID_MILLISECOND = 1000L * 60 * 60 * 24; // 24 hour
+    private static final long ACCESS_TOKEN_VALID_MILLISECOND = 1000L * 60 * 60 * 24; // 24 hour
+    private static final long REFRESH_TOKEN_VALID_MILLISECOND = 7 * 1000L * 60 * 60 * 24; // 7 Days
 
     private static final String CLAIM_KEY = "member";
 
-    public String createToken(String secretKey, MemberTokenCommand memberTokenCommand) {
+    public String createAccessToken(String secretKey, MemberTokenCommand memberTokenCommand) {
+        return createToken(secretKey, memberTokenCommand, ACCESS_TOKEN_VALID_MILLISECOND);
+    }
 
+    public String createRefreshToken(String secretKey, MemberTokenCommand memberTokenCommand) {
+        String token = createToken(secretKey, memberTokenCommand, REFRESH_TOKEN_VALID_MILLISECOND);
+        // TODO: 20. 12. 4. Redis 연동하기
+        return token;
+    }
+
+    private String createToken(String secretKey, MemberTokenCommand memberTokenCommand, long validMilisecond) {
         Claims claims = Jwts.claims().setSubject(CLAIM_KEY);
         claims.put(CLAIM_KEY, memberTokenCommand);
 
@@ -25,7 +35,7 @@ public class JwtHelper {
                            .setHeaderParam("typ", "jwt")
                            .setClaims(claims)
                            .setIssuedAt(now)
-                           .setExpiration(new Date(now.getTime() + VALID_MILLISECOND))
+                           .setExpiration(new Date(now.getTime() + validMilisecond))
                            .signWith(SignatureAlgorithm.HS256, secretKey)
                            .compact();
 

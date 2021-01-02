@@ -1,6 +1,6 @@
 package com.sproutt.eussyaeussyaapi.api.security;
 
-import com.sproutt.eussyaeussyaapi.api.security.exception.InvalidTokenException;
+import com.sproutt.eussyaeussyaapi.api.security.exception.InvalidAccessTokenException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,8 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class JwtInterceptor implements HandlerInterceptor {
 
-    @Value("${jwt.header}")
-    private String tokenKey;
+    @Value("${jwt.accessTokenKey}")
+    private String accessTokenKey;
+
+    @Value("${jwt.refreshTokenKey}")
+    private String refreshTokenKey;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -30,10 +33,10 @@ public class JwtInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        String token = request.getHeader(tokenKey);
+        String accessToken = request.getHeader(accessTokenKey);
 
-        if (token == null || !jwtHelper.isUsable(secretKey, token)) {
-            throw new InvalidTokenException();
+        if (!jwtHelper.isUsable(secretKey, accessToken)) {
+            throw new InvalidAccessTokenException();
         }
 
         return true;

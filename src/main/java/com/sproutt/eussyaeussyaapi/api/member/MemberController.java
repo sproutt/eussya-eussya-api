@@ -4,6 +4,7 @@ import com.sproutt.eussyaeussyaapi.api.member.dto.MemberJoinCommand;
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberLoginCommand;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MemberDTO;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
+import com.sproutt.eussyaeussyaapi.api.security.dto.JwtDTO;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
@@ -26,9 +27,6 @@ import java.util.List;
 @RestController
 @Api(description = "으쌰으쌰 회원 관련 API", tags = {"Member - 담당자 : 김종근"})
 public class MemberController {
-
-    @Value("${jwt.header}")
-    private String tokenKey;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -66,16 +64,16 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity loginMember(@Valid @RequestBody MemberLoginCommand memberLoginCommand) {
+    public ResponseEntity<JwtDTO> loginMember(@Valid @RequestBody MemberLoginCommand memberLoginCommand) {
         Member loginMember = memberService.login(memberLoginCommand);
 
-        String token = jwtHelper.createToken(secretKey, loginMember.toJwtInfo());
+        String accessToken = jwtHelper.createAccessToken(secretKey, loginMember.toJwtInfo());
+        String refreshToken = jwtHelper.createRefreshToken(secretKey, loginMember.toJwtInfo());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(tokenKey, token);
 
-        return new ResponseEntity<>(headers, HttpStatus.OK);
+        return new ResponseEntity<>(new JwtDTO(accessToken, refreshToken), headers, HttpStatus.OK);
     }
 
     @PostMapping("/members/{memberId}/authcode")

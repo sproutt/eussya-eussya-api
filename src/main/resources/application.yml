@@ -35,7 +35,8 @@ logging:
             sql: trace
 
 jwt:
-  header: Authorization
+  accessTokenKey: Authorization
+  refreshTokenKey: Refresh-Authorization
   secret: secret
 
 social:

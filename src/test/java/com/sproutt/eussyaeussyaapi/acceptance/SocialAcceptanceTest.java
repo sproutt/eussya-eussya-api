@@ -80,7 +80,7 @@ public class SocialAcceptanceTest {
 
     private HttpHeaders getHeader(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("accessToken", accessToken);
+        headers.set("token", accessToken);
 
         return headers;
     }
