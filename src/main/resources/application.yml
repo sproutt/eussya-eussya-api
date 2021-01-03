@@ -26,6 +26,14 @@ spring:
           starttls:
             enable: true
 
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            clientId: ENC(xN+dbkNMVVF++uSOT4m+stmqK8dY/QSmJOWGr7lWLMo=)
+            clientSecret: ENC(jU9A80TddJ9UFjQJb07tugRycItMuallO+OSyqz4efkvA1W4HTgwoEErZsRvilGKEZB+6cR/9dY=)
+
 logging:
   level:
     org:
@@ -38,13 +46,6 @@ jwt:
   header: Authorization
   secret: secret
 
-social:
-  github:
-    url: https://api.github.com/user
-  google:
-    url: https://www.googleapis.com/oauth2/v2/userinfo
-  facebook:
-    url: https://graph.facebook.com/v6.0/me
 
 jasypt:
   encryptor:
@@ -54,6 +55,3 @@ jasypt:
 api:
   cors:
     allow-origins: ENC(MUx6CLsdon60zBEAbQ+k0aHjrEkt5/6olFrgs11l7Wjo1VwjzoumVltRKR133vMsTPAp6vQlrCLHZOqniOrBUg==)
-
-kafka:
-  bootstrap-server: localhost:9092

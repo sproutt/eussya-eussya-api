@@ -39,9 +39,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.2'
 
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation 'org.springframework.kafka:spring-kafka'
-
-    implementation 'org.springframework.security:spring-security-core'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testAnnotationProcessor 'org.projectlombok:lombok'
@@ -58,7 +56,6 @@ test {
 
     def JASYPT_PASSWORD = project.getProperties()["JASYPT_PASSWORD"]
     environment 'JASYPT_PASSWORD', JASYPT_PASSWORD
-    failFast = true
 }
 
 jacocoTestReport {

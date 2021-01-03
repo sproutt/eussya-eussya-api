@@ -1,4 +1,4 @@
-package com.sproutt.eussyaeussyaapi.api.oauth2.exception;
+package com.sproutt.eussyaeussyaapi.api.config.auth.exception;
 
 import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
 import org.springframework.web.client.RestClientException;
