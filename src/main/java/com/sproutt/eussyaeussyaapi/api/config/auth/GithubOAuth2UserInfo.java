@@ -11,8 +11,8 @@ public class GithubOAuth2UserInfo implements OAuth2UserInfo {
     private Map<String, Object> attributes;
 
     public GithubOAuth2UserInfo(Map<String, Object> attributes) {
-        Assert.hasText((String) attributes.get("id"), "id cannot be empty");
-        Assert.hasText((String) attributes.get("login"), "nickname cannot be empty");
+        Assert.hasText(String.valueOf(attributes.get("id")), "id cannot be empty");
+        Assert.hasText(String.valueOf(attributes.get("login")), "nickname cannot be empty");
 
         this.attributes = attributes;
     }
