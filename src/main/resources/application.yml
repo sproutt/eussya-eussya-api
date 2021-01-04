@@ -31,8 +31,8 @@ spring:
       client:
         registration:
           github:
-            clientId: ENC(xN+dbkNMVVF++uSOT4m+stmqK8dY/QSmJOWGr7lWLMo=)
-            clientSecret: ENC(jU9A80TddJ9UFjQJb07tugRycItMuallO+OSyqz4efkvA1W4HTgwoEErZsRvilGKEZB+6cR/9dY=)
+            clientId: ENC(IWFzVDnmYftUSyaOA8mwXEciX/DRpdDAFQv4M7PR460=)
+            clientSecret: ENC(Ql1c8B1ZI5AynPFr1yyrQ528PmblCLAmzqVSjzD4Y3cIaQ+l9ULmQqX11Hfg/bRBqT73K8UD0MU=)
 
 logging:
   level:
@@ -45,6 +45,9 @@ logging:
 jwt:
   header: Authorization
   secret: secret
+
+oauth2:
+  authorizedRedirectUrl: https://eussya-eussya.com/oauth/github
 
 
 jasypt:

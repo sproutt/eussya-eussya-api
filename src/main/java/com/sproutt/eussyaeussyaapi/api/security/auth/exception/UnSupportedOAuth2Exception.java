@@ -1,4 +1,4 @@
-package com.sproutt.eussyaeussyaapi.api.config.auth.exception;
+package com.sproutt.eussyaeussyaapi.api.security.auth.exception;
 
 import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
 import org.springframework.http.HttpStatus;

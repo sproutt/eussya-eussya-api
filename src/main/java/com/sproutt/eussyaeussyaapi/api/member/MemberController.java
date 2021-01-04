@@ -41,6 +41,11 @@ public class MemberController {
         this.jwtHelper = jwtHelper;
     }
 
+    @GetMapping("/oauth2/redirect")
+    public String test(@RequestParam(name = "token") String token) {
+        return token;
+    }
+
     @GetMapping("/members")
     public ResponseEntity<List<MemberDTO>> getMembers(@RequestParam(name = "exclude", required = false) String memberId) throws MessagingException {
 

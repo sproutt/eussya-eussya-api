@@ -13,14 +13,10 @@ public class JasyptConfig {
 
     @Bean("jasyptStringEncryptor")
     public StandardPBEStringEncryptor jasyptConfigure() {
-        System.out.println("test");
-        System.out.println(password);
-
         StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
 
         encryptor.setPassword(password);
         encryptor.setAlgorithm("PBEWithMD5AndDES");
-
 
         return encryptor;
     }

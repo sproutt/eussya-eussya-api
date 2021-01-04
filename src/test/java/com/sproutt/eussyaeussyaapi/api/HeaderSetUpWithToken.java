@@ -1,7 +1,7 @@
 package com.sproutt.eussyaeussyaapi.api;
 
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
-import com.sproutt.eussyaeussyaapi.api.security.JwtInterceptor;
+import com.sproutt.eussyaeussyaapi.api.security.JwtAuthenticationFilter;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +28,7 @@ public class HeaderSetUpWithToken {
     private JwtHelper jwtHelper;
 
     @MockBean
-    private JwtInterceptor jwtInterceptor;
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
 
     public HttpHeaders setUpHeader() throws Exception {
@@ -41,7 +41,7 @@ public class HeaderSetUpWithToken {
         headers.set(tokenKey, token);
         headers.setZonedDateTime("date", ZonedDateTime.now());
 
-        when(jwtInterceptor.preHandle(any(), any(), any())).thenReturn(true);
+//        when(jwtAuthenticationFilter.doFilter(any(), any(), any())).thenReturn(true);
         when(jwtHelper.decryptToken(secretKey, token)).thenReturn(loginMember.toJwtInfo());
 
         return headers;

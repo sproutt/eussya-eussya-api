@@ -1,6 +1,6 @@
 package com.sproutt.eussyaeussyaapi.config.auth;
 
-import com.sproutt.eussyaeussyaapi.api.config.auth.CustomOAuth2SuccessHandler;
+import com.sproutt.eussyaeussyaapi.api.security.auth.CustomOAuth2SuccessHandler;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
@@ -38,7 +38,7 @@ public class CustomOAuth2SuccessHandlerTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        String id = "mockId";
+        String id = "github_mockId";
         Map<String, Object> details = new HashMap<>();
         details.put("id", id);
         details.put("login", "mock_nickname");
@@ -53,11 +53,11 @@ public class CustomOAuth2SuccessHandlerTest {
                               .build();
         String token = "mock_token";
 
-        when(memberRepository.findByMemberId("github_mockId")).thenReturn(Optional.ofNullable(mockMember));
+        when(memberRepository.findByMemberId(id)).thenReturn(Optional.ofNullable(mockMember));
         when(jwtHelper.createToken(any(), any())).thenReturn(token);
 
         customOAuth2SuccessHandler.onAuthenticationSuccess(request, response, authentication);
-        assertThat(response.getContentAsString()).isEqualTo(token);
+        assertThat(response.getRedirectedUrl().contains(token)).isTrue();
     }
 
     class MockAuthentication implements Authentication {
