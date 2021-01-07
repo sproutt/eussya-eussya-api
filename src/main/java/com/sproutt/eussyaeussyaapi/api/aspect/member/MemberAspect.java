@@ -18,12 +18,6 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class MemberAspect {
 
-    @Value("${jwt.header}")
-    private String tokenKey;
-
-    @Value("${jwt.secret}")
-    private String secretKey;
-
     private final JwtHelper jwtHelper;
 
     @Around("execution(* *(.., @LoginMember (*), ..))")
@@ -35,8 +29,8 @@ public class MemberAspect {
                                       .findFirst()
                                       .orElseThrow(NoPermissionException::new);
 
-        String token = headers.getFirst(tokenKey);
-        MemberTokenCommand memberTokenCommand = jwtHelper.decryptToken(secretKey, token);
+        String token = headers.getFirst(JwtHelper.ACCESS_TOKEN_HEADER);
+        MemberTokenCommand memberTokenCommand = jwtHelper.decryptToken(token);
 
         for (int i = 0; i < joinPointArgs.length; i++) {
             if (joinPointArgs[i].toString().contains("MemberTokenCommand")) {

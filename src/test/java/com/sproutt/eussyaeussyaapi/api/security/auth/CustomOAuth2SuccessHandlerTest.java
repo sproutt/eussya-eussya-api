@@ -1,6 +1,5 @@
-package com.sproutt.eussyaeussyaapi.config.auth;
+package com.sproutt.eussyaeussyaapi.api.security.auth;
 
-import com.sproutt.eussyaeussyaapi.api.security.auth.CustomOAuth2SuccessHandler;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
@@ -54,7 +53,8 @@ public class CustomOAuth2SuccessHandlerTest {
         String token = "mock_token";
 
         when(memberRepository.findByMemberId(id)).thenReturn(Optional.ofNullable(mockMember));
-        when(jwtHelper.createToken(any(), any())).thenReturn(token);
+        when(jwtHelper.createAccessToken(any())).thenReturn(token);
+        when(jwtHelper.createRefreshToken(any())).thenReturn(token);
 
         customOAuth2SuccessHandler.onAuthenticationSuccess(request, response, authentication);
         assertThat(response.getRedirectedUrl().contains(token)).isTrue();

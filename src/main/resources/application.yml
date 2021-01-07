@@ -43,7 +43,6 @@ logging:
             sql: trace
 
 jwt:
-  header: Authorization
   secret: secret
 
 oauth2:

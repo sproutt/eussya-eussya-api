@@ -112,7 +112,6 @@ public class MemberServiceImpl implements MemberService {
         if (!passwordEncoder.matches(emailAuthCommand.getAuthCode(), member.getAuthentication())) {
             throw new VerificationException();
         }
-
         member.verifyEmail();
 
         return memberRepository.save(member);

@@ -20,6 +20,7 @@ public class AuthController {
         String refreshToken = requestHeaders.getFirst(JwtHelper.REFRESH_TOKEN_HEADER);
 
         if (!jwtHelper.isUsable(refreshToken)) {
+
             throw new InvalidRefreshTokenException();
         }
 

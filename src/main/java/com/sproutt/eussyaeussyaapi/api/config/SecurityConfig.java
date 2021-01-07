@@ -1,8 +1,8 @@
 package com.sproutt.eussyaeussyaapi.api.config;
 
 import com.sproutt.eussyaeussyaapi.api.security.JwtAuthenticationFilter;
+import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.api.security.auth.CustomAuthenticationEntryPoint;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,25 +28,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${api.cors.allow-origins}")
     private String allowedOrigins;
 
-    @Value("${jwt.header}")
-    private String tokenKey;
+    private final OAuth2UserService customOAuth2UserService;
+    private final AuthenticationSuccessHandler customOAuth2SuccessHandler;
+    private final JwtHelper jwtHelper;
 
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    public SecurityConfig(OAuth2UserService customOAuth2UserService, AuthenticationSuccessHandler customOAuth2SuccessHandler, JwtHelper jwtHelper) {
+        this.customOAuth2UserService = customOAuth2UserService;
+        this.customOAuth2SuccessHandler = customOAuth2SuccessHandler;
+        this.jwtHelper = jwtHelper;
+    }
 
-    @Autowired
-    private OAuth2UserService customOAuth2UserService;
-
-    @Autowired
-    private AuthenticationSuccessHandler customOAuth2SuccessHandler;
-
-
-    private static final String[] PUBLIC = {"/oauth2/**", "/signUp/**", "/phrase/**", "/then/**", "/members/**", "/login/**", "/webjars/**", "/swagger-resources/**", "/v2/**", "/email-auth/**", "/swagger-ui.html"};
+    private static final String[] PUBLIC = {"/auth/**", "/oauth2/**", "/signUp/**", "/phrase/**", "/members/**", "/login/**", "/webjars/**", "/swagger-resources/**", "/v2/**", "/email-auth/**", "/swagger-ui.html"};
 
     @Override
     public void configure(WebSecurity web) {
         web
                 .ignoring()
+                .antMatchers("/members/**", "/login", "/webjars/**", "/swagger-resources/**", "/v2/**", "/swagger-ui.html")
                 .antMatchers("/error");
     }
 
@@ -83,7 +81,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                     .successHandler(customOAuth2SuccessHandler);
         http
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtHelper), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean
@@ -93,7 +91,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         Arrays.stream(allowedOrigins.split(", ")).forEach(configuration::addAllowedOrigin);
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
-        configuration.addExposedHeader(tokenKey);
+        configuration.addExposedHeader(JwtHelper.ACCESS_TOKEN_HEADER);
+        configuration.addExposedHeader(JwtHelper.REFRESH_TOKEN_HEADER);
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 

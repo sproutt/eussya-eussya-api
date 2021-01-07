@@ -20,7 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalTime;
@@ -52,8 +55,8 @@ public class MissionAcceptanceTest {
     private MissionRepository missionRepository;
 
 
-    @Value("${jwt.header}")
-    private String tokenKey;
+    @Value("${jwt.accessTokenKey}")
+    private String accessTokenKey;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -77,15 +80,15 @@ public class MissionAcceptanceTest {
         memberRepository.saveAndFlush(member);
         missionRepository.saveAndFlush(mission);
 
-        token = jwtHelper.createToken(secretKey, MemberTokenCommand.builder()
-                                                                   .id(member.getId())
-                                                                   .memberId(member.getMemberId())
-                                                                   .nickName(member.getNickName()).build());
+        token = jwtHelper.createAccessToken(MemberTokenCommand.builder()
+                                                              .id(member.getId())
+                                                              .memberId(member.getMemberId())
+                                                              .nickName(member.getNickName()).build());
 
         template.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {
                     request.getHeaders()
-                           .add(tokenKey, token);
+                           .add(accessTokenKey, token);
                     request.getHeaders()
                            .setZonedDateTime("date", ZonedDateTime.of(2020, 7, 15, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
                     return execution.execute(request, body);
@@ -134,7 +137,7 @@ public class MissionAcceptanceTest {
         Mission mission = missionRepository.findAll().get(0);
 
         String time = "2020-07-15T05:00:00.00Z";
-        Map<String, String > mapForJson = new HashMap<>();
+        Map<String, String> mapForJson = new HashMap<>();
         mapForJson.put("time", time);
 
         HttpEntity<String> httpEntityForProgress = new HttpEntity<>(asJsonString(mapForJson));
@@ -157,7 +160,7 @@ public class MissionAcceptanceTest {
         Mission mission = missionRepository.findAll().get(0);
 
         String time = "2020-07-15T05:00:00.00Z";
-        Map<String, String > mapForJson = new HashMap<>();
+        Map<String, String> mapForJson = new HashMap<>();
         mapForJson.put("time", time);
 
         HttpEntity<String> httpEntity = new HttpEntity<>(asJsonString(mapForJson));
@@ -171,7 +174,7 @@ public class MissionAcceptanceTest {
         template.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {
                     request.getHeaders()
-                           .add(tokenKey, token);
+                           .add(accessTokenKey, token);
                     request.getHeaders()
                            .setZonedDateTime("date", ZonedDateTime.of(2020, 7, 15, 5, 1, 0, 0, ZoneId.of("Asia/Seoul")));
                     return execution.execute(request, body);

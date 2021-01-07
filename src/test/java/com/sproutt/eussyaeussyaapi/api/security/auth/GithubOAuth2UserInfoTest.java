@@ -1,7 +1,5 @@
-package com.sproutt.eussyaeussyaapi.config.auth;
+package com.sproutt.eussyaeussyaapi.api.security.auth;
 
-import com.sproutt.eussyaeussyaapi.api.security.auth.GithubOAuth2UserInfo;
-import com.sproutt.eussyaeussyaapi.api.security.auth.OAuth2UserInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

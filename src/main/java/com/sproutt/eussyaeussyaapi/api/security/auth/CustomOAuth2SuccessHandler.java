@@ -16,9 +16,6 @@ import java.io.IOException;
 @Component
 public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    @Value("${jwt.secret}")
-    private String secretKey;
-
     @Value("${oauth2.authorizedRedirectUrl}")
     private String authorizedRedirectUrl;
 
@@ -35,8 +32,12 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
         String memberId = authentication.getName();
         MemberTokenCommand memberTokenCommand = memberRepository.findByMemberId(memberId).orElseThrow(NoSuchMemberException::new).toJwtInfo();
 
-        String token = jwtHelper.createToken(secretKey, memberTokenCommand);
-        getRedirectStrategy().sendRedirect(req, res, authorizedRedirectUrl + "?token=" + token);
+        String accessToken = jwtHelper.createAccessToken(memberTokenCommand);
+        String refreshToken = jwtHelper.createRefreshToken(memberTokenCommand);
+
+        String query = "?accessToken=" + accessToken + "&refreshToken=" + refreshToken;
+
+        getRedirectStrategy().sendRedirect(req, res, authorizedRedirectUrl + query);
         super.clearAuthenticationAttributes(req);
     }
 }

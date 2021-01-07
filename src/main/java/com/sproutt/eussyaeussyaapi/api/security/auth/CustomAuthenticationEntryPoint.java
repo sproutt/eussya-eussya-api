@@ -1,5 +1,8 @@
 package com.sproutt.eussyaeussyaapi.api.security.auth;
 
+import com.google.gson.Gson;
+import com.sproutt.eussyaeussyaapi.api.exception.dto.ErrorCode;
+import com.sproutt.eussyaeussyaapi.api.exception.dto.ErrorResponse;
 import net.minidev.json.JSONObject;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -17,11 +20,13 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=utf-8");
 
-        JSONObject json = new JSONObject();
-        String message = "로그인이 필요합니다.";
-        json.put("errorMessage", message);
+        Gson gson = new Gson();
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.of(ErrorCode.INVALID_TOKEN);
 
         PrintWriter out = response.getWriter();
-        out.print(json);
+        out.print(gson.toJson(errorResponse));
+        out.flush();
+        out.close();
     }
 }
