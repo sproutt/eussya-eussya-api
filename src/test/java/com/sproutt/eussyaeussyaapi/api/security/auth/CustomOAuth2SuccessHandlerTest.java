@@ -4,6 +4,7 @@ import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -33,6 +34,7 @@ public class CustomOAuth2SuccessHandlerTest {
     }
 
     @Test
+    @DisplayName("onAuthenticationSuccess 메소드 테스트 - 정상적인 요청의 경우 redirect url의 query string으로 access token과 refresh token이 발급됨")
     public void responseIsForwarded() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();

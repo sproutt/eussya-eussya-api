@@ -28,7 +28,7 @@ public class GithubOAuth2UserInfoTest {
     }
 
     @Test
-    @DisplayName("유효하지 않는 attributes를 파라미터로 갖는 GithubOAuth2UserInfo 생성자 인스턴스 테스트 - id가 비어있는 경우")
+    @DisplayName("유효하지 않는 attributes를 파라미터로 갖는 GithubOAuth2UserInfo 생성자 인스턴스 테스트 - id가 비어있는 경우이 에러 발생")
     void constructor_with_emptyId_throw_IllegalArgumentException() {
         attributes.put("id", null);
         assertThrows(IllegalArgumentException.class, () -> new GithubOAuth2UserInfo(this.attributes));
@@ -41,7 +41,7 @@ public class GithubOAuth2UserInfoTest {
     }
 
     @Test
-    @DisplayName("유효하지 않는 attributes를 파라미터로 갖는 GithubOAuth2UserInfo 생성자 인스턴스 테스트 - id가 비어있는 경우")
+    @DisplayName("유효하지 않는 attributes를 파라미터로 갖는 GithubOAuth2UserInfo 생성자 인스턴스 테스트 - nickname 비어있는 경우생 에러 발생")
     void constructor_with_emptyNickName_throw_IllegalArgumentException() {
         attributes.put("login", null);
         assertThrows(IllegalArgumentException.class, () -> new GithubOAuth2UserInfo(this.attributes));
@@ -54,7 +54,7 @@ public class GithubOAuth2UserInfoTest {
     }
 
     @Test
-    @DisplayName("유효한 attributes를 파라미터로 갖는 GithubOAuth2UserInfo 생성자 인스턴스 테스트 - email이 비어있는 경우")
+    @DisplayName("유효한 attributes를 파라미터로 갖는 GithubOAuth2UserInfo 생성자 인스턴스 테스트 - email이 비어있는 경우 정상적인 인스턴스 생성")
     void constructor_with_emptyEmail_created() {
         attributes.put("email", null);
         new GithubOAuth2UserInfo(this.attributes);
