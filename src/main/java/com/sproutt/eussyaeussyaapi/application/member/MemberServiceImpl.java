@@ -48,15 +48,12 @@ public class MemberServiceImpl implements MemberService {
             throw new DuplicationMemberException();
         }
 
-        String authCode = RandomGenerator.createAuthenticationCode();
-        mailService.sendAuthEmail(memberJoinCommand.getMemberId(), authCode);
-
         Member member = Member.builder()
                               .memberId(memberJoinCommand.getMemberId())
                               .password(passwordEncoder.encode(memberJoinCommand.getPassword()))
                               .email(memberJoinCommand.getMemberId())
                               .nickName(memberJoinCommand.getNickName())
-                              .authentication(passwordEncoder.encode(authCode))
+                              .authentication("N")
                               .provider(Provider.LOCAL)
                               .build();
 

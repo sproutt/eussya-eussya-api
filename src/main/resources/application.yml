@@ -56,4 +56,5 @@ jasypt:
 
 api:
   cors:
-    allow-origins: ENC(MUx6CLsdon60zBEAbQ+k0aHjrEkt5/6olFrgs11l7Wjo1VwjzoumVltRKR133vMsTPAp6vQlrCLHZOqniOrBUg==)
+    allow-origins: https://eussya-eussya.com
+
