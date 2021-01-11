@@ -4,10 +4,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @NoArgsConstructor
 @Getter
 @Setter
-public class JwtDTO {
+public class JwtDTO implements Serializable {
 
     private String accessToken;
     private String refreshToken;

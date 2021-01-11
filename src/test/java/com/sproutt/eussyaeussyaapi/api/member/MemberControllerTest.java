@@ -1,44 +1,47 @@
-package com.sproutt.eussyaeussyaapi.api;
+package com.sproutt.eussyaeussyaapi.api.member;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sproutt.eussyaeussyaapi.api.member.EmailAuthCommand;
-import com.sproutt.eussyaeussyaapi.api.member.MemberController;
+import com.sproutt.eussyaeussyaapi.api.config.JasyptConfig;
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberJoinCommand;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(value = MemberController.class, includeFilters = @ComponentScan.Filter(classes = {Configuration.class}))
+@WebMvcTest(controllers = MemberController.class, excludeFilters = @ComponentScan.Filter(EnableWebSecurity.class))
+@Import(JasyptConfig.class)
+@WithMockUser("fake_user")
 public class MemberControllerTest {
 
     private static final String DEFAULT_MEMBER_ID = "kjkun7631@naver.com";
     private static final String DEFAULT_PASSWORD = "12345aA!";
     private static final String DEFAULT_NAME = "test";
 
-    @Autowired
     private MockMvc mvc;
 
     @MockBean
@@ -46,6 +49,13 @@ public class MemberControllerTest {
 
     @MockBean
     private JwtHelper jwtHelper;
+
+    @BeforeEach
+    void setUp(WebApplicationContext context) {
+        this.mvc = MockMvcBuilders.webAppContextSetup(context)
+                                  .apply(springSecurity())
+                                  .build();
+    }
 
     @Test
     @DisplayName("회원가입 테스트(올바른 요청일 경우)")
@@ -56,7 +66,9 @@ public class MemberControllerTest {
         given(memberService.joinWithLocalProvider(memberJoinCommand)).willReturn(member);
 
         ResultActions actions = mvc.perform(post("/members")
+                .with(csrf())
                 .content(asJsonString(memberJoinCommand))
+                .characterEncoding("UTF-8")
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -72,6 +84,7 @@ public class MemberControllerTest {
         given(memberService.joinWithLocalProvider(memberJoinCommand)).willThrow(new DuplicationMemberException());
 
         ResultActions actions = mvc.perform(post("/members")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)).andDo(print());
 
         actions
@@ -87,6 +100,7 @@ public class MemberControllerTest {
         given(memberService.sendAuthCodeToEmail(email)).willReturn(member);
 
         ResultActions actions = mvc.perform(post("/members/" + email + "/authcode")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -107,6 +121,7 @@ public class MemberControllerTest {
         when(memberService.authenticateEmail(emailAuthCommand)).thenReturn(member);
 
         ResultActions actions = mvc.perform(post("/email-auth")
+                .with(csrf())
                 .content(asJsonString(emailAuthCommand))
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
@@ -123,6 +138,7 @@ public class MemberControllerTest {
         when(memberService.isDuplicatedMemberId(member.getMemberId())).thenReturn(false);
 
         ResultActions actions = mvc.perform(get("/members/validate/memberid/{memberId}", member.getMemberId())
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -138,6 +154,7 @@ public class MemberControllerTest {
         when(memberService.isDuplicatedMemberId(member.getMemberId())).thenReturn(true);
 
         ResultActions actions = mvc.perform(get("/members/validate/memberid/{memberId}", member.getMemberId())
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -153,6 +170,7 @@ public class MemberControllerTest {
         when(memberService.isDuplicatedNickName(member.getNickName())).thenReturn(false);
 
         ResultActions actions = mvc.perform(get("/members/validate/nickname/{nickName}", member.getNickName())
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
@@ -168,6 +186,7 @@ public class MemberControllerTest {
         when(memberService.isDuplicatedNickName(member.getNickName())).thenReturn(true);
 
         ResultActions actions = mvc.perform(get("/members/validate/nickname/{nickName}", member.getNickName())
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 

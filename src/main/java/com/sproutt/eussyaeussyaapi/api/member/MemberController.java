@@ -11,7 +11,6 @@ import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberExc
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationNickNameException;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,9 +26,6 @@ import java.util.List;
 @RestController
 @Api(description = "으쌰으쌰 회원 관련 API", tags = {"Member - 담당자 : 김종근"})
 public class MemberController {
-
-    @Value("${jwt.secret}")
-    private String secretKey;
 
     private final MemberService memberService;
     private final JwtHelper jwtHelper;
@@ -67,8 +63,8 @@ public class MemberController {
     public ResponseEntity<JwtDTO> loginMember(@Valid @RequestBody MemberLoginCommand memberLoginCommand) {
         Member loginMember = memberService.login(memberLoginCommand);
 
-        String accessToken = jwtHelper.createAccessToken(secretKey, loginMember.toJwtInfo());
-        String refreshToken = jwtHelper.createRefreshToken(secretKey, loginMember.toJwtInfo());
+        String accessToken = jwtHelper.createAccessToken(loginMember.toJwtInfo());
+        String refreshToken = jwtHelper.createRefreshToken(loginMember.toJwtInfo());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

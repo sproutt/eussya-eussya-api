@@ -26,6 +26,14 @@ spring:
           starttls:
             enable: true
 
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            clientId: ENC(IWFzVDnmYftUSyaOA8mwXEciX/DRpdDAFQv4M7PR460=)
+            clientSecret: ENC(Ql1c8B1ZI5AynPFr1yyrQ528PmblCLAmzqVSjzD4Y3cIaQ+l9ULmQqX11Hfg/bRBqT73K8UD0MU=)
+
 logging:
   level:
     org:
@@ -35,17 +43,11 @@ logging:
             sql: trace
 
 jwt:
-  accessTokenKey: Authorization
-  refreshTokenKey: Refresh-Authorization
   secret: secret
 
-social:
-  github:
-    url: https://api.github.com/user
-  google:
-    url: https://www.googleapis.com/oauth2/v2/userinfo
-  facebook:
-    url: https://graph.facebook.com/v6.0/me
+oauth2:
+  authorizedRedirectUrl: https://eussya-eussya.com/oauth/github
+
 
 jasypt:
   encryptor:
@@ -56,5 +58,3 @@ api:
   cors:
     allow-origins: https://eussya-eussya.com
 
-kafka:
-  bootstrap-server: localhost:9092
