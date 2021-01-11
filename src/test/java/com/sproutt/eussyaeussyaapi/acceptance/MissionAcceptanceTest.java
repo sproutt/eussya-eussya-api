@@ -53,8 +53,8 @@ public class MissionAcceptanceTest {
     private MissionRepository missionRepository;
 
 
-    @Value("${jwt.header}")
-    private String tokenKey;
+    @Value("${jwt.accessTokenKey}")
+    private String accessTokenKey;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -78,15 +78,15 @@ public class MissionAcceptanceTest {
         memberRepository.saveAndFlush(member);
         missionRepository.saveAndFlush(mission);
 
-        token = jwtHelper.createToken(secretKey, MemberTokenCommand.builder()
-                                                                   .id(member.getId())
-                                                                   .memberId(member.getMemberId())
-                                                                   .nickName(member.getNickName()).build());
+        token = jwtHelper.createAccessToken(MemberTokenCommand.builder()
+                                                              .id(member.getId())
+                                                              .memberId(member.getMemberId())
+                                                              .nickName(member.getNickName()).build());
 
         template.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {
                     request.getHeaders()
-                           .add(tokenKey, token);
+                           .add(accessTokenKey, token);
                     request.getHeaders()
                            .setZonedDateTime("date", ZonedDateTime.of(2020, 7, 15, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
                     return execution.execute(request, body);

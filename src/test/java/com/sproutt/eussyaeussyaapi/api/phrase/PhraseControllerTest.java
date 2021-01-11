@@ -8,26 +8,26 @@ import com.sproutt.eussyaeussyaapi.domain.phrase.Phrase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(value = PhraseController.class, includeFilters = @ComponentScan.Filter(classes = {Configuration.class}))
+@WebMvcTest(controllers = PhraseController.class, excludeFilters = @ComponentScan.Filter(EnableWebSecurity.class))
+@WithMockUser("fake_user")
 public class PhraseControllerTest extends HeaderSetUpWithToken {
 
     @Autowired
@@ -52,6 +52,7 @@ public class PhraseControllerTest extends HeaderSetUpWithToken {
 
 
         ResultActions actions = mvc.perform(get("/phrase")
+                .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -69,6 +70,7 @@ public class PhraseControllerTest extends HeaderSetUpWithToken {
         given(phraseService.create(phraseText)).willReturn(phrase);
 
         ResultActions actions = mvc.perform(post("/phrase")
+                .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -1,7 +1,7 @@
 package com.sproutt.eussyaeussyaapi.api.exception;
 
-import com.sproutt.eussyaeussyaapi.api.oauth2.exception.OAuth2CommunicationException;
-import com.sproutt.eussyaeussyaapi.api.oauth2.exception.UnSupportedOAuth2Exception;
+import com.sproutt.eussyaeussyaapi.api.security.auth.exception.OAuth2CommunicationException;
+import com.sproutt.eussyaeussyaapi.api.security.auth.exception.UnSupportedOAuth2Exception;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

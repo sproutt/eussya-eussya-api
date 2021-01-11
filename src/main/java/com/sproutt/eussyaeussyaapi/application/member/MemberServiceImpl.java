@@ -4,7 +4,6 @@ import com.sproutt.eussyaeussyaapi.api.member.EmailAuthCommand;
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberJoinCommand;
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberLoginCommand;
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
-import com.sproutt.eussyaeussyaapi.api.oauth2.dto.OAuth2UserInfoDTO;
 import com.sproutt.eussyaeussyaapi.application.MailService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
@@ -49,15 +48,12 @@ public class MemberServiceImpl implements MemberService {
             throw new DuplicationMemberException();
         }
 
-        String authCode = RandomGenerator.createAuthenticationCode();
-        mailService.sendAuthEmail(memberJoinCommand.getMemberId(), authCode);
-
         Member member = Member.builder()
                               .memberId(memberJoinCommand.getMemberId())
                               .password(passwordEncoder.encode(memberJoinCommand.getPassword()))
                               .email(memberJoinCommand.getMemberId())
                               .nickName(memberJoinCommand.getNickName())
-                              .authentication(passwordEncoder.encode(authCode))
+                              .authentication("N")
                               .provider(Provider.LOCAL)
                               .build();
 
@@ -104,19 +100,6 @@ public class MemberServiceImpl implements MemberService {
 
         return memberRepository.findAll().stream().filter(member -> !member.getMemberId().equals(memberId)).collect(Collectors.toList());
     }
-
-    @Override
-    public Member loginWithSocialProvider(OAuth2UserInfoDTO userInfoDTO) {
-        if (!memberRepository.existsByMemberId(userInfoDTO.getId())) {
-
-            Member member = userInfoDTO.toEntity();
-            member.verifyEmail();
-
-            return memberRepository.save(member);
-        }
-
-        return memberRepository.findByMemberId(userInfoDTO.getId()).orElseThrow(NoSuchMemberException::new);
-    }
   
     @Override
     @Transactional
@@ -126,7 +109,6 @@ public class MemberServiceImpl implements MemberService {
         if (!passwordEncoder.matches(emailAuthCommand.getAuthCode(), member.getAuthentication())) {
             throw new VerificationException();
         }
-
         member.verifyEmail();
 
         return memberRepository.save(member);

@@ -41,17 +41,22 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
     private List<Mission> missions = new ArrayList<>();
 
     @Builder
-    public Member(String memberId, String password, String email, String nickName, String authentication, Provider provider) {
+    public Member(String memberId, String password, String email, String nickName, String authentication, Provider provider, Role role) {
         this.memberId = memberId;
         this.password = password;
         this.email = email;
         this.nickName = nickName;
         this.authentication = authentication;
         this.provider = provider;
+        this.role = role;
     }
 
     public void changeAuthCode(String authCode) {
@@ -63,6 +68,7 @@ public class Member {
                                  .id(this.id)
                                  .memberId(this.memberId)
                                  .nickName(this.nickName)
+                                 .role(this.role)
                                  .build();
     }
 
@@ -84,6 +90,8 @@ public class Member {
                 ", nickName='" + nickName + '\'' +
                 ", authentication='" + authentication + '\'' +
                 ", provider=" + provider +
+                ", role=" + role +
+                ", missions=" + missions +
                 '}';
     }
 

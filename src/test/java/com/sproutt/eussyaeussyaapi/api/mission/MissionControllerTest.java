@@ -14,17 +14,15 @@ import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -32,23 +30,23 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(value = MissionController.class, includeFilters = @ComponentScan.Filter(classes = {Configuration.class}))
+@WebMvcTest(controllers = MissionController.class, excludeFilters = @ComponentScan.Filter(EnableWebSecurity.class))
 @EnableAspectJAutoProxy
+@WithMockUser("fake_user")
 public class MissionControllerTest extends HeaderSetUpWithToken {
-
-    @Autowired
-    private DefaultListableBeanFactory beanFactory;
 
     @Autowired
     private MockMvc mvc;
@@ -65,10 +63,6 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
 
     @BeforeEach
     void setUp() throws Exception {
-        for (String name : beanFactory.getBeanDefinitionNames()) {
-            System.out.println(name + "\t" + beanFactory.getBean(name).getClass().getName());
-        }
-
         headers = setUpHeader();
         loginMember = MemberFactory.getDefaultMember();
         missionsList = setMockMissionList();
@@ -92,6 +86,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
         given(missionService.create(any(), any())).willReturn(mission);
 
         ResultActions actions = mvc.perform(post("/missions")
+                .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -116,6 +111,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
         given(missionService.create(loginMember, wrongMissionRequestDTO)).willReturn(mission);
 
         ResultActions actions = mvc.perform(post("/missions")
+                .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -131,6 +127,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
         given(missionService.findByWriter(any())).willReturn(missionsList);
 
         ResultActions actions = mvc.perform(get("/missions")
+                .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -158,6 +155,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
         given(missionService.update(loginMember, 0l, updatedMissionRequestDTO)).willReturn(updatedMission);
 
         ResultActions actions = mvc.perform(put("/missions/0")
+                .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -193,6 +191,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
         given(missionService.update(loginMember, 0l, wrongUpdatedMissionRequestDTO)).willReturn(updatedMission);
 
         ResultActions actions = mvc.perform(put("/missions/0")
+                .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -206,6 +205,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     @DisplayName("미션 삭제 요청 - 정상적인 경우")
     void deleteMissionTest() throws Exception {
         ResultActions actions = mvc.perform(delete("/missions/0")
+                .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -220,6 +220,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
         doThrow(new NoPermissionException()).when(missionService).delete(any(), any());
 
         ResultActions actions = mvc.perform(delete("/missions/0")
+                .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -229,11 +230,32 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     }
 
     @Test
+    @DisplayName("미션 시작 요청")
+    void startMissionTest() throws Exception {
+        String time = "2020-07-15T05:00:00.00Z";
+        Map<String, String> mapForJson = new HashMap<>();
+        mapForJson.put("time", time);
+
+        doNothing().when(missionService).completeMission(any(), any());
+
+        ResultActions actions = mvc.perform(put("/missions/0/progress")
+                .with(csrf())
+                .headers(headers)
+                .characterEncoding("utf-8")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(mapForJson)))
+                                   .andDo(print());
+
+        actions.andExpect(status().isOk());
+    }
+
+    @Test
     @DisplayName("미션 달성 요청 - 정상적인 경우")
     void completeMissionTest() throws Exception {
         doNothing().when(missionService).completeMission(any(), any());
 
         ResultActions actions = mvc.perform(put("/missions/0/complete")
+                .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -248,6 +270,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
         doThrow(NotSatisfiedCondition.class).when(missionService).completeMission(any(), any());
 
         ResultActions actions = mvc.perform(put("/missions/0/complete")
+                .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -273,6 +296,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
         given(missionService.updateMissionResult(loginMember, 0l, "test result")).willReturn(mission);
 
         ResultActions actions = mvc.perform(put("/missions/0/result")
+                .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -289,6 +313,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
         doThrow(NotCompletedMissionException.class).when(missionService).updateMissionResult(any(), any(), any());
 
         ResultActions actions = mvc.perform(put("/missions/0/result")
+                .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
