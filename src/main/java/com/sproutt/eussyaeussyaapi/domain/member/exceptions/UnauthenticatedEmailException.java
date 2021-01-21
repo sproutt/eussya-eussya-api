@@ -1,10 +1,11 @@
 package com.sproutt.eussyaeussyaapi.domain.member.exceptions;
 
-import com.sproutt.eussyaeussyaapi.api.exception.message.MemberExceptionMessage;
-
 public class UnauthenticatedEmailException extends RuntimeException {
+
+    private static final String UN_AUTHENTICATED_EMAIL = "인증되지 않은 email입니다.";
+
     public UnauthenticatedEmailException() {
-        super(MemberExceptionMessage.UN_AUTHENTICATED_EMAIL);
+        super(UN_AUTHENTICATED_EMAIL);
     }
 
 }

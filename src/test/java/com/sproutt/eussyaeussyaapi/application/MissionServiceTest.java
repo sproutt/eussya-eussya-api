@@ -3,7 +3,7 @@ package com.sproutt.eussyaeussyaapi.application;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionService;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionServiceImpl;
-import com.sproutt.eussyaeussyaapi.application.mission.ServiceTimeProvider;
+import com.sproutt.eussyaeussyaapi.application.mission.ServiceTimeProperties;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import com.sproutt.eussyaeussyaapi.domain.mission.MissionRepository;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class MissionServiceTest {
     private MissionRepository missionRepository = mock(MissionRepository.class);
-    private ServiceTimeProvider serviceTimeProvider = mock(ServiceTimeProvider.class);
+    private ServiceTimeProperties serviceTimeProperties = mock(ServiceTimeProperties.class);
 
     private MissionService missionService;
     private Member loginMember;
@@ -43,7 +43,7 @@ public class MissionServiceTest {
 
     @BeforeEach
     void setUp() {
-        missionService = new MissionServiceImpl(missionRepository, serviceTimeProvider);
+        missionService = new MissionServiceImpl(missionRepository, serviceTimeProperties);
         loginMember = MemberFactory.getDefaultMember();
         mockedMissionList = setMockMissionList();
 
@@ -209,8 +209,8 @@ public class MissionServiceTest {
 
         LocalDateTime mockingNow = now.plusHours(1);
 
-        when(serviceTimeProvider.now()).thenReturn(mockingNow);
-        when(serviceTimeProvider.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).plusHours(3).getHour());
+        when(serviceTimeProperties.now()).thenReturn(mockingNow);
+        when(serviceTimeProperties.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).plusHours(3).getHour());
 
         missionService.completeMission(loginMember, 0l);
 
@@ -240,8 +240,8 @@ public class MissionServiceTest {
 
         LocalDateTime mockingNow = now.plusHours(1);
 
-        when(serviceTimeProvider.now()).thenReturn(mockingNow);
-        when(serviceTimeProvider.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).getHour());
+        when(serviceTimeProperties.now()).thenReturn(mockingNow);
+        when(serviceTimeProperties.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).getHour());
 
         assertThrows(LimitedTimeExceedException.class, () -> missionService.completeMission(loginMember, 0l));
     }
@@ -267,8 +267,8 @@ public class MissionServiceTest {
             now = now.minusHours(3);
         }
 
-        when(serviceTimeProvider.now()).thenReturn(now);
-        when(serviceTimeProvider.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).plusHours(3).getHour());
+        when(serviceTimeProperties.now()).thenReturn(now);
+        when(serviceTimeProperties.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).plusHours(3).getHour());
 
         assertThrows(NotSatisfiedCondition.class, () -> missionService.completeMission(loginMember, 0l));
     }
@@ -298,8 +298,8 @@ public class MissionServiceTest {
 
         mission.complete();
 
-        when(serviceTimeProvider.now()).thenReturn(mockingNow);
-        when(serviceTimeProvider.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).plusHours(3).getHour());
+        when(serviceTimeProperties.now()).thenReturn(mockingNow);
+        when(serviceTimeProperties.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).plusHours(3).getHour());
 
         assertThrows(ExpiredMissionException.class, () -> missionService.completeMission(loginMember, 0l));
     }

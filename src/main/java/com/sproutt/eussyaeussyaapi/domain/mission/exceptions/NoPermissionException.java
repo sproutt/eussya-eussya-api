@@ -1,9 +1,10 @@
 package com.sproutt.eussyaeussyaapi.domain.mission.exceptions;
 
-import com.sproutt.eussyaeussyaapi.api.exception.message.MissionExceptionMessage;
-
 public class NoPermissionException extends RuntimeException {
+
+    private static final String NO_PERMISSION = "권한 없음";
+
     public NoPermissionException() {
-        super(MissionExceptionMessage.NO_PERMISSION);
+        super(NO_PERMISSION);
     }
 }

@@ -1,9 +1,10 @@
 package com.sproutt.eussyaeussyaapi.api.security.exception;
 
-import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
-
 public class InvalidRefreshTokenException extends RuntimeException {
+
+    public static final String INVALID_REFRESH_TOKEN = "유효하지 않은 Refresh 토큰";
+
     public InvalidRefreshTokenException() {
-        super(ExceptionMessage.INVALID_REFRESH_TOKEN);
+        super(INVALID_REFRESH_TOKEN);
     }
 }

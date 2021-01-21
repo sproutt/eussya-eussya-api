@@ -23,13 +23,13 @@ public class MissionServiceImpl implements MissionService {
     private static final String ZONE_SEOUL = "Asia/Seoul";
 
     private final MissionRepository missionRepository;
-    private final ServiceTimeProvider serviceTimeProvider;
+    private final ServiceTimeProperties serviceTimeProperties;
 
 
     @Override
     public Mission create(Member loginMember, MissionRequestDTO missionRequestDTO) {
         Mission mission = new Mission(loginMember, missionRequestDTO);
-        mission.startAt(serviceTimeProvider.now());
+        mission.startAt(serviceTimeProperties.now());
 
         return missionRepository.save(mission);
     }
@@ -102,7 +102,7 @@ public class MissionServiceImpl implements MissionService {
     @Transactional
     public void completeMission(Member loginMember, Long missionId) {
         Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchMissionException::new);
-        LocalDateTime now = serviceTimeProvider.now();
+        LocalDateTime now = serviceTimeProperties.now();
 
         if (!mission.isWriter(loginMember)) {
             throw new NoPermissionException();
@@ -134,7 +134,7 @@ public class MissionServiceImpl implements MissionService {
                 now.getYear(),
                 now.getMonth(),
                 now.getDayOfMonth(),
-                serviceTimeProvider.getLimitHour(),
+                serviceTimeProperties.getLimitHour(),
                 0,
                 0);
 

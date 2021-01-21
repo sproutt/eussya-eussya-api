@@ -1,9 +1,10 @@
 package com.sproutt.eussyaeussyaapi.domain.mission.exceptions;
 
-import com.sproutt.eussyaeussyaapi.api.exception.message.MissionExceptionMessage;
-
 public class CompletedMissionException extends RuntimeException {
+
+    private static final String COMPLETED_MISSION = "이미 완료된 미션은 수정할 수 없습니다.";
+
     public CompletedMissionException() {
-        super(MissionExceptionMessage.COMPLETED_MISSION);
+        super(COMPLETED_MISSION);
     }
 }

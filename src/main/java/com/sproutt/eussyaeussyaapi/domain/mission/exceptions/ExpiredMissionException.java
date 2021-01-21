@@ -1,9 +1,10 @@
 package com.sproutt.eussyaeussyaapi.domain.mission.exceptions;
 
-import com.sproutt.eussyaeussyaapi.api.exception.message.MissionExceptionMessage;
-
 public class ExpiredMissionException extends RuntimeException {
+
+    private static final String EXPIRED_MISSION = "종료된 미션입니다.";
+
     public ExpiredMissionException() {
-        super(MissionExceptionMessage.EXPIRED_MISSION);
+        super(EXPIRED_MISSION);
     }
 }

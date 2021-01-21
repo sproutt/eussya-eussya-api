@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @Component
-public class ServiceTimeProvider {
+public class ServiceTimeProperties {
 
     @Value("${time.start}")
     private int startHour;

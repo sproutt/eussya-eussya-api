@@ -1,6 +1,6 @@
 package com.sproutt.eussyaeussyaapi.api.aspect.mission;
 
-import com.sproutt.eussyaeussyaapi.application.mission.ServiceTimeProvider;
+import com.sproutt.eussyaeussyaapi.application.mission.ServiceTimeProperties;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotAvailableTimeException;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,7 +17,7 @@ import java.time.ZoneId;
 public class MissionAspect {
 
     private static final String ZONE_SEOUL = "Asia/Seoul";
-    private final ServiceTimeProvider serviceTimeProvider;
+    private final ServiceTimeProperties serviceTimeProperties;
 
     @Before("@annotation(AvailableTime)")
     public void checkAvailableTime() {
@@ -27,8 +27,8 @@ public class MissionAspect {
     }
 
     private boolean isAvailableTime(LocalDateTime now) {
-        LocalDateTime startLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(serviceTimeProvider.getStartHour(), 0));
-        LocalDateTime endLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(serviceTimeProvider.getEndHour() - 1, 59));
+        LocalDateTime startLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(serviceTimeProperties.getStartHour(), 0));
+        LocalDateTime endLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(serviceTimeProperties.getEndHour() - 1, 59));
 
         return now.isAfter(startLocalDateTime) && now.isBefore(endLocalDateTime);
     }

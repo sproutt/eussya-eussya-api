@@ -1,9 +1,10 @@
 package com.sproutt.eussyaeussyaapi.domain.mission.exceptions;
 
-import com.sproutt.eussyaeussyaapi.api.exception.message.MissionExceptionMessage;
-
 public class NotCompletedMissionException extends RuntimeException {
+
+    private static final String NOT_COMPLETED_MISSION = "완료하지 않은 미션은 결과물을 작성할 수 없습니다.";
+
     public NotCompletedMissionException() {
-        super(MissionExceptionMessage.NOT_COMPLETED_MISSION);
+        super(NOT_COMPLETED_MISSION);
     }
 }

@@ -1,9 +1,10 @@
 package com.sproutt.eussyaeussyaapi.domain.mission.exceptions;
 
-import com.sproutt.eussyaeussyaapi.api.exception.message.MissionExceptionMessage;
-
 public class NoSuchMissionException extends RuntimeException {
+
+    public static final String NO_SUCH_MISSION = "존재하지 않는 미션입니다.";
+
     public NoSuchMissionException() {
-        super(MissionExceptionMessage.NO_SUCH_MISSION);
+        super(NO_SUCH_MISSION);
     }
 }
