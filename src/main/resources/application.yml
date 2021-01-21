@@ -46,7 +46,7 @@ jwt:
   secret: secret
 
 oauth2:
-  authorizedRedirectUrl: https://eussya-eussya.com/oauth/github
+  authorizedRedirectUrl: https://eussya-eussya.com/oauth/github/process
 
 
 jasypt:
