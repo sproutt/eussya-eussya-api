@@ -54,6 +54,7 @@ public class GithubOAuth2UserInfo implements OAuth2UserInfo {
                      .nickName(this.getNickName())
                      .email(this.getEmail())
                      .provider(this.getProvider())
+                     .authentication("Y")
                      .password(RandomGenerator.createAuthenticationCode())
                      .role(Role.USER)
                      .build();

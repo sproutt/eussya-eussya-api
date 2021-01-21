@@ -35,10 +35,6 @@ public class MemberServiceImpl implements MemberService {
             throw new WrongPasswordException();
         }
 
-        if (!member.isVerified()) {
-            throw new UnauthenticatedEmailException();
-        }
-
         return member;
     }
 
