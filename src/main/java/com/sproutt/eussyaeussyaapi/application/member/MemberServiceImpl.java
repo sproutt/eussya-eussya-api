@@ -8,6 +8,7 @@ import com.sproutt.eussyaeussyaapi.application.MailService;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.domain.member.Provider;
+import com.sproutt.eussyaeussyaapi.domain.member.Role;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.*;
 import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,7 @@ public class MemberServiceImpl implements MemberService {
                               .email(memberJoinCommand.getMemberId())
                               .nickName(memberJoinCommand.getNickName())
                               .authentication("N")
+                              .role(Role.USER)
                               .provider(Provider.LOCAL)
                               .build();
 
