@@ -56,5 +56,5 @@ jasypt:
 
 api:
   cors:
-    allow-origins: https://eussya-eussya.com
+    allow-origins: https://eussya-eussya.com, https://www.eussya-eussya.com, http://eussya-eussya.com, http://www.eussya-eussya.com
 

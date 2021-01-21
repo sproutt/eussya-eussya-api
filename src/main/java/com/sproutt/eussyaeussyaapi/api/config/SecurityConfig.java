@@ -91,7 +91,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         CorsConfiguration configuration = new CorsConfiguration();
 
         Arrays.stream(allowedOrigins.split(", ")).forEach(configuration::addAllowedOrigin);
-        configuration.addAllowedOrigin("http://kostat.go.kr");
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.addExposedHeader(JwtHelper.ACCESS_TOKEN_HEADER);
