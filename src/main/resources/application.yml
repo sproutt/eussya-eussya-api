@@ -46,7 +46,7 @@ jwt:
   secret: secret
 
 oauth2:
-  authorizedRedirectUrl: https://eussya-eussya.com/oauth/github
+  authorizedRedirectUrl: https://eussya-eussya.com/oauth/github/process
 
 
 jasypt:
@@ -56,7 +56,7 @@ jasypt:
 
 api:
   cors:
-    allow-origins: https://eussya-eussya.com
+    allow-origins: https://eussya-eussya.com, https://www.eussya-eussya.com, http://eussya-eussya.com, http://www.eussya-eussya.com
 
 time:
   start: 4

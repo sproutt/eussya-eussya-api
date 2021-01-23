@@ -38,13 +38,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.jwtHelper = jwtHelper;
     }
 
-    private static final String[] PUBLIC = {"/auth/**", "/oauth2/**", "/signUp/**", "/phrase/**", "/members/**", "/login/**", "/webjars/**", "/swagger-resources/**", "/v2/**", "/email-auth/**", "/swagger-ui.html"};
+    private static final String[] PUBLIC = {"/auth/**", "/oauth2/**", "/signUp/**", "/phrase/**", "/members/**", "/login/**", "/email-auth/**"};
 
     @Override
     public void configure(WebSecurity web) {
         web
                 .ignoring()
-                .antMatchers("/members/**", "/login", "/webjars/**", "/swagger-resources/**", "/v2/**", "/swagger-ui.html")
+                .antMatchers("/webjars/**", "/swagger-resources/**", "/v2/**", "/swagger-ui.html")
                 .antMatchers("/error");
     }
 
@@ -54,6 +54,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                     .disable()
                 .formLogin()
+                    .disable()
+                .httpBasic()
                     .disable()
                 .cors()
                 .and()
