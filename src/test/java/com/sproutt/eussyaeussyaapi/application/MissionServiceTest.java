@@ -13,13 +13,10 @@ import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +28,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class MissionServiceTest {
     private MissionRepository missionRepository = mock(MissionRepository.class);
     private ServiceTimeProperties serviceTimeProperties = mock(ServiceTimeProperties.class);
@@ -39,7 +35,7 @@ public class MissionServiceTest {
     private MissionService missionService;
     private Member loginMember;
     private List<Mission> mockedMissionList;
-    private String setUpDeadLineTime;
+    private LocalDateTime setUpDeadLineTime;
 
     @BeforeEach
     void setUp() {
@@ -53,7 +49,7 @@ public class MissionServiceTest {
             now = now.minusHours(3);
         }
 
-        setUpDeadLineTime = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), now.plusHours(1).getHour(), 0, 0).toInstant(ZoneOffset.of("+09:00")).toString();
+        setUpDeadLineTime = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), now.plusHours(1).getHour(), 0, 0);
     }
 
     @Test
@@ -143,7 +139,7 @@ public class MissionServiceTest {
 
     @Test
     @DisplayName("미션 수정 테스트 - 이미 완료된 테스트인 경우 수정 금지")
-    void updateMission_already_completed() {
+    void updateMission_when_already_completed_then_throw_exception() {
         MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
@@ -219,7 +215,7 @@ public class MissionServiceTest {
 
     @Test
     @DisplayName("미션 완료 테스트 - 미션 완료 제한 시간을 초과한 경우 실패")
-    void completeMission_limit_time_over() {
+    void completeMission_when_time_over_then_throw_exception() {
         MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
@@ -248,7 +244,7 @@ public class MissionServiceTest {
 
     @Test
     @DisplayName("미션 완료 테스트 - 목표 시간을 채우지 못한 경우 실패")
-    void completeMission_before_deadline_time() {
+    void completeMission_when_before_deadline_time_then_throw_exception() {
         MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
@@ -275,7 +271,7 @@ public class MissionServiceTest {
 
     @Test
     @DisplayName("미션 완료 테스트 - 이미 완료된 미션인 경우 실패")
-    void completeMission_already_completed() {
+    void completeMission_when_already_completed_then_throw_exception() {
         MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
@@ -306,7 +302,7 @@ public class MissionServiceTest {
 
     @Test
     @DisplayName("미션 결과 추가 테스트 - 미션의 상태가 complete 인 경우에만 성공")
-    void addMissionResult() {
+    void addMissionResult_when_status_complete_then_success() {
         MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
@@ -325,7 +321,7 @@ public class MissionServiceTest {
 
     @Test
     @DisplayName("미션 결과 추가 테스트 - 미션 상태가 complete가 아닌 경우 실패")
-    void addMissionResult_with_not_complete() {
+    void addMissionResult_with_status_not_complete_then_throw_exception() {
         MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")

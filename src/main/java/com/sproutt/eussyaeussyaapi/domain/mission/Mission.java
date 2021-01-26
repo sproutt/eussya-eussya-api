@@ -16,8 +16,6 @@ import java.time.*;
 @NoArgsConstructor
 public class Mission {
 
-    private static final String ZONE_SEOUL = "Asia/Seoul";
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -64,7 +62,7 @@ public class Mission {
     public Mission(Member writer, MissionRequestDTO missionRequestDTO) {
         this.title = missionRequestDTO.getTitle();
         this.contents = missionRequestDTO.getContents();
-        this.deadlineTime = LocalDateTime.ofInstant(Instant.parse(missionRequestDTO.getDeadlineTime()), ZoneId.of(ZONE_SEOUL));
+        this.deadlineTime = missionRequestDTO.getDeadlineTime();
         this.writer = writer;
     }
 
@@ -75,7 +73,7 @@ public class Mission {
     public Mission update(MissionRequestDTO missionRequestDTO) {
         this.title = missionRequestDTO.getTitle();
         this.contents = missionRequestDTO.getContents();
-        this.deadlineTime = LocalDateTime.ofInstant(Instant.parse(missionRequestDTO.getDeadlineTime()), ZoneId.of(ZONE_SEOUL));
+        this.deadlineTime = missionRequestDTO.getDeadlineTime();
 
         return this;
     }
