@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -31,11 +32,11 @@ import static org.mockito.Mockito.when;
 public class MissionServiceTest {
     private MissionRepository missionRepository = mock(MissionRepository.class);
     private ServiceTimeProperties serviceTimeProperties = mock(ServiceTimeProperties.class);
-
     private MissionService missionService;
     private Member loginMember;
     private List<Mission> mockedMissionList;
-    private LocalDateTime setUpDeadLineTime;
+    private LocalDateTime mockDeadlineTime;
+    private LocalDateTime mockNow;
 
     @BeforeEach
     void setUp() {
@@ -43,13 +44,9 @@ public class MissionServiceTest {
         loginMember = MemberFactory.getDefaultMember();
         mockedMissionList = setMockMissionList();
 
-        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-
-        if (now.getHour() >= 21) {
-            now = now.minusHours(3);
-        }
-
-        setUpDeadLineTime = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), now.plusHours(1).getHour(), 0, 0);
+        LocalDate now = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        mockDeadlineTime = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 8, 0, 0);
+        mockNow = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 8, 30, 0);
     }
 
     @Test
@@ -59,7 +56,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime(setUpDeadLineTime)
+                .deadlineTime(mockDeadlineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
@@ -117,7 +114,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime(setUpDeadLineTime)
+                .deadlineTime(mockDeadlineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
@@ -126,7 +123,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title2")
                 .contents("test_contents2")
-                .deadlineTime(setUpDeadLineTime)
+                .deadlineTime(mockDeadlineTime)
                 .build();
 
         when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
@@ -144,7 +141,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime(setUpDeadLineTime)
+                .deadlineTime(mockDeadlineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
@@ -154,7 +151,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title2")
                 .contents("test_contents2")
-                .deadlineTime(setUpDeadLineTime)
+                .deadlineTime(mockDeadlineTime)
                 .build();
 
         when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
@@ -170,7 +167,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime(setUpDeadLineTime)
+                .deadlineTime(mockDeadlineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
@@ -189,7 +186,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime(setUpDeadLineTime)
+                .deadlineTime(mockDeadlineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
@@ -197,16 +194,11 @@ public class MissionServiceTest {
 
         when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
 
-        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        mission.startAt(LocalDateTime.of(mockNow.getYear(), mockNow.getMonth(), mockNow.getDayOfMonth(), 7, 0, 0));
 
-        if (now.getHour() >= 21) {
-            now = now.minusHours(3);
-        }
-
-        LocalDateTime mockingNow = now.plusHours(1);
-
-        when(serviceTimeProperties.now()).thenReturn(mockingNow);
-        when(serviceTimeProperties.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).plusHours(3).getHour());
+        when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
+        when(serviceTimeProperties.now()).thenReturn(mockNow);
+        when(serviceTimeProperties.getLimitHour()).thenReturn(12);
 
         missionService.completeMission(loginMember, 0l);
 
@@ -220,24 +212,15 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime(setUpDeadLineTime)
+                .deadlineTime(mockDeadlineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
-        mission.startAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+        mission.startAt(LocalDateTime.of(mockNow.getYear(), mockNow.getMonth(), mockNow.getDayOfMonth(), 7, 0, 0));
 
         when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
-
-        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-
-        if (now.getHour() >= 21) {
-            now = now.minusHours(3);
-        }
-
-        LocalDateTime mockingNow = now.plusHours(1);
-
-        when(serviceTimeProperties.now()).thenReturn(mockingNow);
-        when(serviceTimeProperties.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).getHour());
+        when(serviceTimeProperties.now()).thenReturn(mockNow.plusHours(5));
+        when(serviceTimeProperties.getLimitHour()).thenReturn(12);
 
         assertThrows(LimitedTimeExceedException.class, () -> missionService.completeMission(loginMember, 0l));
     }
@@ -249,22 +232,15 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime(setUpDeadLineTime)
+                .deadlineTime(mockDeadlineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
-        mission.startAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+        mission.startAt(LocalDateTime.of(mockNow.getYear(), mockNow.getMonth(), mockNow.getDayOfMonth(), 7, 0, 0));
 
         when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
-
-        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-
-        if (now.getHour() >= 21) {
-            now = now.minusHours(3);
-        }
-
-        when(serviceTimeProperties.now()).thenReturn(now);
-        when(serviceTimeProperties.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).plusHours(3).getHour());
+        when(serviceTimeProperties.now()).thenReturn(mockNow.minusHours(1));
+        when(serviceTimeProperties.getLimitHour()).thenReturn(12);
 
         assertThrows(NotSatisfiedCondition.class, () -> missionService.completeMission(loginMember, 0l));
     }
@@ -276,26 +252,17 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime(setUpDeadLineTime)
+                .deadlineTime(mockDeadlineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
-        mission.startAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+        mission.startAt(LocalDateTime.of(mockNow.getYear(), mockNow.getMonth(), mockNow.getDayOfMonth(), 7, 0, 0));
 
         when(missionRepository.findById(0l)).thenReturn(Optional.of(mission));
-
-        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-
-        if (now.getHour() >= 21) {
-            now = now.minusHours(3);
-        }
-
-        LocalDateTime mockingNow = now.plusHours(1);
+        when(serviceTimeProperties.now()).thenReturn(mockNow.plusHours(5));
+        when(serviceTimeProperties.getLimitHour()).thenReturn(12);
 
         mission.complete();
-
-        when(serviceTimeProperties.now()).thenReturn(mockingNow);
-        when(serviceTimeProperties.getLimitHour()).thenReturn(LocalTime.now(ZoneId.of("Asia/Seoul")).plusHours(3).getHour());
 
         assertThrows(ExpiredMissionException.class, () -> missionService.completeMission(loginMember, 0l));
     }
@@ -307,7 +274,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime(setUpDeadLineTime)
+                .deadlineTime(mockDeadlineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
@@ -326,7 +293,7 @@ public class MissionServiceTest {
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime(setUpDeadLineTime)
+                .deadlineTime(mockDeadlineTime)
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
