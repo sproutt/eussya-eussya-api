@@ -33,4 +33,8 @@ public class ChatRoom {
     public void setType(ChatRoomType type) {
         this.type = type;
     }
+
+    public void addChatMessage(ChatMessage chatMessage) {
+        this.messages.add(chatMessage);
+    }
 }

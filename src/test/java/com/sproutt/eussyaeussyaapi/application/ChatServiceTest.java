@@ -9,8 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -72,6 +71,7 @@ class ChatServiceTest {
 
         when(chatRoomJoinRepository.findAllByParticipant(loginMember)).thenReturn(chatRoomJoinListOfLoginMember);
         when(chatRoomJoinRepository.findAllByParticipant(anotherMember)).thenReturn(chatRoomJoinListOfAnotherMember);
+
         List<ChatRoom> savedChatRooms = chatService.findExistedChatRooms(ChatRoomType.ONE_ON_ONE, loginMember, anotherMember);
 
         assertEquals(savedChatRooms.size(), 0);
@@ -149,5 +149,110 @@ class ChatServiceTest {
         assertNotEquals(savedChatRoom, chatRoomOnlyLoginMember);
         assertNotEquals(savedChatRoom, chatRoomOnlyAnotherMember);
         assertEquals(savedChatRoom.getType(), ChatRoomType.ONE_ON_ONE);
+    }
+
+    @Test
+    @DisplayName("채팅 메세지 히스토리 조회 테스트 - 채팅방 참여자가 아니면 권한 없음")
+    void loadChatMessageHistoryTest_when_not_participant_return_fail() {
+        Long chatRoomId = 1l;
+
+        when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Collections.singletonList(new ChatRoomJoin()));
+
+        Exception exception = assertThrows(RuntimeException.class, () -> chatService.loadChatMessageHistory(chatRoomId, loginMember));
+        assertEquals("참여자가 아니면 메세지 조회가 불가능합니다.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("채팅 메세지 히스토리 조회 테스트") // pagination, lazy load
+    void loadChatMessageHistoryTest() {
+        Long chatRoomId = 1l;
+        ChatRoom chatRoom = ChatRoom.createOneOnOne();
+        ChatRoomJoin chatRoomJoin = new ChatRoomJoin(loginMember, chatRoom);
+        ChatMessage chatMessage1 = new ChatMessage(chatRoom, loginMember, "으쌰으쌰 메세지 테스트1");
+
+        List<ChatMessage> chatMessageList = new ArrayList<>();
+        chatMessageList.add(chatMessage1);
+
+        when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Collections.singletonList(chatRoomJoin));
+        when(chatMessageRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Optional.of(chatMessageList));
+
+        List<ChatMessage> chatMessageHistory = chatService.loadChatMessageHistory(chatRoomId, loginMember);
+
+        assertEquals(chatMessageHistory.size(), 1);
+        assertEquals("으쌰으쌰 메세지 테스트1", chatMessageHistory.get(0).getMessage());
+    }
+
+    @Test
+    @DisplayName("채팅 메세지 히스토리 조회 테스트 - 채팅 방이 존재하지 않는 경우 에러") // pagination, lazy load
+    void loadChatMessageHistoryTest_when_not_exist_chatRoom_return_empty_list() {
+        Long chatRoomId = 1l;
+
+        when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(null);
+
+        Exception exception = assertThrows(RuntimeException.class, () -> chatService.loadChatMessageHistory(chatRoomId, loginMember));
+        assertEquals(exception.getMessage(), "존재하지 않는 채팅방입니다.");
+    }
+
+    @Test
+    @DisplayName("채팅 메세지 히스토리 조회 테스트 - 히스토리가 없으면 빈 List 리턴") // pagination, lazy load
+    void loadChatMessageHistoryTest_when_not_exist_return_empty_list() {
+        Long chatRoomId = 1l;
+        ChatRoom chatRoom = ChatRoom.createOneOnOne();
+        ChatRoomJoin chatRoomJoin = new ChatRoomJoin(loginMember, chatRoom);
+
+        when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Collections.singletonList(chatRoomJoin));
+        when(chatMessageRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Optional.empty());
+
+        List<ChatMessage> chatMessageHistory = chatService.loadChatMessageHistory(chatRoomId, loginMember);
+
+        assertEquals(chatMessageHistory.size(), 0);
+    }
+
+    @Test
+    @DisplayName("채팅 메세지 저장 테스트 - 채팅방 참여자가 아니면 권한 없음")
+    void saveChatMessageTest_when_not_participant_return_fail() {
+        Long chatRoomId = 1l;
+        ChatRoom chatRoom = ChatRoom.createOneOnOne();
+        ChatRoomJoin chatRoomJoin = new ChatRoomJoin(anotherMember, chatRoom);
+        ChatMessage chatMessage = new ChatMessage(chatRoom, loginMember, "으쌰으쌰 메세지 테스트1");
+
+        when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.of(chatRoom));
+        when(chatMessageRepository.save(chatMessage)).thenReturn(chatMessage);
+        when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Collections.singletonList(chatRoomJoin));
+
+        Exception exception = assertThrows(RuntimeException.class, () -> chatService.saveChatMessage(chatRoomId, loginMember, "으쌰으쌰 메세지 테스트1"));
+        assertEquals("권한 없음", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("채팅 메세지 저장 테스트 - 채팅방이 존재하지 않는 경우 에러")
+    void saveChatMessageTest_when_chatRoom_not_existed_return_fail() {
+        Long chatRoomId = 1l;
+        ChatRoom chatRoom = ChatRoom.createOneOnOne();
+        ChatRoomJoin chatRoomJoin = new ChatRoomJoin(loginMember, chatRoom);
+        ChatMessage chatMessage = new ChatMessage(chatRoom, loginMember, "으쌰으쌰 메세지 테스트1");
+
+        when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.empty());
+        when(chatMessageRepository.save(any(ChatMessage.class))).thenReturn(chatMessage);
+        when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Collections.singletonList(chatRoomJoin));
+
+        assertThrows(NoSuchElementException.class, () -> chatService.saveChatMessage(chatRoomId, loginMember, "으쌰으쌰 메세지 테스트1"));
+    }
+
+    @Test
+    @DisplayName("채팅 메세지 저장 테스트")
+    void saveChatMessageTest() {
+        Long chatRoomId = 1l;
+        ChatRoom chatRoom = ChatRoom.createOneOnOne();
+        ChatRoomJoin chatRoomJoin = new ChatRoomJoin(loginMember, chatRoom);
+        ChatMessage chatMessage = new ChatMessage(chatRoom, loginMember, "으쌰으쌰 메세지 테스트1");
+
+        when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.of(chatRoom));
+        when(chatMessageRepository.save(any(ChatMessage.class))).thenReturn(chatMessage);
+        when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Collections.singletonList(chatRoomJoin));
+
+        ChatMessage savedChatMessage = chatService.saveChatMessage(chatRoomId, loginMember, "으쌰으쌰 메세지 테스트1");
+
+        assertEquals(chatMessage.getMessage(), savedChatMessage.getMessage());
     }
 }

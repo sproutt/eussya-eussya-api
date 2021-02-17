@@ -3,6 +3,7 @@ package com.sproutt.eussyaeussyaapi.domain.chat;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -22,16 +23,20 @@ public class ChatMessage {
 
     @ManyToOne
     @JoinColumn(name = "member_id")
-    private Member participant;
+    private Member sender;
 
-    @Column(unique = true)
+    @CreatedDate
     private LocalDateTime time;
 
     @Column(unique = true)
-    private Member sender;
-
-    @Column(unique = true)
     private String message;
+
+    public ChatMessage(ChatRoom chatRoom, Member sender, String message) {
+        this.chatRoom = chatRoom;
+        this.sender = sender;
+        this.message = message;
+        chatRoom.addChatMessage(this);
+    }
 
     public Long getRoomId() {
         return this.chatRoom.getId();
