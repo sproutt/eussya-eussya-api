@@ -2,6 +2,8 @@ package com.sproutt.eussyaeussyaapi.application.chat;
 
 import com.sproutt.eussyaeussyaapi.domain.chat.*;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,14 +68,14 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<ChatMessage> loadChatMessageHistory(Long chatRoomId, Member loginMember) {
+    public Page<ChatMessage> loadChatMessageHistory(Long chatRoomId, Member loginMember, Pageable pageable) {
         Set<Member> participants = findChatRoomParticipants(chatRoomId);
 
         if (!participants.contains(loginMember)) {
             throw new RuntimeException("참여자가 아니면 메세지 조회가 불가능합니다.");
         }
 
-        return chatMessageRepository.findAllByChatRoomId(chatRoomId).orElse(new ArrayList<>());
+        return chatMessageRepository.findAllByChatRoomId(chatRoomId, pageable);
     }
 
     @Override

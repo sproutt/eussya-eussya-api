@@ -8,6 +8,7 @@ import com.sproutt.eussyaeussyaapi.object.MemberFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.*;
 
 import java.util.*;
 
@@ -155,10 +156,11 @@ class ChatServiceTest {
     @DisplayName("채팅 메세지 히스토리 조회 테스트 - 채팅방 참여자가 아니면 권한 없음")
     void loadChatMessageHistoryTest_when_not_participant_return_fail() {
         Long chatRoomId = 1l;
+        Pageable pageable = PageRequest.of(0, 20, Sort.by("time"));
 
         when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Collections.singletonList(new ChatRoomJoin()));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> chatService.loadChatMessageHistory(chatRoomId, loginMember));
+        Exception exception = assertThrows(RuntimeException.class, () -> chatService.loadChatMessageHistory(chatRoomId, loginMember, pageable));
         assertEquals("참여자가 아니면 메세지 조회가 불가능합니다.", exception.getMessage());
     }
 
@@ -173,23 +175,25 @@ class ChatServiceTest {
         List<ChatMessage> chatMessageList = new ArrayList<>();
         chatMessageList.add(chatMessage1);
 
+        Pageable pageable = PageRequest.of(0, 20, Sort.by("time"));
+
         when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Collections.singletonList(chatRoomJoin));
-        when(chatMessageRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Optional.of(chatMessageList));
+        when(chatMessageRepository.findAllByChatRoomId(chatRoomId, pageable)).thenReturn(new PageImpl<>(chatMessageList, pageable, 1));
 
-        List<ChatMessage> chatMessageHistory = chatService.loadChatMessageHistory(chatRoomId, loginMember);
-
-        assertEquals(chatMessageHistory.size(), 1);
-        assertEquals("으쌰으쌰 메세지 테스트1", chatMessageHistory.get(0).getMessage());
+        Page<ChatMessage> chatMessageHistory = chatService.loadChatMessageHistory(chatRoomId, loginMember, pageable);
+        assertEquals(chatMessageHistory.getTotalElements(), 1);
+        assertEquals("으쌰으쌰 메세지 테스트1", chatMessageHistory.getContent().get(0).getMessage());
     }
 
     @Test
     @DisplayName("채팅 메세지 히스토리 조회 테스트 - 채팅 방이 존재하지 않는 경우 에러") // pagination, lazy load
     void loadChatMessageHistoryTest_when_not_exist_chatRoom_return_empty_list() {
         Long chatRoomId = 1l;
+        Pageable pageable = PageRequest.of(0, 20, Sort.by("time"));
 
         when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(null);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> chatService.loadChatMessageHistory(chatRoomId, loginMember));
+        Exception exception = assertThrows(RuntimeException.class, () -> chatService.loadChatMessageHistory(chatRoomId, loginMember, pageable));
         assertEquals(exception.getMessage(), "존재하지 않는 채팅방입니다.");
     }
 
@@ -199,13 +203,14 @@ class ChatServiceTest {
         Long chatRoomId = 1l;
         ChatRoom chatRoom = ChatRoom.createOneOnOne();
         ChatRoomJoin chatRoomJoin = new ChatRoomJoin(loginMember, chatRoom);
+        Pageable pageable = PageRequest.of(0, 20, Sort.by("time"));
 
         when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Collections.singletonList(chatRoomJoin));
-        when(chatMessageRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Optional.empty());
+        when(chatMessageRepository.findAllByChatRoomId(chatRoomId, pageable)).thenReturn(new PageImpl<>(new ArrayList<>()));
 
-        List<ChatMessage> chatMessageHistory = chatService.loadChatMessageHistory(chatRoomId, loginMember);
+        Page<ChatMessage> chatMessageHistory = chatService.loadChatMessageHistory(chatRoomId, loginMember, pageable);
 
-        assertEquals(chatMessageHistory.size(), 0);
+        assertEquals(chatMessageHistory.getTotalElements(), 0);
     }
 
     @Test
