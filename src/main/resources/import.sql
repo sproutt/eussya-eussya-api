@@ -20,3 +20,21 @@ INSERT INTO mission (id, title, contents, writer_id, deadline_time, running_time
 INSERT INTO mission (id, title, contents, writer_id, deadline_time, running_time, status) values ( 67, 'mission18', 'mission18 contents', 99, '2020-07-27T03:00', '01:00:08', 2);
 INSERT INTO mission (id, title, contents, writer_id, deadline_time, running_time, status) values ( 68, 'mission19', 'mission19 contents', 99, '2020-07-28T03:00', '01:00:09', 2);
 INSERT INTO mission (id, title, contents, writer_id, deadline_time, running_time, status) values ( 69, 'mission20', 'mission20 contents', 99, '2020-07-29T03:00', '01:00:10', 2);
+
+INSERT INTO activity (id, member_id) values( 51, 99)
+INSERT INTO activity (id, member_id) values( 52, 99)
+INSERT INTO activity (id, member_id) values( 53, 99)
+INSERT INTO activity (id, member_id) values( 54, 99)
+INSERT INTO activity (id, member_id) values( 55, 99)
+INSERT INTO activity (id, member_id) values( 56, 99)
+INSERT INTO activity (id, member_id) values( 57, 99)
+INSERT INTO activity (id, member_id) values( 58, 99)
+
+
+INSERT INTO grass(id, member_id, activity_id, generated_time) values(91, 99, 51, '2020-07-11T03:00')
+INSERT INTO grass(id, member_id, activity_id, generated_time) values(92, 99, 52, '2020-07-12T03:00')
+INSERT INTO grass(id, member_id, activity_id, generated_time) values(93, 99, 53, '2020-07-13T03:00')
+INSERT INTO grass(id, member_id, activity_id, generated_time) values(94, 99, 54, '2020-07-14T03:00')
+INSERT INTO grass(id, member_id, activity_id, generated_time) values(95, 99, 55, '2020-07-15T03:00')
+INSERT INTO grass(id, member_id, activity_id, generated_time) values(96, 99, 56, '2020-07-16T03:00')
+INSERT INTO grass(id, member_id, activity_id, generated_time) values(97, 99, 57, '2020-07-17T03:00')

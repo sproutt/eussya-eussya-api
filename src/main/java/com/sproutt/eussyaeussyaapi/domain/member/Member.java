@@ -2,6 +2,8 @@ package com.sproutt.eussyaeussyaapi.domain.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MemberDTO;
+import com.sproutt.eussyaeussyaapi.domain.activity.Activity;
+import com.sproutt.eussyaeussyaapi.domain.grass.Grass;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import lombok.Builder;
 import lombok.Getter;
@@ -48,6 +50,9 @@ public class Member {
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
     private List<Mission> missions = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Grass> grasses = new ArrayList<>();
+
     @Builder
     public Member(String memberId, String password, String email, String nickName, String authentication, Provider provider, Role role) {
         this.memberId = memberId;
@@ -74,6 +79,10 @@ public class Member {
 
     public void addMission(Mission mission) {
         missions.add(mission);
+    }
+
+    public void addActivities(Grass grass){
+        grasses.add(grass);
     }
 
     public boolean isSame(Member member) {
