@@ -1,5 +1,7 @@
 package com.sproutt.eussyaeussyaapi.domain.chat;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.sproutt.eussyaeussyaapi.api.chat.dto.ChatRoomResponseDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,7 +22,8 @@ public class ChatRoom {
     @Column(unique = true)
     private ChatRoomType type;
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ChatMessage> messages = new ArrayList<>();
 
     public static ChatRoom createOneOnOne() {
@@ -36,5 +39,9 @@ public class ChatRoom {
 
     public void addChatMessage(ChatMessage chatMessage) {
         this.messages.add(chatMessage);
+    }
+
+    public ChatRoomResponseDTO toResponseDTO() {
+        return new ChatRoomResponseDTO(this.id, this.type);
     }
 }

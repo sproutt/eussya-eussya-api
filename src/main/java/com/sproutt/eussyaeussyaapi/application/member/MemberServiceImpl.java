@@ -90,6 +90,12 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.findByMemberId(memberId).orElseThrow(NoSuchMemberException::new);
     }
 
+
+    @Override
+    public Member findChatParticipantByMemberId(String memberId) {
+        return memberRepository.findByMemberId(memberId).orElseThrow(NotExistMemberException::new);
+    }
+
     @Override
     public List<Member> findAllExclude(String memberId) {
         if (memberId == null) {

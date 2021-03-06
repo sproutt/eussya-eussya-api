@@ -1,7 +1,10 @@
 package com.sproutt.eussyaeussyaapi.domain.member;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MemberDTO;
+import com.sproutt.eussyaeussyaapi.domain.chat.ChatMessage;
 import com.sproutt.eussyaeussyaapi.domain.chat.ChatRoom;
 import com.sproutt.eussyaeussyaapi.domain.chat.ChatRoomJoin;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;

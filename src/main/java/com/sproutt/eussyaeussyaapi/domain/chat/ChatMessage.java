@@ -1,5 +1,7 @@
 package com.sproutt.eussyaeussyaapi.domain.chat;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.sproutt.eussyaeussyaapi.api.chat.dto.ChatMessageResponseDTO;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,7 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "room_id")
     private ChatRoom chatRoom;
@@ -40,5 +43,15 @@ public class ChatMessage {
 
     public Long getRoomId() {
         return this.chatRoom.getId();
+    }
+
+    public ChatMessageResponseDTO toDTO() {
+        return ChatMessageResponseDTO.builder()
+                                     .id(this.id)
+                                     .sender(this.sender.getMemberId())
+                                     .time(this.time)
+                                     .roomId(this.chatRoom.getId())
+                                     .message(this.message)
+                                     .build();
     }
 }

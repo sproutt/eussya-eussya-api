@@ -1,8 +1,11 @@
 package com.sproutt.eussyaeussyaapi.application.chat;
 
+import com.sproutt.eussyaeussyaapi.api.chat.dto.ChatMessageResponseDTO;
 import com.sproutt.eussyaeussyaapi.domain.chat.*;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
+import com.sproutt.eussyaeussyaapi.utils.exception.BadRequestException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +30,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public ChatRoom loadOneOnOneChatRoom(Member participant1, Member participant2) {
         if (participant1.isSame(participant2)) {
-            throw new RuntimeException("participant1 is equals participant2");
+            throw new BadRequestException("participant1 is equals participant2");
         }
 
         List<ChatRoom> existedChatRooms = findExistedChatRooms(ChatRoomType.ONE_ON_ONE, participant1, participant2);
@@ -37,7 +40,7 @@ public class ChatServiceImpl implements ChatService {
         }
 
         if (existedChatRooms.size() > 1) {
-            throw new RuntimeException("채팅 참여자들 포함된 1:1 채팅방이 두 개 이상이어서는 안됨");
+            throw new BadRequestException("채팅 참여자들 포함된 1:1 채팅방이 두 개 이상이어서는 안됨");
         }
 
         ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.createOneOnOne());
@@ -68,14 +71,19 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public Page<ChatMessage> loadChatMessageHistory(Long chatRoomId, Member loginMember, Pageable pageable) {
-        Set<Member> participants = findChatRoomParticipants(chatRoomId);
+    public Page<ChatMessageResponseDTO> loadChatMessageHistory(ChatRoom chatRoom, Member loginMember, Pageable pageable) {
+        Set<Member> participants = findChatRoomParticipants(chatRoom.getId());
 
         if (!participants.contains(loginMember)) {
-            throw new RuntimeException("참여자가 아니면 메세지 조회가 불가능합니다.");
+            throw new BadRequestException("참여자가 아니면 메세지 조회가 불가능합니다.");
         }
 
-        return chatMessageRepository.findAllByChatRoomId(chatRoomId, pageable);
+        Page<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomId(chatRoom.getId(), pageable);
+
+        List<ChatMessageResponseDTO> chatMessageResponseDTOList = new ArrayList<>();
+        chatMessages.getContent().forEach(message -> chatMessageResponseDTOList.add(message.toDTO()));
+
+        return new PageImpl<>(chatMessageResponseDTOList, pageable, chatMessages.getTotalElements());
     }
 
     @Override
@@ -84,7 +92,7 @@ public class ChatServiceImpl implements ChatService {
 
         List<ChatRoomJoin> chatRoomJoins = chatRoomJoinRepository.findAllByChatRoomId(chatRoomId);
         if (chatRoomJoins == null) {
-            throw new RuntimeException("존재하지 않는 채팅방입니다.");
+            throw new BadRequestException("존재하지 않는 채팅방입니다.");
         }
 
         chatRoomJoins.forEach(chatRoomJoin -> participants.add(chatRoomJoin.getParticipant()));
@@ -92,11 +100,17 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    public ChatRoom findChatRoom(Long chatRoomId) {
+        return chatRoomRepository.findById(chatRoomId).orElseThrow(NoSuchElementException::new);
+    }
+
+
+    @Override
     public ChatMessage saveChatMessage(Long chatRoomId, Member sender, String message) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(NoSuchElementException::new);
 
         if (!findChatRoomParticipants(chatRoomId).contains(sender)) {
-            throw new RuntimeException("권한 없음");
+            throw new BadRequestException("권한 없음");
         }
 
         return chatMessageRepository.save(new ChatMessage(chatRoom, sender, message));

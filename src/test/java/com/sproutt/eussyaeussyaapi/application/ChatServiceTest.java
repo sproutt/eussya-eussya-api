@@ -1,10 +1,14 @@
 package com.sproutt.eussyaeussyaapi.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sproutt.eussyaeussyaapi.api.chat.dto.ChatMessageResponseDTO;
 import com.sproutt.eussyaeussyaapi.application.chat.ChatService;
 import com.sproutt.eussyaeussyaapi.application.chat.ChatServiceImpl;
 import com.sproutt.eussyaeussyaapi.domain.chat.*;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.object.MemberFactory;
+import com.sproutt.eussyaeussyaapi.utils.exception.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +18,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -103,7 +108,7 @@ class ChatServiceTest {
     @Test
     @DisplayName("1:1 채팅방 조회 테스트 - 조회 혹은 생성될 1:1 채팅방의 두 참여자가 동일한 회원이어서는 안됨")
     void findOneOnOneChatRoomTest_when_OneOnOneChatRoom_participants_are_same_Member_then_return_fail() {
-        Exception exception = assertThrows(RuntimeException.class, () -> chatService.loadOneOnOneChatRoom(loginMember, loginMember));
+        Exception exception = assertThrows(BadRequestException.class, () -> chatService.loadOneOnOneChatRoom(loginMember, loginMember));
         assertEquals("participant1 is equals participant2", exception.getMessage());
     }
 
@@ -124,7 +129,7 @@ class ChatServiceTest {
         when(chatRoomJoinRepository.findAllByParticipant(loginMember)).thenReturn(chatRoomJoinListOfLoginMember);
         when(chatRoomJoinRepository.findAllByParticipant(anotherMember)).thenReturn(chatRoomJoinListOfAnotherMember);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> chatService.loadOneOnOneChatRoom(loginMember, anotherMember));
+        Exception exception = assertThrows(BadRequestException.class, () -> chatService.loadOneOnOneChatRoom(loginMember, anotherMember));
         assertEquals("채팅 참여자들 포함된 1:1 채팅방이 두 개 이상이어서는 안됨", exception.getMessage());
     }
 
@@ -160,55 +165,59 @@ class ChatServiceTest {
 
         when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Collections.singletonList(new ChatRoomJoin()));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> chatService.loadChatMessageHistory(chatRoomId, loginMember, pageable));
+        Exception exception = assertThrows(BadRequestException.class, () -> chatService.loadChatMessageHistory(ChatRoom.createOneOnOne(), loginMember, pageable));
         assertEquals("참여자가 아니면 메세지 조회가 불가능합니다.", exception.getMessage());
     }
 
     @Test
     @DisplayName("채팅 메세지 히스토리 조회 테스트") // pagination, lazy load
-    void loadChatMessageHistoryTest() {
+    void loadChatMessageHistoryTest() throws JsonProcessingException {
         Long chatRoomId = 1l;
-        ChatRoom chatRoom = ChatRoom.createOneOnOne();
-        ChatRoomJoin chatRoomJoin = new ChatRoomJoin(loginMember, chatRoom);
-        ChatMessage chatMessage1 = new ChatMessage(chatRoom, loginMember, "으쌰으쌰 메세지 테스트1");
+        ObjectMapper objectMapper = new ObjectMapper();
+        ChatRoom mockChatRoom = objectMapper.readValue("{\"id\":"+ chatRoomId +",\"type\":\"ONE_ON_ONE\",\"messages\":[]}", ChatRoom.class);
+        ChatRoomJoin chatRoomJoin = new ChatRoomJoin(loginMember, mockChatRoom);
+        ChatMessage chatMessage1 = new ChatMessage(mockChatRoom, loginMember, "으쌰으쌰 메세지 테스트1");
 
         List<ChatMessage> chatMessageList = new ArrayList<>();
         chatMessageList.add(chatMessage1);
 
         Pageable pageable = PageRequest.of(0, 20, Sort.by("time"));
 
-        when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Collections.singletonList(chatRoomJoin));
-        when(chatMessageRepository.findAllByChatRoomId(chatRoomId, pageable)).thenReturn(new PageImpl<>(chatMessageList, pageable, 1));
+        when(chatRoomJoinRepository.findAllByChatRoomId(eq(chatRoomId))).thenReturn(Collections.singletonList(chatRoomJoin));
+        when(chatMessageRepository.findAllByChatRoomId(eq(chatRoomId), eq(pageable))).thenReturn(new PageImpl<>(chatMessageList, pageable, 1));
 
-        Page<ChatMessage> chatMessageHistory = chatService.loadChatMessageHistory(chatRoomId, loginMember, pageable);
+        Page<ChatMessageResponseDTO> chatMessageHistory = chatService.loadChatMessageHistory(mockChatRoom, loginMember, pageable);
         assertEquals(chatMessageHistory.getTotalElements(), 1);
         assertEquals("으쌰으쌰 메세지 테스트1", chatMessageHistory.getContent().get(0).getMessage());
     }
 
     @Test
     @DisplayName("채팅 메세지 히스토리 조회 테스트 - 채팅 방이 존재하지 않는 경우 에러") // pagination, lazy load
-    void loadChatMessageHistoryTest_when_not_exist_chatRoom_return_empty_list() {
+    void loadChatMessageHistoryTest_when_not_exist_chatRoom_return_empty_list() throws JsonProcessingException {
         Long chatRoomId = 1l;
+        ObjectMapper objectMapper = new ObjectMapper();
+        ChatRoom mockChatRoom = objectMapper.readValue("{\"id\":"+ chatRoomId +",\"type\":\"ONE_ON_ONE\",\"messages\":[]}", ChatRoom.class);
         Pageable pageable = PageRequest.of(0, 20, Sort.by("time"));
 
         when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(null);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> chatService.loadChatMessageHistory(chatRoomId, loginMember, pageable));
-        assertEquals(exception.getMessage(), "존재하지 않는 채팅방입니다.");
+        Exception exception = assertThrows(BadRequestException.class, () -> chatService.loadChatMessageHistory(mockChatRoom, loginMember, pageable));
+        assertEquals("존재하지 않는 채팅방입니다.", exception.getMessage());
     }
 
     @Test
     @DisplayName("채팅 메세지 히스토리 조회 테스트 - 히스토리가 없으면 빈 List 리턴") // pagination, lazy load
-    void loadChatMessageHistoryTest_when_not_exist_return_empty_list() {
+    void loadChatMessageHistoryTest_when_not_exist_return_empty_list() throws JsonProcessingException {
         Long chatRoomId = 1l;
-        ChatRoom chatRoom = ChatRoom.createOneOnOne();
-        ChatRoomJoin chatRoomJoin = new ChatRoomJoin(loginMember, chatRoom);
+        ObjectMapper objectMapper = new ObjectMapper();
+        ChatRoom mockChatRoom = objectMapper.readValue("{\"id\":"+ chatRoomId +",\"type\":\"ONE_ON_ONE\",\"messages\":[]}", ChatRoom.class);
+        ChatRoomJoin chatRoomJoin = new ChatRoomJoin(loginMember, mockChatRoom);
         Pageable pageable = PageRequest.of(0, 20, Sort.by("time"));
 
         when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Collections.singletonList(chatRoomJoin));
         when(chatMessageRepository.findAllByChatRoomId(chatRoomId, pageable)).thenReturn(new PageImpl<>(new ArrayList<>()));
 
-        Page<ChatMessage> chatMessageHistory = chatService.loadChatMessageHistory(chatRoomId, loginMember, pageable);
+        Page<ChatMessageResponseDTO> chatMessageHistory = chatService.loadChatMessageHistory(mockChatRoom, loginMember, pageable);
 
         assertEquals(chatMessageHistory.getTotalElements(), 0);
     }
@@ -225,7 +234,7 @@ class ChatServiceTest {
         when(chatMessageRepository.save(chatMessage)).thenReturn(chatMessage);
         when(chatRoomJoinRepository.findAllByChatRoomId(chatRoomId)).thenReturn(Collections.singletonList(chatRoomJoin));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> chatService.saveChatMessage(chatRoomId, loginMember, "으쌰으쌰 메세지 테스트1"));
+        Exception exception = assertThrows(BadRequestException.class, () -> chatService.saveChatMessage(chatRoomId, loginMember, "으쌰으쌰 메세지 테스트1"));
         assertEquals("권한 없음", exception.getMessage());
     }
 

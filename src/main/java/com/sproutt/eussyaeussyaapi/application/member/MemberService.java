@@ -27,5 +27,7 @@ public interface MemberService {
 
     Member findByMemberId(String memberId);
 
+    Member findChatParticipantByMemberId(String memberId);
+
     List<Member> findAllExclude(String memberId);
 }

@@ -1,5 +1,6 @@
 package com.sproutt.eussyaeussyaapi.application.chat;
 
+import com.sproutt.eussyaeussyaapi.api.chat.dto.ChatMessageResponseDTO;
 import com.sproutt.eussyaeussyaapi.domain.chat.ChatMessage;
 import com.sproutt.eussyaeussyaapi.domain.chat.ChatRoom;
 import com.sproutt.eussyaeussyaapi.domain.chat.ChatRoomType;
@@ -15,9 +16,11 @@ public interface ChatService {
 
     List<ChatRoom> findExistedChatRooms(ChatRoomType chatRoomType, Member... participants);
 
-    Page<ChatMessage> loadChatMessageHistory(Long chatRoomId, Member loginMember, Pageable pageable);
+    Page<ChatMessageResponseDTO> loadChatMessageHistory(ChatRoom chatRoom, Member loginMember, Pageable pageable);
 
     Set<Member> findChatRoomParticipants(Long chatRoomId);
 
     ChatMessage saveChatMessage(Long chatRoomId, Member Sender, String message);
+
+    ChatRoom findChatRoom(Long chatRoomId);
 }

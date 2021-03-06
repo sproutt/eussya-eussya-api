@@ -10,6 +10,7 @@ import com.sproutt.eussyaeussyaapi.api.security.exception.InvalidAccessTokenExce
 import com.sproutt.eussyaeussyaapi.api.security.exception.InvalidRefreshTokenException;
 import com.sproutt.eussyaeussyaapi.domain.member.exceptions.*;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.*;
+import com.sproutt.eussyaeussyaapi.utils.exception.BadRequestException;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestControllerAdvice
@@ -59,6 +61,13 @@ public class GlobalExceptionHandler {
         log.info("response: {}", response.toString());
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = BadRequestException.class)
+    public ResponseEntity badRequestException(BadRequestException exception) {
+        log.info("BadRequestException : {}", exception);
+
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(exception.getMessage());
     }
 
     @ExceptionHandler(value = NotSatisfiedCondition.class)
@@ -154,11 +163,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(exception.getMessage());
     }
 
+    @ExceptionHandler(value = NoSuchElementException.class)
+    public ResponseEntity handleNoSuchElementException(NoSuchElementException exception) {
+        log.info("handleNoSuchMemberException : {}", exception);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(exception.getMessage());
+    }
+
     @ExceptionHandler(value = NoSuchMemberException.class)
     public ResponseEntity handleNoSuchMemberException(NoSuchMemberException exception) {
         log.info("handleNoSuchMemberException : {}", exception);
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(value = NotExistMemberException.class)
+    public ResponseEntity handleNotExistedMemberException(NotExistMemberException exception) {
+        log.info("handleNoExistMemberException : {}", exception);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(exception.getMessage());
     }
 
 
