@@ -8,6 +8,7 @@ import java.util.Optional;
 
 @Service
 public interface FileService {
+
     Optional<File> findByNickName(String nickName);
 
     void saveProfile(Member loginMember, String storagePath);
