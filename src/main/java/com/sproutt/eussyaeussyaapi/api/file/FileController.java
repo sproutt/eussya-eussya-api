@@ -32,9 +32,19 @@ public class FileController {
     private final MemberService memberService;
 
     @PostMapping("/profile")
-    public ResponseEntity uploadProfile(@RequestHeader HttpHeaders requestHeaders, @LoginMember MemberTokenCommand memberTokenCommand,@RequestParam("file") MultipartFile multipartFile) throws IOException, ImageProcessingException {
+    public ResponseEntity uploadProfile(@RequestHeader HttpHeaders requestHeaders,
+                                        @LoginMember MemberTokenCommand memberTokenCommand,
+                                        @RequestParam("file") MultipartFile multipartFile) throws IOException {
+        if (multipartFile.isEmpty())
+            return new ResponseEntity(new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        String fileType = s3Service.getContentType(multipartFile.getOriginalFilename());
+        if (!((fileType.equals("jpg") ||
+                fileType.equals("jpeg") ||
+                fileType.equals("png")))) {
+            return new ResponseEntity(new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        }
         Member loginMember = memberService.findTokenOwner(memberTokenCommand);
-        String fileKey = s3Service.upload(loginMember.getNickName(), multipartFile);
+        String fileKey = s3Service.upload(loginMember.getNickName(), multipartFile, fileType);
         fileService.saveProfile(loginMember, fileKey);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -45,10 +55,10 @@ public class FileController {
     public ResponseEntity<FileDto> getProfile(@PathVariable String nickName) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        if(fileService.findByNickName(nickName).isPresent()){
-            File file = fileService.findByNickName(nickName).get();
-            return new ResponseEntity<>(new FileDto(nickName, file.getStoragePath()), headers, HttpStatus.OK);
+        if (fileService.findByNickName(nickName).isEmpty()) {
+            return new ResponseEntity<>(new FileDto(nickName, defaultProfileKey), headers, HttpStatus.OK);
         }
-        return new ResponseEntity<>(new FileDto(nickName, defaultProfileKey), headers, HttpStatus.OK);
+        File file = fileService.findByNickName(nickName).get();
+        return new ResponseEntity<>(new FileDto(nickName, file.getStoragePath()), headers, HttpStatus.OK);
     }
 }

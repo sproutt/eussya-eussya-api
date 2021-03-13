@@ -11,7 +11,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
-    public static final String CLOUD_FRONT_DOMAIN_NAME = "dugjnp7kky4tj.cloudfront.net";
+    public static final String CLOUD_FRONT_DOMAIN_NAME = "https://dugjnp7kky4tj.cloudfront.net/";
 
     private final FileRepository fileRepository;
 
@@ -21,17 +21,17 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void saveProfile(Member loginMember, String fileKey) {
-        String storagePath = "https://" + CLOUD_FRONT_DOMAIN_NAME + "/" + fileKey;
+    public File saveProfile(Member loginMember, String fileKey) {
+        String storagePath = CLOUD_FRONT_DOMAIN_NAME + fileKey;
         if (!fileRepository.findByNickName(loginMember.getNickName()).isPresent()) {
-            fileRepository.save(File.builder()
+            return fileRepository.save(File.builder()
                     .member(loginMember)
                     .storagePath(storagePath)
                     .fileKey(fileKey)
                     .build());
         } else {
             File file = fileRepository.findByNickName(loginMember.getNickName()).get();
-            fileRepository.save(file.updateFile(storagePath, fileKey));
+            return fileRepository.save(file.updateFile(storagePath, fileKey));
         }
     }
 }

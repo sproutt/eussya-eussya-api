@@ -46,21 +46,21 @@ public class S3Service {
                 .build();
     }
 
-    public String upload(String nickName, MultipartFile file) throws IOException {
-        if(fileService.findByNickName(nickName).isPresent()) {
+    public String upload(String nickName, MultipartFile file, String fileType) throws IOException {
+        if (fileService.findByNickName(nickName).isPresent()) {
             String originFileKey = fileService.findByNickName(nickName).get().getFileKey();
             if (s3Client.doesObjectExist(bucket, originFileKey)) {
                 s3Client.deleteObject(bucket, originFileKey);
             }
         }
         SimpleDateFormat date = new SimpleDateFormat("yyyymmddHHmmss");
-        String newFileKey = nickName + infix + getContentType(file.getOriginalFilename()) + "-" + date.format(new Date());
+        String newFileKey = nickName + infix + fileType + "-" + date.format(new Date());
         s3Client.putObject(new PutObjectRequest(bucket, newFileKey, file.getInputStream(), null)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
         return newFileKey;
     }
 
-    private String getContentType(String filePath) {
+    public String getContentType(String filePath) {
         String[] strings = filePath.split("\\.");
         return strings[strings.length - 1];
     }

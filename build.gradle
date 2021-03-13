@@ -66,6 +66,12 @@ test {
 
     def JASYPT_PASSWORD = project.getProperties()["JASYPT_PASSWORD"]
     environment 'JASYPT_PASSWORD', JASYPT_PASSWORD
+
+    def AWS_ACCESS_KEY = project.getProperties()["AWS_ACCESS_KEY"]
+    environment 'AWS_ACCESS_KEY', AWS_ACCESS_KEY
+
+    def AWS_SECRET_KEY = project.getProperties()["AWS_SECRET_KEY"]
+    environment 'AWS_SECRET_KEY', AWS_SECRET_KEY
 }
 
 jacocoTestReport {
