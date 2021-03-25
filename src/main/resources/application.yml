@@ -69,6 +69,10 @@ cloud:
       secretKey: ${AWS_SECRET_KEY}
     s3:
       bucket: springboot-s3-cloudfront-ex
+      profile:
+        default: https://dugjnp7kky4tj.cloudfront.net/default_profile.jpg
+    cloudFront:
+        domain: https://dugjnp7kky4tj.cloudfront.net/
     region:
       static: ap-northeast-2
     stack:

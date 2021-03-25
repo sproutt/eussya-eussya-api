@@ -40,7 +40,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String[] PUBLIC = {"/auth/**", "/oauth2/**", "/signUp/**", "/phrase/**", "/members/**", "/login/**", "/email-auth/**"};
 
-
     @Override
     public void configure(WebSecurity web) {
         web

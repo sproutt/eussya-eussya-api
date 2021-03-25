@@ -46,14 +46,14 @@ public class MemberServiceImpl implements MemberService {
         }
 
         Member member = Member.builder()
-                              .memberId(memberJoinCommand.getMemberId())
-                              .password(passwordEncoder.encode(memberJoinCommand.getPassword()))
-                              .email(memberJoinCommand.getMemberId())
-                              .nickName(memberJoinCommand.getNickName())
-                              .authentication("N")
-                              .role(Role.USER)
-                              .provider(Provider.LOCAL)
-                              .build();
+                .memberId(memberJoinCommand.getMemberId())
+                .password(passwordEncoder.encode(memberJoinCommand.getPassword()))
+                .email(memberJoinCommand.getMemberId())
+                .nickName(memberJoinCommand.getNickName())
+                .authentication("N")
+                .role(Role.USER)
+                .provider(Provider.LOCAL)
+                .build();
 
         return memberRepository.save(member);
     }
@@ -98,7 +98,7 @@ public class MemberServiceImpl implements MemberService {
 
         return memberRepository.findAll().stream().filter(member -> !member.getMemberId().equals(memberId)).collect(Collectors.toList());
     }
-  
+
     @Override
     @Transactional
     public Member authenticateEmail(EmailAuthCommand emailAuthCommand) {
@@ -110,5 +110,11 @@ public class MemberServiceImpl implements MemberService {
         member.verifyEmail();
 
         return memberRepository.save(member);
+    }
+
+    @Override
+    public Member updateProfilePath(Member loginMember, String profilePath) {
+        loginMember.saveProfilePath(profilePath);
+        return memberRepository.save(loginMember);
     }
 }
