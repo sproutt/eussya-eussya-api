@@ -73,7 +73,8 @@ public class ProfileControllerTest extends HeaderSetUpWithToken {
                 .with(csrf())
                 .headers(headers));
         //then
-        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(status().isCreated());
     }
 }
+
 

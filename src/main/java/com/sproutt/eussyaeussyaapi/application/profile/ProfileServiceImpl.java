@@ -5,7 +5,6 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.ProfileContentType;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,20 +14,23 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
-@RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
+    private final AmazonS3 s3Client;
+    private final String bucket;
+    private final String cloudFrontDomain;
+    private final String defaultProfilePath;
+
     private static final String INFIX = "_profile.";
 
-    private final AmazonS3 s3Client;
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
-
-    @Value("${cloud.aws.cloudFront.domain}")
-    private String cloudFrontDomain;
-
-    @Value("${cloud.aws.s3.profile.default}")
-    private String defaultProfilePath;
+    public ProfileServiceImpl(AmazonS3 s3Client,
+                              @Value("${cloud.aws.s3.bucket}") String bucket,
+                              @Value("${cloud.aws.cloudFront.domain}") String cloudFrontDomain,
+                              @Value("${cloud.aws.s3.profile.default}") String defaultProfilePath) {
+        this.s3Client = s3Client;
+        this.bucket = bucket;
+        this.cloudFrontDomain = cloudFrontDomain;
+        this.defaultProfilePath = defaultProfilePath;
+    }
 
     @Override
     public String uploadProfile(Member loginMember, MultipartFile file) throws IOException {
@@ -63,3 +65,4 @@ public class ProfileServiceImpl implements ProfileService {
         return splitProfilePath[profileKeyIndex];
     }
 }
+
