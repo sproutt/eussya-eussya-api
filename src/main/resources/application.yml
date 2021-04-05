@@ -41,6 +41,10 @@ logging:
         type:
           descriptor:
             sql: trace
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
 
 jwt:
   secret: secret
@@ -58,3 +62,18 @@ api:
   cors:
     allow-origins: https://eussya-eussya.com, https://www.eussya-eussya.com, http://eussya-eussya.com, http://www.eussya-eussya.com
 
+cloud:
+  aws:
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY}
+      secretKey: ${AWS_SECRET_KEY}
+    s3:
+      bucket: springboot-s3-cloudfront-ex
+      profile:
+        default: https://dugjnp7kky4tj.cloudfront.net/default_profile.jpg
+    cloudFront:
+        domain: https://dugjnp7kky4tj.cloudfront.net/
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false

@@ -1,16 +1,13 @@
 package com.sproutt.eussyaeussyaapi.domain.member;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MemberDTO;
-import com.sproutt.eussyaeussyaapi.domain.chat.ChatMessage;
-import com.sproutt.eussyaeussyaapi.domain.chat.ChatRoom;
 import com.sproutt.eussyaeussyaapi.domain.chat.ChatRoomJoin;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -21,6 +18,8 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class Member {
+    @Value("${cloud.aws.s3.profile.default}")
+    public String defaultProfilePath;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -53,6 +52,9 @@ public class Member {
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
     private List<Mission> missions = new ArrayList<>();
 
+    @Column(nullable = false)
+    private String profilePath;
+
     @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
     private List<ChatRoomJoin> chatRoomJoins = new ArrayList<>();
 
@@ -65,6 +67,7 @@ public class Member {
         this.authentication = authentication;
         this.provider = provider;
         this.role = role;
+        this.profilePath = defaultProfilePath;
     }
 
     public void changeAuthCode(String authCode) {
@@ -73,11 +76,11 @@ public class Member {
 
     public MemberTokenCommand toJwtInfo() {
         return MemberTokenCommand.builder()
-                                 .id(this.id)
-                                 .memberId(this.memberId)
-                                 .nickName(this.nickName)
-                                 .role(this.role)
-                                 .build();
+                .id(this.id)
+                .memberId(this.memberId)
+                .nickName(this.nickName)
+                .role(this.role)
+                .build();
     }
 
     public void addMission(Mission mission) {
@@ -91,7 +94,8 @@ public class Member {
     @Override
     public String toString() {
         return "Member{" +
-                "id=" + id +
+                "defaultProfilePath='" + defaultProfilePath + '\'' +
+                ", id=" + id +
                 ", memberId='" + memberId + '\'' +
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
@@ -100,15 +104,16 @@ public class Member {
                 ", provider=" + provider +
                 ", role=" + role +
                 ", missions=" + missions +
+                ", profilePath='" + profilePath + '\'' +
                 '}';
     }
 
     public MemberDTO toDTO() {
         return MemberDTO.builder()
-                        .id(this.id)
-                        .memberId(this.memberId)
-                        .nickName(this.nickName)
-                        .build();
+                .id(this.id)
+                .memberId(this.memberId)
+                .nickName(this.nickName)
+                .build();
     }
 
     public void verifyEmail() {
@@ -117,5 +122,9 @@ public class Member {
 
     public boolean isVerified() {
         return this.authentication.equals("Y");
+    }
+
+    public void saveProfilePath(String profilePath) {
+        this.profilePath = profilePath;
     }
 }
