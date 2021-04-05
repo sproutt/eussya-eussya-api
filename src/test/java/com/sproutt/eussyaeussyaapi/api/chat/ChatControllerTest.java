@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutt.eussyaeussyaapi.api.HeaderSetUpWithToken;
 import com.sproutt.eussyaeussyaapi.api.chat.dto.ChatMessageResponseDTO;
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
+import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.application.chat.ChatService;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.domain.chat.ChatMessage;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -58,6 +60,12 @@ public class ChatControllerTest extends HeaderSetUpWithToken {
 
     @MockBean
     private MemberService memberService;
+
+    @MockBean
+    private SimpMessageSendingOperations messagingTemplate;
+
+    @MockBean
+    private JwtHelper jwtHelper;
 
     private HttpHeaders headers;
     private Member loginMember;
