@@ -26,9 +26,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
-    @Value("${cloud.aws.s3.profile.default}")
-    public String defaultProfilePath;
-
     private final MemberRepository memberRepository;
     private final MailService mailService;
     private final PasswordEncoder passwordEncoder;
@@ -59,7 +56,6 @@ public class MemberServiceImpl implements MemberService {
                 .authentication("N")
                 .role(Role.USER)
                 .provider(Provider.LOCAL)
-                .profilePath(defaultProfilePath)
                 .build();
 
         return memberRepository.save(member);
