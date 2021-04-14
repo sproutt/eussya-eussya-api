@@ -13,7 +13,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.Image;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -39,12 +45,21 @@ public class ProfileServiceTest {
     @Test
     @DisplayName("프로필 등록을 하면 S3에 업로드한 URL이 반환된다")
     void saveProfileTest() throws IOException {
-        MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "multipart/form-data", "Spring Framework".getBytes());
-        String tmpProfilePath = cloudFrontDomain + loginMember.getNickName() + "_profile.jpg";
+        URL url = Thread.currentThread().getContextClassLoader().getResource("default_profile.jpeg");
+        Image tmpImage = ImageIO.read(url);
+
+        BufferedImage bufferedImage = new BufferedImage(tmpImage.getWidth(null), tmpImage.getHeight(null), BufferedImage.TYPE_INT_RGB);
+        Graphics graphics = bufferedImage.getGraphics();
+        graphics.drawImage(tmpImage, 0, 0, null);
+        graphics.dispose();
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage, "jpeg", byteArrayOutputStream);
+
+        MockMultipartFile file = new MockMultipartFile("default_profile", "default_profile.jpeg", "multipart/form-data", byteArrayOutputStream.toByteArray());
+        String tmpProfilePath = cloudFrontDomain + loginMember.getNickName() + "_profile.jpeg";
         String newProfilePath = profileService.uploadProfile(loginMember, file);
 
         assertTrue(newProfilePath.contains(tmpProfilePath));
     }
 }
-
-

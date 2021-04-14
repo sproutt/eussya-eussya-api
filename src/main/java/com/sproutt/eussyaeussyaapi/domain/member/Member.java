@@ -55,7 +55,7 @@ public class Member {
     private String profilePath;
 
     @Builder
-    public Member(String memberId, String password, String email, String nickName, String authentication, Provider provider, Role role) {
+    public Member(String memberId, String password, String email, String nickName, String authentication, Provider provider, Role role, String profilePath) {
         this.memberId = memberId;
         this.password = password;
         this.email = email;
@@ -63,7 +63,7 @@ public class Member {
         this.authentication = authentication;
         this.provider = provider;
         this.role = role;
-        this.profilePath = defaultProfilePath;
+        this.profilePath = profilePath;
     }
 
     public void changeAuthCode(String authCode) {

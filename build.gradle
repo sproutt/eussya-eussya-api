@@ -49,6 +49,7 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-aws-jdbc'
     implementation 'org.springframework.cloud:spring-cloud-starter-aws-messaging'
     implementation 'com.drewnoakes:metadata-extractor:2.15.0'
+    compile group: 'org.springframework', name: 'spring-test', version: '5.1.0.RELEASE'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testAnnotationProcessor 'org.projectlombok:lombok'

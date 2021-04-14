@@ -11,6 +11,11 @@ spring:
         show_sql: true
         format_sql: true
 
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
   #gmail SMTP
   mail:
     host: smtp.gmail.com
