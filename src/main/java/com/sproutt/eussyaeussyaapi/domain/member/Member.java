@@ -6,6 +6,7 @@ import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@DynamicInsert
 @NoArgsConstructor
 public class Member {
     @Value("${cloud.aws.s3.profile.default}")
@@ -51,7 +53,7 @@ public class Member {
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
     private List<Mission> missions = new ArrayList<>();
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'https://dugjnp7kky4tj.cloudfront.net/default_profile.jpg'")
     private String profilePath;
 
     @Builder
@@ -63,7 +65,6 @@ public class Member {
         this.authentication = authentication;
         this.provider = provider;
         this.role = role;
-        this.profilePath = defaultProfilePath;
     }
 
     public void changeAuthCode(String authCode) {

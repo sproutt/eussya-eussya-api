@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.ProfileContentType;
+import com.sproutt.eussyaeussyaapi.utils.ImageResizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,8 +43,9 @@ public class ProfileServiceImpl implements ProfileService {
             }
         }
         String postFix = "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        String newFileKey = loginMember.getNickName() + INFIX + getContentType(file.getOriginalFilename()) + postFix;
-        s3Client.putObject(new PutObjectRequest(bucket, newFileKey, file.getInputStream(), null)
+        String contentType = getContentType(file.getOriginalFilename());
+        String newFileKey = loginMember.getNickName() + INFIX + contentType + postFix;
+        s3Client.putObject(new PutObjectRequest(bucket, newFileKey, ImageResizer.resizeImage(file, contentType).getInputStream(), null)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
         return cloudFrontDomain + newFileKey;
     }
@@ -65,4 +67,3 @@ public class ProfileServiceImpl implements ProfileService {
         return splitProfilePath[profileKeyIndex];
     }
 }
-
