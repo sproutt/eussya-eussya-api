@@ -55,6 +55,11 @@ public class ProfileServiceImpl implements ProfileService {
         return ProfileContentType.isImageType(getContentType(fileName));
     }
 
+    @Override
+    public String getDefaultProfilePath(Member loginMember) {
+        return defaultProfilePath;
+    }
+
     private String getContentType(String filePath) {
         String[] splitFilePath = filePath.split("\\.");
         int contentTypeIndex = splitFilePath.length - 1;

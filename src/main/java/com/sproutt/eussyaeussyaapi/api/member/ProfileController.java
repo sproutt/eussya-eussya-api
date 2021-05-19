@@ -15,10 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -54,5 +51,23 @@ public class ProfileController {
         memberService.updateProfilePath(loginMember, profilePath);
 
         return new ResponseEntity(headers, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "기본 프로필 이미지로 변경 확인")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Success Reset Profile"),
+            @ApiResponse(code = 400, message = "Request Error")
+    })
+    @PutMapping("/profile")
+    public ResponseEntity resetProfile(@RequestHeader HttpHeaders requestHeaders,
+                                       @LoginMember MemberTokenCommand memberTokenCommand) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Member loginMember = memberService.findTokenOwner(memberTokenCommand);
+        String defaultProfilePath = profileService.getDefaultProfilePath(loginMember);
+        memberService.updateProfilePath(loginMember, defaultProfilePath);
+
+        return new ResponseEntity(headers, HttpStatus.OK);
     }
 }
