@@ -65,7 +65,7 @@ public class ProfileController {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         Member loginMember = memberService.findTokenOwner(memberTokenCommand);
-        String defaultProfilePath = profileService.getDefaultProfilePath(loginMember);
+        String defaultProfilePath = profileService.resetProfile(loginMember);
         memberService.updateProfilePath(loginMember, defaultProfilePath);
 
         return new ResponseEntity(headers, HttpStatus.OK);

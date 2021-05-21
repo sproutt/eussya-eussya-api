@@ -13,5 +13,5 @@ public interface ProfileService {
 
     boolean isImageType(String fileName);
 
-    String getDefaultProfilePath(Member loginMember);
+    String resetProfile(Member loginMember);
 }

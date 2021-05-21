@@ -65,7 +65,7 @@ public class ProfileServiceTest {
     @Test
     @DisplayName("기본 프로필 경로를 반환한다.")
     void getDefaultProfilePath() {
-        String tmpDefaultProfilePath = profileService.getDefaultProfilePath(loginMember);
+        String tmpDefaultProfilePath = profileService.resetProfile(loginMember);
 
         assertTrue(defaultProfilePath.equals(tmpDefaultProfilePath));
     }
