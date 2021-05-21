@@ -15,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -28,6 +29,8 @@ import java.time.format.DateTimeFormatter;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ProfileController.class, excludeFilters = @ComponentScan.Filter(EnableWebSecurity.class))
@@ -74,6 +77,21 @@ public class ProfileControllerTest extends HeaderSetUpWithToken {
                 .headers(headers));
         //then
         resultActions.andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("프로필 제거를 요청할 경우 사용자의 프로필이 기본 프로필 경로로 바뀐다.")
+    void resetProfileTest() throws Exception {
+        //given
+        given(memberService.findTokenOwner(any())).willReturn(loginMember);
+        //when
+        ResultActions resultActions = mockMvc.perform(put("/profile")
+                .with(csrf())
+                .characterEncoding("UTF-8")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print());
+        //then
+        resultActions.andExpect(status().isOk());
     }
 }
 
