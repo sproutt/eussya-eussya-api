@@ -27,9 +27,9 @@ public class ProfileServiceTest {
     private ProfileService profileService;
     private Member loginMember;
 
-    private static final String cloudFrontDomain = "https://dugjnp7kky4tj.cloudfront.net/";
-    private static final String defaultProfilePath = "https://dugjnp7kky4tj.cloudfront.net/default_profile.jpg";
-    private static final String bucket = "springboot-s3-cloudfront-ex";
+    private static final String cloudFrontDomain = "https://d3kjmjnyg8cjdl.cloudfront.net/";
+    private static final String defaultProfilePath = "https://d3kjmjnyg8cjdl.cloudfront.net/default_profile.jpg";
+    private static final String bucket = "eussya-eussya-bucket";
 
     @Mock
     private AmazonS3 amazonS3;
