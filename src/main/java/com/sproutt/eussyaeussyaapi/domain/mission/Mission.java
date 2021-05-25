@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.AbstractAggregateRoot;
 
 import javax.persistence.*;
 import java.time.*;
@@ -18,7 +19,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Mission {
+public class Mission extends AbstractAggregateRoot<Mission> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -132,6 +133,7 @@ public class Mission {
 
     public void complete() {
         this.status = MissionStatus.COMPLETE;
+        registerEvent(new MissionCompleteEvent(this));
     }
 
     public void updateRunningTime() {
