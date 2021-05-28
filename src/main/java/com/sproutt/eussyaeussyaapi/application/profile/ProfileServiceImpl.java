@@ -35,13 +35,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public String uploadProfile(Member loginMember, MultipartFile file) throws IOException {
-        String loginMemberProfilePath = loginMember.getProfilePath();
-        if (!loginMemberProfilePath.equals(defaultProfilePath)) {
-            String profileKey = getProfileKey(loginMemberProfilePath);
-            if (s3Client.doesObjectExist(bucket, profileKey)) {
-                s3Client.deleteObject(bucket, profileKey);
-            }
-        }
+        deletePreviousObject(loginMember);
         String postFix = "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         String contentType = getContentType(file.getOriginalFilename());
         String newFileKey = loginMember.getNickName() + INFIX + contentType + postFix;
@@ -53,6 +47,22 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public boolean isImageType(String fileName) {
         return ProfileContentType.isImageType(getContentType(fileName));
+    }
+
+    @Override
+    public String resetProfile(Member loginMember) {
+        deletePreviousObject(loginMember);
+        return defaultProfilePath;
+    }
+
+    private void deletePreviousObject(Member loginMember) {
+        String loginMemberProfilePath = loginMember.getProfilePath();
+        if (!loginMemberProfilePath.equals(defaultProfilePath)) {
+            String profileKey = getProfileKey(loginMemberProfilePath);
+            if (s3Client.doesObjectExist(bucket, profileKey)) {
+                s3Client.deleteObject(bucket, profileKey);
+            }
+        }
     }
 
     private String getContentType(String filePath) {

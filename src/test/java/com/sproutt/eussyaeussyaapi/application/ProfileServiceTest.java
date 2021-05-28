@@ -14,8 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
 import javax.imageio.ImageIO;
-import java.awt.Image;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,9 +27,9 @@ public class ProfileServiceTest {
     private ProfileService profileService;
     private Member loginMember;
 
-    private static final String cloudFrontDomain = "https://dugjnp7kky4tj.cloudfront.net/";
-    private static final String defaultProfilePath = "https://dugjnp7kky4tj.cloudfront.net/default_profile.jpg";
-    private static final String bucket = "springboot-s3-cloudfront-ex";
+    private static final String cloudFrontDomain = "https://d3kjmjnyg8cjdl.cloudfront.net/";
+    private static final String defaultProfilePath = "https://d3kjmjnyg8cjdl.cloudfront.net/default_profile.jpg";
+    private static final String bucket = "eussya-eussya-bucket";
 
     @Mock
     private AmazonS3 amazonS3;
@@ -61,5 +60,13 @@ public class ProfileServiceTest {
         String newProfilePath = profileService.uploadProfile(loginMember, file);
 
         assertTrue(newProfilePath.contains(tmpProfilePath));
+    }
+
+    @Test
+    @DisplayName("기본 프로필 경로를 반환한다.")
+    void getDefaultProfilePath() {
+        String tmpDefaultProfilePath = profileService.resetProfile(loginMember);
+
+        assertTrue(defaultProfilePath.equals(tmpDefaultProfilePath));
     }
 }

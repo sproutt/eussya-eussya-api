@@ -15,10 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -36,23 +33,44 @@ public class ProfileController {
             @ApiResponse(code = 201, message = "Success Upload Profile"),
             @ApiResponse(code = 400, message = "Request Error")
     })
-    @PostMapping("/profile")
-    public ResponseEntity uploadProfile(@RequestHeader HttpHeaders requestHeaders,
+    @PostMapping("/members/{id}/profile")
+    public ResponseEntity uploadProfile(@PathVariable Long id,
+                                        @RequestHeader HttpHeaders requestHeaders,
                                         @LoginMember MemberTokenCommand memberTokenCommand,
                                         @RequestParam("file") MultipartFile multipartFile) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
-        if (multipartFile.isEmpty()) {
-            return new ResponseEntity(new HttpHeaders(), HttpStatus.BAD_REQUEST);
-        }
-        if (!(profileService.isImageType(multipartFile.getOriginalFilename()))) {
-            return new ResponseEntity(new HttpHeaders(), HttpStatus.BAD_REQUEST);
-        }
         Member loginMember = memberService.findTokenOwner(memberTokenCommand);
+        if (!memberService.isSameUser(loginMember, id)) {
+            return new ResponseEntity(headers, HttpStatus.FORBIDDEN);
+        }
+        if (multipartFile.isEmpty() || !(profileService.isImageType(multipartFile.getOriginalFilename()))) {
+            return new ResponseEntity(new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        }
         String profilePath = profileService.uploadProfile(loginMember, multipartFile);
         memberService.updateProfilePath(loginMember, profilePath);
 
         return new ResponseEntity(headers, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "기본 프로필 이미지로 변경 확인")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Success Reset Profile"),
+            @ApiResponse(code = 400, message = "Request Error")
+    })
+    @PutMapping("//members/{id}/profile")
+    public ResponseEntity resetProfile(@PathVariable Long id,
+                                       @RequestHeader HttpHeaders requestHeaders,
+                                       @LoginMember MemberTokenCommand memberTokenCommand) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Member loginMember = memberService.findTokenOwner(memberTokenCommand);
+        if (!memberService.isSameUser(loginMember, id)) {
+            return new ResponseEntity(headers, HttpStatus.FORBIDDEN);
+        }
+        String defaultProfilePath = profileService.resetProfile(loginMember);
+        memberService.updateProfilePath(loginMember, defaultProfilePath);
+
+        return new ResponseEntity(headers, HttpStatus.OK);
     }
 }

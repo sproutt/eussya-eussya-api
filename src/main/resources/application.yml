@@ -73,11 +73,11 @@ cloud:
       accessKey: ${AWS_ACCESS_KEY}
       secretKey: ${AWS_SECRET_KEY}
     s3:
-      bucket: springboot-s3-cloudfront-ex
+      bucket: eussya-eussya-bucket
       profile:
-        default: https://dugjnp7kky4tj.cloudfront.net/default_profile.jpg
+        default: https://d3kjmjnyg8cjdl.cloudfront.net/default_profile.jpg
     cloudFront:
-        domain: https://dugjnp7kky4tj.cloudfront.net/
+        domain: https://d3kjmjnyg8cjdl.cloudfront.net/
     region:
       static: ap-northeast-2
     stack:

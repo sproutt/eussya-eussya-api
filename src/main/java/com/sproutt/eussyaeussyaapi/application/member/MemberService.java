@@ -30,4 +30,6 @@ public interface MemberService {
     List<Member> findAllExclude(String memberId);
 
     Member updateProfilePath(Member loginMember, String profilePath);
+
+    boolean isSameUser(Member member, Long id);
 }

@@ -12,4 +12,6 @@ public interface ProfileService {
     String uploadProfile(Member loginMember, MultipartFile file) throws IOException;
 
     boolean isImageType(String fileName);
+
+    String resetProfile(Member loginMember);
 }

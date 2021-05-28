@@ -120,4 +120,9 @@ public class MemberServiceImpl implements MemberService {
         loginMember.saveProfilePath(profilePath);
         return memberRepository.save(loginMember);
     }
+
+    @Override
+    public boolean isSameUser(Member member, Long id) {
+        return member.getId().equals(id);
+    }
 }
