@@ -53,7 +53,7 @@ public class Member {
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
     private List<Mission> missions = new ArrayList<>();
 
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'https://dugjnp7kky4tj.cloudfront.net/default_profile.jpg'")
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'https://d3kjmjnyg8cjdl.cloudfront.net/default_profile.jpg'")
     private String profilePath;
 
     @Builder

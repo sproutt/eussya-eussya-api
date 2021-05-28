@@ -33,15 +33,15 @@ public class ProfileController {
             @ApiResponse(code = 201, message = "Success Upload Profile"),
             @ApiResponse(code = 400, message = "Request Error")
     })
-    @PostMapping("/members/{memberId}/profile")
-    public ResponseEntity uploadProfile(@PathVariable String memberId,
+    @PostMapping("/members/{id}/profile")
+    public ResponseEntity uploadProfile(@PathVariable Long id,
                                         @RequestHeader HttpHeaders requestHeaders,
                                         @LoginMember MemberTokenCommand memberTokenCommand,
                                         @RequestParam("file") MultipartFile multipartFile) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         Member loginMember = memberService.findTokenOwner(memberTokenCommand);
-        if (!memberService.isSameUser(loginMember, memberId)) {
+        if (!memberService.isSameUser(loginMember, id)) {
             return new ResponseEntity(headers, HttpStatus.FORBIDDEN);
         }
         if (multipartFile.isEmpty() || !(profileService.isImageType(multipartFile.getOriginalFilename()))) {
@@ -58,14 +58,14 @@ public class ProfileController {
             @ApiResponse(code = 200, message = "Success Reset Profile"),
             @ApiResponse(code = 400, message = "Request Error")
     })
-    @PutMapping("//members/{memberId}/profile")
-    public ResponseEntity resetProfile(@PathVariable String memberId,
+    @PutMapping("//members/{id}/profile")
+    public ResponseEntity resetProfile(@PathVariable Long id,
                                        @RequestHeader HttpHeaders requestHeaders,
                                        @LoginMember MemberTokenCommand memberTokenCommand) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         Member loginMember = memberService.findTokenOwner(memberTokenCommand);
-        if (!memberService.isSameUser(loginMember, memberId)) {
+        if (!memberService.isSameUser(loginMember, id)) {
             return new ResponseEntity(headers, HttpStatus.FORBIDDEN);
         }
         String defaultProfilePath = profileService.resetProfile(loginMember);

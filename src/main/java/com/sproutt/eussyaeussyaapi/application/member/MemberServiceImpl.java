@@ -122,7 +122,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public boolean isSameUser(Member member, String memberId) {
-        return member.getMemberId().equals(memberId);
+    public boolean isSameUser(Member member, Long id) {
+        return member.getId().equals(id);
     }
 }
