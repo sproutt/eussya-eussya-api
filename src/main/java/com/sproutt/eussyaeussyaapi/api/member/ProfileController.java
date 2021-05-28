@@ -33,20 +33,20 @@ public class ProfileController {
             @ApiResponse(code = 201, message = "Success Upload Profile"),
             @ApiResponse(code = 400, message = "Request Error")
     })
-    @PostMapping("/profile")
-    public ResponseEntity uploadProfile(@RequestHeader HttpHeaders requestHeaders,
+    @PostMapping("/members/{memberId}/profile")
+    public ResponseEntity uploadProfile(@PathVariable String memberId,
+                                        @RequestHeader HttpHeaders requestHeaders,
                                         @LoginMember MemberTokenCommand memberTokenCommand,
                                         @RequestParam("file") MultipartFile multipartFile) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
-        if (multipartFile.isEmpty()) {
-            return new ResponseEntity(new HttpHeaders(), HttpStatus.BAD_REQUEST);
-        }
-        if (!(profileService.isImageType(multipartFile.getOriginalFilename()))) {
-            return new ResponseEntity(new HttpHeaders(), HttpStatus.BAD_REQUEST);
-        }
         Member loginMember = memberService.findTokenOwner(memberTokenCommand);
+        if (!memberService.isSameUser(loginMember, memberId)) {
+            return new ResponseEntity(headers, HttpStatus.FORBIDDEN);
+        }
+        if (multipartFile.isEmpty() || !(profileService.isImageType(multipartFile.getOriginalFilename()))) {
+            return new ResponseEntity(new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        }
         String profilePath = profileService.uploadProfile(loginMember, multipartFile);
         memberService.updateProfilePath(loginMember, profilePath);
 
@@ -58,13 +58,16 @@ public class ProfileController {
             @ApiResponse(code = 200, message = "Success Reset Profile"),
             @ApiResponse(code = 400, message = "Request Error")
     })
-    @PutMapping("/profile")
-    public ResponseEntity resetProfile(@RequestHeader HttpHeaders requestHeaders,
+    @PutMapping("//members/{memberId}/profile")
+    public ResponseEntity resetProfile(@PathVariable String memberId,
+                                       @RequestHeader HttpHeaders requestHeaders,
                                        @LoginMember MemberTokenCommand memberTokenCommand) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
         Member loginMember = memberService.findTokenOwner(memberTokenCommand);
+        if (!memberService.isSameUser(loginMember, memberId)) {
+            return new ResponseEntity(headers, HttpStatus.FORBIDDEN);
+        }
         String defaultProfilePath = profileService.resetProfile(loginMember);
         memberService.updateProfilePath(loginMember, defaultProfilePath);
 
