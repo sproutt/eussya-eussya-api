@@ -5,6 +5,7 @@ import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.api.security.auth.CustomAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -72,6 +73,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .requestMatchers(CorsUtils::isPreFlightRequest)
                         .permitAll()
                     .antMatchers(PUBLIC)
+                        .permitAll()
+                    .antMatchers(HttpMethod.GET, "/ws-stomp/**")
                         .permitAll()
                     .anyRequest()
                         .authenticated()

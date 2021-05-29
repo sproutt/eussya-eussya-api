@@ -2,6 +2,7 @@ package com.sproutt.eussyaeussyaapi.domain.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberTokenCommand;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MemberDTO;
+import com.sproutt.eussyaeussyaapi.domain.chat.ChatRoomJoin;
 import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import lombok.Builder;
 import lombok.Getter;
@@ -56,6 +57,9 @@ public class Member {
     @Column(nullable = false, columnDefinition = "varchar(255) default 'https://d3kjmjnyg8cjdl.cloudfront.net/default_profile.jpg'")
     private String profilePath;
 
+    @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
+    private List<ChatRoomJoin> chatRoomJoins = new ArrayList<>();
+
     @Builder
     public Member(String memberId, String password, String email, String nickName, String authentication, Provider provider, Role role) {
         this.memberId = memberId;
@@ -85,7 +89,7 @@ public class Member {
     }
 
     public boolean isSame(Member member) {
-        return this == member;
+        return this.getMemberId().equals(member.getMemberId());
     }
 
     @Override
