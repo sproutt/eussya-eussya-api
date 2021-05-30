@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.AbstractAggregateRoot;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -14,7 +15,7 @@ import java.time.*;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Mission {
+public class Mission extends AbstractAggregateRoot<Mission> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -84,6 +85,7 @@ public class Mission {
 
     public void complete() {
         this.status = MissionStatus.COMPLETE;
+        registerEvent(new MissionCompleteEvent(this));
     }
 
     public boolean isComplete() {

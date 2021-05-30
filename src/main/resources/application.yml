@@ -11,6 +11,11 @@ spring:
         show_sql: true
         format_sql: true
 
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
   #gmail SMTP
   mail:
     host: smtp.gmail.com
@@ -41,6 +46,10 @@ logging:
         type:
           descriptor:
             sql: trace
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
 
 jwt:
   secret: secret
@@ -62,3 +71,19 @@ time:
   start: 4
   end: 9
   limit: 12
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY}
+      secretKey: ${AWS_SECRET_KEY}
+    s3:
+      bucket: eussya-eussya-bucket
+      profile:
+        default: https://d3kjmjnyg8cjdl.cloudfront.net/default_profile.jpg
+    cloudFront:
+        domain: https://d3kjmjnyg8cjdl.cloudfront.net/
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false

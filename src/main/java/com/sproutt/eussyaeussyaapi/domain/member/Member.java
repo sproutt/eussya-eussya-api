@@ -6,6 +6,8 @@ import com.sproutt.eussyaeussyaapi.domain.mission.Mission;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -14,8 +16,11 @@ import java.util.List;
 
 @Entity
 @Getter
+@DynamicInsert
 @NoArgsConstructor
 public class Member {
+    @Value("${cloud.aws.s3.profile.default}")
+    public String defaultProfilePath;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -48,6 +53,9 @@ public class Member {
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
     private List<Mission> missions = new ArrayList<>();
 
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'https://d3kjmjnyg8cjdl.cloudfront.net/default_profile.jpg'")
+    private String profilePath;
+
     @Builder
     public Member(String memberId, String password, String email, String nickName, String authentication, Provider provider, Role role) {
         this.memberId = memberId;
@@ -65,11 +73,11 @@ public class Member {
 
     public MemberTokenCommand toJwtInfo() {
         return MemberTokenCommand.builder()
-                                 .id(this.id)
-                                 .memberId(this.memberId)
-                                 .nickName(this.nickName)
-                                 .role(this.role)
-                                 .build();
+                .id(this.id)
+                .memberId(this.memberId)
+                .nickName(this.nickName)
+                .role(this.role)
+                .build();
     }
 
     public void addMission(Mission mission) {
@@ -83,7 +91,8 @@ public class Member {
     @Override
     public String toString() {
         return "Member{" +
-                "id=" + id +
+                "defaultProfilePath='" + defaultProfilePath + '\'' +
+                ", id=" + id +
                 ", memberId='" + memberId + '\'' +
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
@@ -92,15 +101,16 @@ public class Member {
                 ", provider=" + provider +
                 ", role=" + role +
                 ", missions=" + missions +
+                ", profilePath='" + profilePath + '\'' +
                 '}';
     }
 
     public MemberDTO toDTO() {
         return MemberDTO.builder()
-                        .id(this.id)
-                        .memberId(this.memberId)
-                        .nickName(this.nickName)
-                        .build();
+                .id(this.id)
+                .memberId(this.memberId)
+                .nickName(this.nickName)
+                .build();
     }
 
     public void verifyEmail() {
@@ -109,5 +119,9 @@ public class Member {
 
     public boolean isVerified() {
         return this.authentication.equals("Y");
+    }
+
+    public void saveProfilePath(String profilePath) {
+        this.profilePath = profilePath;
     }
 }

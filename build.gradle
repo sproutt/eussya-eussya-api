@@ -15,6 +15,10 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set('springCloudVersion', "Hoxton.SR10")
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.h2database:h2'
@@ -41,6 +45,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws'
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws-jdbc'
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws-messaging'
+    implementation 'com.drewnoakes:metadata-extractor:2.15.0'
+    compile group: 'org.springframework', name: 'spring-test', version: '5.1.0.RELEASE'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testAnnotationProcessor 'org.projectlombok:lombok'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
@@ -57,11 +67,23 @@ test {
 
     def JASYPT_PASSWORD = project.getProperties()["JASYPT_PASSWORD"]
     environment 'JASYPT_PASSWORD', JASYPT_PASSWORD
+
+    def AWS_ACCESS_KEY = project.getProperties()["AWS_ACCESS_KEY"]
+    environment 'AWS_ACCESS_KEY', AWS_ACCESS_KEY
+
+    def AWS_SECRET_KEY = project.getProperties()["AWS_SECRET_KEY"]
+    environment 'AWS_SECRET_KEY', AWS_SECRET_KEY
 }
 
 jacocoTestReport {
     reports {
         xml.enabled = true // coveralls plugin depends on xml format report
         html.enabled = true
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
 }

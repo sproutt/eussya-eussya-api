@@ -9,9 +9,13 @@ import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.MemberRepository;
 import com.sproutt.eussyaeussyaapi.domain.member.Provider;
 import com.sproutt.eussyaeussyaapi.domain.member.Role;
-import com.sproutt.eussyaeussyaapi.domain.member.exceptions.*;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.DuplicationMemberException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.NoSuchMemberException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.VerificationException;
+import com.sproutt.eussyaeussyaapi.domain.member.exceptions.WrongPasswordException;
 import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +26,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
-
     private final MemberRepository memberRepository;
     private final MailService mailService;
     private final PasswordEncoder passwordEncoder;
@@ -46,14 +49,14 @@ public class MemberServiceImpl implements MemberService {
         }
 
         Member member = Member.builder()
-                              .memberId(memberJoinCommand.getMemberId())
-                              .password(passwordEncoder.encode(memberJoinCommand.getPassword()))
-                              .email(memberJoinCommand.getMemberId())
-                              .nickName(memberJoinCommand.getNickName())
-                              .authentication("N")
-                              .role(Role.USER)
-                              .provider(Provider.LOCAL)
-                              .build();
+                .memberId(memberJoinCommand.getMemberId())
+                .password(passwordEncoder.encode(memberJoinCommand.getPassword()))
+                .email(memberJoinCommand.getMemberId())
+                .nickName(memberJoinCommand.getNickName())
+                .authentication("N")
+                .role(Role.USER)
+                .provider(Provider.LOCAL)
+                .build();
 
         return memberRepository.save(member);
     }
@@ -98,7 +101,7 @@ public class MemberServiceImpl implements MemberService {
 
         return memberRepository.findAll().stream().filter(member -> !member.getMemberId().equals(memberId)).collect(Collectors.toList());
     }
-  
+
     @Override
     @Transactional
     public Member authenticateEmail(EmailAuthCommand emailAuthCommand) {
@@ -110,5 +113,16 @@ public class MemberServiceImpl implements MemberService {
         member.verifyEmail();
 
         return memberRepository.save(member);
+    }
+
+    @Override
+    public Member updateProfilePath(Member loginMember, String profilePath) {
+        loginMember.saveProfilePath(profilePath);
+        return memberRepository.save(loginMember);
+    }
+
+    @Override
+    public boolean isSameUser(Member member, Long id) {
+        return member.getId().equals(id);
     }
 }
