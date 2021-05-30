@@ -6,11 +6,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CompleteMissionResponseDTO extends MissionResponseDTO {
+public class CompletedMissionResponseDTO extends MissionResponseDTO {
 
     private String result;
 
-    public CompleteMissionResponseDTO(Mission mission) {
+    public CompletedMissionResponseDTO(Mission mission) {
         super(mission);
         this.result = mission.getResult();
     }

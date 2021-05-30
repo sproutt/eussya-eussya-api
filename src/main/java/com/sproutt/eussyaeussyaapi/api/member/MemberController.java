@@ -2,7 +2,7 @@ package com.sproutt.eussyaeussyaapi.api.member;
 
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberJoinCommand;
 import com.sproutt.eussyaeussyaapi.api.member.dto.MemberLoginCommand;
-import com.sproutt.eussyaeussyaapi.api.mission.dto.MemberDTO;
+import com.sproutt.eussyaeussyaapi.api.member.dto.MemberDTO;
 import com.sproutt.eussyaeussyaapi.api.security.JwtHelper;
 import com.sproutt.eussyaeussyaapi.api.security.dto.JwtDTO;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;

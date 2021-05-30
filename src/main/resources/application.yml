@@ -67,6 +67,11 @@ api:
   cors:
     allow-origins: https://eussya-eussya.com, https://www.eussya-eussya.com, http://eussya-eussya.com, http://www.eussya-eussya.com
 
+time:
+  start: 4
+  end: 9
+  limit: 12
+
 cloud:
   aws:
     credentials:

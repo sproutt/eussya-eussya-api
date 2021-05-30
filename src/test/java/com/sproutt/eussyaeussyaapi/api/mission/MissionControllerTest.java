@@ -2,7 +2,6 @@ package com.sproutt.eussyaeussyaapi.api.mission;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutt.eussyaeussyaapi.api.HeaderSetUpWithToken;
-import com.sproutt.eussyaeussyaapi.api.mission.dto.CompleteMissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.api.mission.dto.MissionRequestDTO;
 import com.sproutt.eussyaeussyaapi.application.member.MemberService;
 import com.sproutt.eussyaeussyaapi.application.mission.MissionService;
@@ -35,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -61,37 +60,43 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     private HttpHeaders headers;
     private Member loginMember;
     private List<Mission> missionsList;
+    private Map<String, String> mockMissionRequestDTO;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         headers = setUpHeader();
         loginMember = MemberFactory.getDefaultMember();
         missionsList = setMockMissionList();
+
+        mockMissionRequestDTO = new HashMap<>();
+        mockMissionRequestDTO.put("title", "test_title");
+        mockMissionRequestDTO.put("contents", "test_contents");
+        mockMissionRequestDTO.put("deadlineTime", "2020-07-15T00:00:00.000Z");
     }
 
     @Test
     @DisplayName("미션 등록 요청 - 정상적인 경우")
-    void createMissionTest() throws Exception {
+    void createMissionTest_then_return_created() throws Exception {
         headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
 
         MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .deadlineTime(LocalDateTime.of(2020, 07, 15, 0, 0, 0))
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
 
-        given(memberService.findTokenOwner(any())).willReturn(loginMember);
-        given(missionService.create(any(), any())).willReturn(mission);
+        given(memberService.findTokenOwner(eq(loginMember.toJwtInfo()))).willReturn(loginMember);
+        given(missionService.create(eq(loginMember), eq(missionRequestDTO))).willReturn(mission);
 
         ResultActions actions = mvc.perform(post("/missions")
                 .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(missionRequestDTO)))
+                .content(asJsonString(mockMissionRequestDTO)))
                                    .andDo(print());
 
         actions.andExpect(status().isCreated());
@@ -99,12 +104,12 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
 
     @Test
     @DisplayName("미션 등록 요청 - 입력이 잘못된 경우")
-    void createMissionTest_withWrongInput() throws Exception {
+    void createMissionTest_with_invalid_input_then_return_badRequest() throws Exception {
         MissionRequestDTO wrongMissionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("")
                 .contents(" ")
-                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .deadlineTime(LocalDateTime.of(2020, 07, 15, 0, 0, 0))
                 .build();
 
         Mission mission = new Mission(loginMember, wrongMissionRequestDTO);
@@ -124,8 +129,8 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
 
     @Test
     @DisplayName("미션 조회 요청")
-    void readMissionTest_withDate() throws Exception {
-        given(missionService.findByWriter(any())).willReturn(missionsList);
+    void readMissionTest_withDate_then_return_ok() throws Exception {
+        given(missionService.findByWriter(eq(loginMember))).willReturn(missionsList);
 
         ResultActions actions = mvc.perform(get("/missions")
                 .with(csrf())
@@ -139,20 +144,20 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
 
     @Test
     @DisplayName("미션 수정 요청 - 정상적인 경우")
-    void updateMissionTest() throws Exception {
+    void updateMissionTest_then_return_ok() throws Exception {
         headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
 
         MissionRequestDTO updatedMissionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("update")
                 .contents("update_contents")
-                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .deadlineTime(LocalDateTime.of(2020, 07, 15, 0, 0, 0))
                 .build();
 
 
         Mission updatedMission = new Mission(loginMember, updatedMissionRequestDTO);
 
-        given(memberService.findTokenOwner(any())).willReturn(loginMember);
+        given(memberService.findTokenOwner(eq(loginMember.toJwtInfo()))).willReturn(loginMember);
         given(missionService.update(loginMember, 0l, updatedMissionRequestDTO)).willReturn(updatedMission);
 
         ResultActions actions = mvc.perform(put("/missions/0")
@@ -160,7 +165,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
                 .headers(headers)
                 .characterEncoding("utf-8")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(updatedMissionRequestDTO)))
+                .content(asJsonString(mockMissionRequestDTO)))
                                    .andDo(print());
 
         actions.andExpect(status().isOk());
@@ -168,21 +173,21 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
 
     @Test
     @DisplayName("미션 수정 요청 - 입력이 잘못된 경우")
-    void updateMissionTest_withWrongInput() throws Exception {
+    void updateMissionTest_with_invalid_input_then_return_badRequest() throws Exception {
         headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
 
         MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .deadlineTime(LocalDateTime.of(2020, 07, 15, 0, 0, 0))
                 .build();
 
         MissionRequestDTO wrongUpdatedMissionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("")
                 .contents(" ")
-                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .deadlineTime(LocalDateTime.of(2020, 07, 15, 0, 0, 0))
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
@@ -204,7 +209,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
 
     @Test
     @DisplayName("미션 삭제 요청 - 정상적인 경우")
-    void deleteMissionTest() throws Exception {
+    void deleteMissionTest_then_return_ok() throws Exception {
         ResultActions actions = mvc.perform(delete("/missions/0")
                 .with(csrf())
                 .headers(headers)
@@ -217,7 +222,7 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
 
     @Test
     @DisplayName("미션 삭제 요청 - 작성자와 일치하지 않는 경우")
-    void deleteMissionTest_WithWrongWriter() throws Exception {
+    void deleteMissionTest_when_not_matched_writer_then_return_badRequest() throws Exception {
         doThrow(new NoPermissionException()).when(missionService).delete(any(), any());
 
         ResultActions actions = mvc.perform(delete("/missions/0")
@@ -231,50 +236,24 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     }
 
     @Test
-    @DisplayName("미션 시작 요청")
-    void startMissionTest() throws Exception {
-        String time = "2020-07-15T05:00:00.00Z";
-        Map<String, String> mapForJson = new HashMap<>();
-        mapForJson.put("time", time);
-
-        doNothing().when(missionService).completeMission(any(), any(), any());
-
-        ResultActions actions = mvc.perform(put("/missions/0/progress")
-                .with(csrf())
-                .headers(headers)
-                .characterEncoding("utf-8")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(mapForJson)))
-                                   .andDo(print());
-
-        actions.andExpect(status().isOk());
-    }
-
-    @Test
     @DisplayName("미션 달성 요청 - 정상적인 경우")
-    void completeMissionTest() throws Exception {
-        String time = "2020-07-15T05:00:00.00Z";
-        CompleteMissionRequestDTO completeMissionRequestDTO = new CompleteMissionRequestDTO(time, "result contents...");
-
-        doNothing().when(missionService).completeMission(any(), any(), any());
+    void completeMissionTest_then_return_ok() throws Exception {
+        doNothing().when(missionService).completeMission(eq(loginMember), any());
 
         ResultActions actions = mvc.perform(put("/missions/0/complete")
                 .with(csrf())
                 .headers(headers)
                 .characterEncoding("utf-8")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(completeMissionRequestDTO)))
+                .contentType(MediaType.APPLICATION_JSON))
                                    .andDo(print());
 
         actions.andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("미션 달성 요청 - 목표 시간을 채우지 못한 경우")
-    void completeMissionTest_withWrongProgressTime() throws Exception {
-        headers.setZonedDateTime("date", ZonedDateTime.of(2020, 7, 4, 5, 0, 0, 0, ZoneId.of("Asia/Seoul")));
-
-        doThrow(NotSatisfiedCondition.class).when(missionService).completeMission(any(), any(), any());
+    @DisplayName("미션 달성 요청 - 목표 시간이 지나지 않았을 때 요청한 경우")
+    void completeMissionTest_when_before_deadline_time_then_return_badRequest() throws Exception {
+        doThrow(NotSatisfiedCondition.class).when(missionService).completeMission(any(), any());
 
         ResultActions actions = mvc.perform(put("/missions/0/complete")
                 .with(csrf())
@@ -288,18 +267,18 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
 
     @Test
     @DisplayName("미션 결과 수정 요청 - 정상적인 경우")
-    void writeMissionResultTest() throws Exception {
+    void writeMissionResultTest_when_status_complete_then_return_ok() throws Exception {
         MissionRequestDTO missionRequestDTO = MissionRequestDTO
                 .builder()
                 .title("test_title")
                 .contents("test_contents")
-                .deadlineTime("2020-07-15T00:00:00.00Z")
+                .deadlineTime(LocalDateTime.of(2020, 07, 15, 0, 0, 0))
                 .build();
 
         Mission mission = new Mission(loginMember, missionRequestDTO);
         mission.complete();
 
-        given(memberService.findTokenOwner(any())).willReturn(loginMember);
+        given(memberService.findTokenOwner(loginMember.toJwtInfo())).willReturn(loginMember);
         given(missionService.updateMissionResult(loginMember, 0l, "test result")).willReturn(mission);
 
         ResultActions actions = mvc.perform(put("/missions/0/result")
@@ -314,10 +293,10 @@ public class MissionControllerTest extends HeaderSetUpWithToken {
     }
 
     @Test
-    @DisplayName("미션 결과 수정 요청 - 비정상적인 경우")
-    void writeMissionResultTest_with_wrong_request() throws Exception {
-        given(memberService.findTokenOwner(any())).willReturn(loginMember);
-        doThrow(NotCompletedMissionException.class).when(missionService).updateMissionResult(any(), any(), any());
+    @DisplayName("미션 결과 수정 요청 - 미션이 complete 되지 않은 경우")
+    void writeMissionResultTest_with_status_not_complete_then_return_badRequest() throws Exception {
+        given(memberService.findTokenOwner(loginMember.toJwtInfo())).willReturn(loginMember);
+        doThrow(NotCompletedMissionException.class).when(missionService).updateMissionResult(any(), anyLong(), anyString());
 
         ResultActions actions = mvc.perform(put("/missions/0/result")
                 .with(csrf())

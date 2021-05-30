@@ -1,48 +1,34 @@
 package com.sproutt.eussyaeussyaapi.api.aspect.mission;
 
+import com.sproutt.eussyaeussyaapi.application.mission.ServiceTimeProperties;
 import com.sproutt.eussyaeussyaapi.domain.mission.exceptions.NotAvailableTimeException;
+import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 
 @Component
 @Aspect
+@RequiredArgsConstructor
 public class MissionAspect {
 
     private static final String ZONE_SEOUL = "Asia/Seoul";
-    private static final int START_AVAILABLE_HOUR = 0;
-    private static final int END_AVAILABLE_HOUR = 23;
+    private final ServiceTimeProperties serviceTimeProperties;
 
     @Before("@annotation(AvailableTime)")
     public void checkAvailableTime() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-
-        LocalDateTime now = changeEpochMilliToLocalTime(request.getDateHeader("date"));
-        System.out.println(now);
-        System.out.println(LocalDateTime.now());
-
-        if (!isAvailableTime(now)) {
+        if (!isAvailableTime(LocalDateTime.now(ZoneId.of(ZONE_SEOUL)))) {
             throw new NotAvailableTimeException();
         }
     }
 
-    private LocalDateTime changeEpochMilliToLocalTime(long epochMilli) {
-        Instant requestInstant = Instant.ofEpochMilli(epochMilli);
-
-        return requestInstant.atZone(ZoneId.of(ZONE_SEOUL)).toLocalDateTime();
-    }
-
     private boolean isAvailableTime(LocalDateTime now) {
-        LocalDateTime startLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(START_AVAILABLE_HOUR, 0));
-        LocalDateTime endLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(END_AVAILABLE_HOUR, 59));
+        LocalDateTime startLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(serviceTimeProperties.getStartHour(), 0));
+        LocalDateTime endLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.of(serviceTimeProperties.getEndHour() - 1, 59));
 
         return now.isAfter(startLocalDateTime) && now.isBefore(endLocalDateTime);
     }

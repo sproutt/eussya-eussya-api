@@ -2,6 +2,7 @@ package com.sproutt.eussyaeussyaapi.object;
 
 import com.sproutt.eussyaeussyaapi.domain.member.Member;
 import com.sproutt.eussyaeussyaapi.domain.member.Provider;
+import com.sproutt.eussyaeussyaapi.domain.member.Role;
 import com.sproutt.eussyaeussyaapi.utils.RandomGenerator;
 
 public class MemberFactory {
@@ -15,6 +16,7 @@ public class MemberFactory {
                      .memberId(DEFAULT_MEMBER_ID)
                      .password(DEFAULT_PASSWORD)
                      .nickName(DEFAULT_NAME)
+                     .role(Role.USER)
                      .provider(Provider.LOCAL)
                      .authentication(RandomGenerator.createAuthenticationCode())
                      .build();

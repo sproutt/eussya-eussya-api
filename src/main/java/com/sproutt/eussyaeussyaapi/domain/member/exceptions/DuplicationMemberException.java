@@ -1,13 +1,12 @@
 package com.sproutt.eussyaeussyaapi.domain.member.exceptions;
 
-import com.sproutt.eussyaeussyaapi.utils.ExceptionMessage;
-
 public class DuplicationMemberException extends DuplicationException {
-    public DuplicationMemberException() {
-        super(ExceptionMessage.DUPLICATED_MEMBER_ID);
-    }
 
-    public DuplicationMemberException(String message) {
-        super(message);
+    private static final String DUPLICATED_MEMBER_ID = "중복된 아이디입니다.";
+
+    public DuplicationMemberException() {
+        super(DUPLICATED_MEMBER_ID);
+
     }
 }
+
