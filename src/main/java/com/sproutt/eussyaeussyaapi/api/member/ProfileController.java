@@ -58,7 +58,7 @@ public class ProfileController {
             @ApiResponse(code = 200, message = "Success Reset Profile"),
             @ApiResponse(code = 400, message = "Request Error")
     })
-    @PutMapping("//members/{id}/profile")
+    @PutMapping("/members/{id}/profile")
     public ResponseEntity resetProfile(@PathVariable Long id,
                                        @RequestHeader HttpHeaders requestHeaders,
                                        @LoginMember MemberTokenCommand memberTokenCommand) {
