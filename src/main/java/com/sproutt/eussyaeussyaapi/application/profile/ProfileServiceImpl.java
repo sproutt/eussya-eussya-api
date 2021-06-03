@@ -39,7 +39,7 @@ public class ProfileServiceImpl implements ProfileService {
         String postFix = "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         String contentType = getContentType(file.getOriginalFilename());
         String newFileKey = loginMember.getNickName() + INFIX + contentType + postFix;
-        s3Client.putObject(new PutObjectRequest(bucket, newFileKey, ImageResizer.resizeImage(file, contentType).getInputStream(), null)
+        s3Client.putObject(new PutObjectRequest(bucket, newFileKey, ImageResizer.resizeImage(file, contentType), null)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
         return cloudFrontDomain + newFileKey;
     }

@@ -11,6 +11,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,11 +33,12 @@ public class ImageResizerTest {
         ImageIO.write(bufferedImage, "jpeg", byteArrayOutputStream);
 
         MultipartFile image = new MockMultipartFile("default_profile", "default_profile.jpeg", "multipart/form-data", byteArrayOutputStream.toByteArray());
-        MultipartFile resizedImage = ImageResizer.resizeImage(image, "jpeg");
+        InputStream resizedImageInputStream = ImageResizer.resizeImage(image, "jpeg");
+        BufferedImage resizedImage = ImageIO.read(resizedImageInputStream);
 
         assertThat(ImageIO.read(image.getInputStream()).getHeight()).isNotEqualTo(300);
         assertThat(ImageIO.read(image.getInputStream()).getWidth()).isNotEqualTo(300);
-        assertThat(ImageIO.read(resizedImage.getInputStream()).getHeight()).isEqualTo(300);
-        assertThat(ImageIO.read(resizedImage.getInputStream()).getWidth()).isEqualTo(300);
+        assertThat(resizedImage.getHeight()).isEqualTo(300);
+        assertThat(resizedImage.getWidth()).isEqualTo(300);
     }
 }
