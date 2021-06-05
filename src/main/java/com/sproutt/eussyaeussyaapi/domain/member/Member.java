@@ -77,6 +77,7 @@ public class Member {
                 .memberId(this.memberId)
                 .nickName(this.nickName)
                 .role(this.role)
+                .profilePath(this.profilePath)
                 .build();
     }
 
