@@ -21,7 +21,7 @@ public class ImageResizer {
         }
 
         BufferedImage originImage = ImageIO.read(multipartFile.getInputStream());
-        Image resizedImage = originImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_FAST);
+        Image resizedImage = originImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_AREA_AVERAGING);
 
         BufferedImage bufferedImage = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT, BufferedImage.TYPE_INT_RGB);
         Graphics graphics = bufferedImage.getGraphics();
