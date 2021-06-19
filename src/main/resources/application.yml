@@ -1,9 +1,8 @@
-# DB
+
+# default profile
 spring:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+  profiles:
+    active: local
 
   jpa:
     properties:
@@ -57,7 +56,6 @@ jwt:
 oauth2:
   authorizedRedirectUrl: https://eussya-eussya.com/oauth/github/process
 
-
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor
@@ -82,8 +80,51 @@ cloud:
       profile:
         default: https://d3kjmjnyg8cjdl.cloudfront.net/default_profile.jpg
     cloudFront:
-        domain: https://d3kjmjnyg8cjdl.cloudfront.net/
+      domain: https://d3kjmjnyg8cjdl.cloudfront.net/
     region:
       static: ap-northeast-2
     stack:
       auto: false
+
+---
+
+# profile - local
+spring:
+  profiles: local
+  datasource:
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+---
+
+# profile - dev
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:mysql://localhost:3306/${DATABASE_NAME}?characterEncoding=UTF-8&serverTimezone=UTC
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+---
+
+# profile - real
+spring:
+  profiles: real
+  datasource:
+    url: jdbc:mysql://localhost:3306/${DATABASE_NAME}?characterEncoding=UTF-8&serverTimezone=UTC
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
