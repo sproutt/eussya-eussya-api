@@ -32,4 +32,6 @@ public interface MemberService {
     Member updateProfilePath(Member loginMember, String profilePath);
 
     boolean isSameUser(Member member, Long id);
+
+    String getProfilePathById(Long id);
 }

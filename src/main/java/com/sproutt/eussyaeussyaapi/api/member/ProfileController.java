@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -28,11 +30,27 @@ public class ProfileController {
     private final ProfileService profileService;
     private final MemberService memberService;
 
+    @ApiOperation(value = "프로필 경로 확인")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Success Get Profile"),
+            @ApiResponse(code = 400, message = "Request Error")
+    })
+    @GetMapping("/members/{id}/profile")
+    public ResponseEntity getProfile(@PathVariable Long id,
+                                     @RequestHeader HttpHeaders requestHeaders) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Map<String, String> data = new HashMap<>();
+        data.put("profilePath", memberService.getProfilePathById(id));
+        return new ResponseEntity(data, headers, HttpStatus.OK);
+    }
+
     @ApiOperation(value = "프로필 업로드 확인")
     @ApiResponses({
             @ApiResponse(code = 201, message = "Success Upload Profile"),
             @ApiResponse(code = 400, message = "Request Error")
     })
+
     @PostMapping("/members/{id}/profile")
     public ResponseEntity uploadProfile(@PathVariable Long id,
                                         @RequestHeader HttpHeaders requestHeaders,

@@ -125,4 +125,9 @@ public class MemberServiceImpl implements MemberService {
     public boolean isSameUser(Member member, Long id) {
         return member.getId().equals(id);
     }
+
+    @Override
+    public String getProfilePathById(Long id) {
+        return memberRepository.findById(id).orElseThrow(RuntimeException::new).getProfilePath();
+    }
 }
