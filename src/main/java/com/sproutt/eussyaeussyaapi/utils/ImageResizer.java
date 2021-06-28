@@ -16,11 +16,13 @@ public class ImageResizer {
     private static final int IMAGE_HEIGHT = 300;
 
     public static InputStream resizeImage(MultipartFile multipartFile, String contentType) throws IOException {
-        if (isSizeOk(ImageIO.read(multipartFile.getInputStream()))) {
-            return multipartFile.getInputStream();
+        InputStream inputStream = multipartFile.getInputStream();
+        BufferedImage originImage = ImageIO.read(inputStream);
+
+        if (isSizeOk(originImage)) {
+            return inputStream;
         }
 
-        BufferedImage originImage = ImageIO.read(multipartFile.getInputStream());
         Image resizedImage = originImage.getScaledInstance(IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_AREA_AVERAGING);
 
         BufferedImage bufferedImage = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT, BufferedImage.TYPE_INT_RGB);
